@@ -16,6 +16,10 @@ app.debug = True
 import logging
 logging.captureWarnings(True)
 
+# todo: MemCache?
+from werkzeug.contrib.cache import SimpleCache
+cache = SimpleCache()
+
 # todo: these should be moved into a settings file.
 API_KEY = "a956dacd-09ed-49d2-a610-dc9597599af3"
 URLS = {'ids': 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/',
@@ -71,63 +75,69 @@ def profile(username):
 # ids? maybe it can be used in the future to handle region?
 
 # defines the API route in which the username and the user id has been
-# supplied.
+# supplied. returns a json of all of the player stats for every champion
+# including non played champions
 @app.route('/api/stats/<username>/<user_id>/')
 def stats(username, user_id):
-    query = PlayerData.query.filter_by(player_id = user_id).all()
+    rv = cache.get('user_data_' + user_id)
+    if rv is None:
+        query = PlayerData.query.filter_by(player_id = user_id).all()
 
-    # todo: update user data if the data is old.
-    if len(query) == 0:
-        try:
-            print(str(user_id) + " does not exist as a model. Attempting to create...")
-            # todo: catching the errors!
-            r = requests.get(URLS['stats'] % str(user_id), params = {'api_key': API_KEY})
-            user_data = r.json()
-            build_stats(user_data, username)
+        # todo: update user data if the data is old.
+        if len(query) == 0:
+            try:
+                print(str(user_id) + " does not exist as a model. Attempting to create...")
+                # todo: catching the errors!
+                r = requests.get(URLS['stats'] % str(user_id), params = {'api_key': API_KEY})
+                user_data = r.json()
+                build_stats(user_data, username)
 
-            query = PlayerData.query.filter_by(player_id = user_id).all()
-        # todo: not very descriptive error. the name could not exist or maybe
-        # there was an actual overload of requests!
-        except KeyError:
-            abort(429)
+                query = PlayerData.query.filter_by(player_id = user_id).all()
+            # todo: not very descriptive error. the name could not exist or maybe
+            # there was an actual overload of requests!
+            except KeyError:
+                abort(429)
 
-    full_stats = {'scores': []}
-    query = ChampionData.query.all()
+        full_stats = {'scores': []}
+        query = ChampionData.query.all()
 
-    # todo: depricated. remove this! no need for this anymore.
-    index = 1
+        # todo: depricated. remove this! no need for this anymore.
+        index = 1
 
-    # todo: this is vastly inefficient. it goes through a LOT of data to
-    # generate this. maybe cache this? maybe not? it's user specific, so
-    # maybe cache another function that just gets champion data and adjust
-    # certain key values after it has been given?
+        # todo: this is vastly inefficient. it goes through a LOT of data to
+        # generate this. maybe cache this? maybe not? it's user specific, so
+        # maybe cache another function that just gets champion data and adjust
+        # certain key values after it has been given?
 
-    # attempts to go through all the champion data and generate the
-    # array of score information for each champion. this also appends
-    # user data and user adjustments to the data.
-    for champion in query:
-        # attempts to go through each of the players champions when playing
-        # this champion and gets their adjustment for the score
-        user_query = PlayerData.query.filter_by(player_id = user_id, champion_id = champion.champion_id).first()
-        if user_query == None:
-            adjustment = 0
-        else:
-            adjustment = user_query.get_adjustment()
+        # attempts to go through all the champion data and generate the
+        # array of score information for each champion. this also appends
+        # user data and user adjustments to the data.
+        for champion in query:
+            # attempts to go through each of the players champions when playing
+            # this champion and gets their adjustment for the score
+            user_query = PlayerData.query.filter_by(player_id = user_id, champion_id = champion.champion_id).first()
+            if user_query == None:
+                adjustment = 0
+            else:
+                adjustment = user_query.get_adjustment()
 
-        # todo: implement quick notes. quick information jabs of what they should play
-        # what they like to play and some analysis about that.
-        full_stats['scores'].append({'championName': champion.get_name(), 'championId': champion.champion_id,
-            'score': champion.get_score(False) + adjustment,
-            'role': champion.role, 'id': index, 'image': champion.get_image(),
-            'playerAdjust': adjustment, 'uriname': champion.get_image().split('.')[0],
-            'kills': champion.kills, 'deaths': champion.deaths, 'assists': champion.assists,
-            'kda': champion.get_kda(), 'winRate': champion.won * 100, 'pickRate': champion.pick_rate * 100,
-            'calculated': champion.get_calculated_win()})
+            # todo: implement quick notes. quick information jabs of what they should play
+            # what they like to play and some analysis about that.
+            full_stats['scores'].append({'championName': champion.get_name(), 'championId': champion.champion_id,
+                'score': champion.get_score(False) + adjustment,
+                'role': champion.role, 'id': index, 'image': champion.get_image(),
+                'playerAdjust': adjustment, 'uriname': champion.get_image().split('.')[0],
+                'kills': champion.kills, 'deaths': champion.deaths, 'assists': champion.assists,
+                'kda': champion.get_kda(), 'winRate': champion.won * 100, 'pickRate': champion.pick_rate * 100,
+                'calculated': champion.get_calculated_win(), 'player': username})
 
-        index += 1
+            index += 1
 
-    # returns the json of the stats as an array of scores
-    return jsonify(full_stats)
+        # returns the json of the stats as an array of scores
+        cache.set('user_data_' + user_id, full_stats, timeout = 5 * 60)
+        return jsonify(full_stats)
+    else:
+        return jsonify(rv)
 
 # defines the API route to reset the user's stats. to be implemented as a button?
 @app.route('/api/stats/<username>/<user_id>/reset/')

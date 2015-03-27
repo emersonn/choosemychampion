@@ -76,7 +76,7 @@
           // requests data from the server and stores it in the controller
           SessionService.StartSession($scope.playerName).then(function(data) {
             console.log("Yay! Found player " + data['data']['user_id'] + " from " + $scope.summonerName + ".");
-            $scope.playerId = data['data']['user_id'];
+            $scope.playerId = encodeURI(data['data']['user_id']);
 
             // todo: add handler for retries of the full information and also
             // giving better error feedback

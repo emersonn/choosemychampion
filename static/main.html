@@ -15,7 +15,8 @@
             seconds before the clock runs out.
           </p>
         </md-toolbar>
-        <md-content class="md-padding" layout="column" style="box-shadow: 0 0px 20px 0 rgba(0,0,0,.26);">
+        <!-- style="box-shadow: 0 0px 20px 0 rgba(0,0,0,.26);" -->
+        <md-content class="md-padding" layout="column">
           <div>
             <form ng-controller="SummonerController as summonerCtrl" ng-submit="summonerCtrl.getSummoner()" flex>
               <md-input-container flex>
@@ -28,56 +29,6 @@
             </form>
           </div>
         </md-content>
-        <div class="padding-sides">
-          <h4>
-            Wait, tell me again, what does this do?
-          </h4>
-          <p>
-            We've all had that moment. We are never sure what to play until the clock is about 10 seconds. Kind of
-            freak out a little bit and then we pick some randy champion that we think might be able to do well with.
-            But, we're never quite sure because sometimes we get absolutely destroyed. Why not let the computer
-            help us decide what champion to play?
-          </p>
-          <h4>
-            How does this work?
-          </h4>
-          <p>
-            Well, long story short, the system gathers not only your play information but gathers information of over
-            millions of players' results with a particular information. Using the mighty power of statistics, a bit of
-            magic, and deep data analysis, you are presented with a list of champions for each role ordered by a champion
-            score.
-          </p>
-          <h4>
-            What does this champion score represent?
-          </h4>
-          <p>
-            The champion score encompasses a lot of things. From the actual win rate of the champion, the pick rate of the
-            champion, to even the ability for the champion to acquire objectives. Most importantly the champion score also
-            includes an adjustment that represents the champions compatibility with you!
-          </p>
-          <h4>
-            I'm getting an error, try again later message!
-          </h4>
-          <p>
-            Something must have gone wrong! There are two possible reasons for this: you may have typed in the wrong summoner
-            name! If the typo'd summoner name didn't exist the system will go crazy and go kaput. Just kidding, it would
-            just say there's an error since it couldn't find it. Another reason for this is that the system is currently
-            overloaded. It automatically tries to reconnect and pull your data, but sometimes those retries may not always
-            work, also! Try again in a minute or two.
-          </p>
-          <h4>
-            Who made this?
-          </h4>
-          <p>
-            Hi. I'm Emerson. I'm a student at the University of Washington. I like to make apps for fun and hope they help people
-            out! If you have any questions, comments, or you would like to report some bugs send me an email
-            at <a href="mailto:emersonn@uw.edu">emersonn@uw.edu</a>!
-          </p>
-          <h4>
-            Legal Jibber Jabber
-          </h4>
-          <p>
-            League Champion Suggestion Engine isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends. League of Legends and Riot Games are trademarks or registered trademarks of Riot Games, Inc. League of Legends © Riot Games, Inc.
-          </p>
-        </div>
+        <!-- <md-divider></md-divider> -->
+        <!-- and look up pro players? div makes it grey and it has a shadow? -->
       </div>

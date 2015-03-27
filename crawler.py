@@ -97,7 +97,8 @@ def crawl_player(player, depth, breadth):
             sleep(1)
 
             # todo: implement skipping matches if the match has already been crawled in this
-            # session or another session. multiple matches may obscufate data.
+            # session or another session. multiple matches may obscufate data. and match_data
+            # returns an error if get_match_data.json() does not exist.
             get_match_data = requests.get(URLS['match'] + str(match['matchId']), params = {'api_key': API_KEY})
             match_data = get_match_data.json()
 

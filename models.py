@@ -268,7 +268,7 @@ class ChampionData(Base):
             from crawler import API_KEY
 
             # todo: try to match the image with already generated champions. no need
-            # to request servers if it has already been found.
+            # to request servers if it has already been found. also gives an error!
             r = requests.get(URLS['champion'] + str(self.champion_id), params = {'api_key': API_KEY, 'champData': 'image'})
             print("Dont have the image for " + self.champion_name + "...")
             self.image = r.json()['image']['full']
@@ -276,17 +276,31 @@ class ChampionData(Base):
         return self.image
 
     # todo: make this a better calculation. gives a relatively low percentage. should
-    # be normalized around 50%.
+    # be normalized around 50%. maybe also calculate champions that share a similar role?
 
     # calculates the percepted win for a particular player with this champion.
-    def get_calculated_win(self):
-        player = PlayerData.query.all()
+    def get_calculated_win(self, user_id):
+        wins = 0.0
+        seen = 0.0
+        multiplier = 1.1
 
-        wins = 0
-        seen = 0
+        player = PlayerData.query.filter_by(player_id = user_id)
+
+        """
+        champions = ChampionData.query.all()
+        champions_list = set()
+        for champion in champions:
+            if champion.role == self.role:
+                wins += champion.won
+                seen += champion.num_seen
+        """
 
         for champion in player:
             wins += champion.won
             seen += champion.sessions_played
 
-        return self.get_score(False) * (wins * 1.0 / seen)
+        if self.role == "MIDDLE" or self.role == "BOTTOM":
+            multiplier = 1.15
+
+        return (self.get_score(False) + self.get_kda() +
+            self.objective_score + self.tower_score) * min(multiplier * (wins * 1.0 / seen), 1.0)

@@ -130,7 +130,7 @@ def stats(username, user_id):
                 'playerAdjust': adjustment, 'uriname': champion.get_image().split('.')[0],
                 'kills': champion.kills, 'deaths': champion.deaths, 'assists': champion.assists,
                 'kda': champion.get_kda(), 'winRate': champion.won * 100, 'pickRate': champion.pick_rate * 100,
-                'calculated': champion.get_calculated_win(), 'player': username})
+                'calculated': champion.get_calculated_win(user_id), 'player': username})
 
             index += 1
 

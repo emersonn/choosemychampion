@@ -4,10 +4,7 @@ import sqlalchemy, datetime, requests, math
 # todo: make this into a package instead
 from models import Match, Champion, BannedChampion, BuiltItems, ChampionData
 from database import db_session
-from crawler import API_KEY
-
-# todo: put this into a settings file
-URLS = {'champion': 'https://na.api.pvp.net/api/lol/static-data/na/v1.2/champion/'}
+from settings import API_KEY, URLS
 
 # takes all the champion data of Champions and Matches and summarizes it into
 # ChampionData models which is summary data of particular champions (and their

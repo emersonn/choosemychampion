@@ -72,6 +72,8 @@ def crawl_player(player, depth, breadth):
         # not want to try to crawl if that happens, b/c program breaks, r.status_code == 429
         r = requests.get(URLS['matches'] + str(player), params = {'api_key': API_KEY, 'rankedQueues': 'RANKED_SOLO_5x5', 'endIndex': BREADTH})
 
+        # todo: maybe modify these multiline crawler messages? they kind of take up
+        # the whole console room...
         print("Projected processing time on this player: " + Fore.BLUE +
         str((breadth ** depth) * 15) + Fore.RESET + " seconds.")
         print(Fore.GREEN + "Got match history. Crawling matches: " + Fore.RESET + "["),
@@ -147,7 +149,7 @@ def crawl_player(player, depth, breadth):
 def store_match(given_match):
     # todo: fix this. it doesn't print on a new line but this may be broken in
     # python 3.
-    print("Constructing row for match: " + Fore.MAGENTA + str(given_match['matchId']) + Fore.RESET + "."),
+    print("Made row for match: " + Fore.MAGENTA + str(given_match['matchId']) + Fore.RESET + "."),
 
     # generates the match and saves it in the database.
     match = Match(match_id = given_match['matchId'],

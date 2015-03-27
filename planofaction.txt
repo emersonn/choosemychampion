@@ -107,4 +107,4 @@ Work flow: crawler.py -> analyze.py -> adjustment.py
 > need to encode the username! usernames with spaces are not working! (fixed) fix the email link?
 > maybe make it a more private email? (fixed)
 
-> settings files and decomposing some extra code.
+> settings files and decomposing some extra code, add ssh key to webfaction and sshkey from webfaction to git.

@@ -8,8 +8,8 @@
         <div flex>
           <h3>{{champion.championName}}</h3>
           <h4 class="light"><a ng-href="http://gameinfo.na.leagueoflegends.com/en/game-info/champions/{{champion.uriname|lowercase}}">Champion Profile</a>
-            <span ng-if="champion.playerAdjust != 0">- Your adjustment: <strong class="md-accent">{{champion.playerAdjust|number:0}}</strong></span>
-            <span ng-if="champion.playerAdjust == 0">- Your calculated win rate: <strong>{{champion.calculated|number:2}}%</strong></span>
+            <span ng-if="champion.playerAdjust != 0">- Your adjustment: <strong class="player-accented">{{champion.playerAdjust|number:2}} points</strong></span>
+            <span ng-if="champion.playerAdjust == 0">- Your calculated win rate: <strong class="accented">{{champion.calculated|number:2}}%</strong></span>
             <br />
             KDA: <strong>{{champion.kills|number:0}}/{{champion.deaths|number:0}}/{{champion.assists|number:0}} ({{champion.kda|number:2}})</strong> |
             Win rate: <strong>{{champion.winRate|number:0}}%</strong> |

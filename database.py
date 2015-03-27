@@ -2,7 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine('sqlite:///database/history.db', convert_unicode=True)
+from settings import DATABASE
+
+engine = create_engine(DATABASE, convert_unicode=True)
 db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
 Base = declarative_base()
@@ -19,16 +21,3 @@ def init_db():
 # todo: implement this. make a clean tables for the player data!
 def clean_db():
     import models
-    # can only do this in interpreter?
-    # db_session.query(models.BannedChampion).delete()
-    # db_session.commit()
-    # db_session.query(models.BuiltItems).delete()
-    # db_session.commit()
-    # db_session.query(models.Champion).delete()
-    # db_session.commit()
-    # db_session.query(models.Match).delete()
-    # db_session.commit()
-
-# def create_db():
-#     db_session.commit()
-#     init_db()

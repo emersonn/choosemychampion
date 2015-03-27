@@ -3,9 +3,7 @@ from sqlalchemy.orm import relationship, backref
 
 # todo: make this into a module
 from database import Base
-
-# todo: put this into a configuration file
-URLS = {'champion': 'https://na.api.pvp.net/api/lol/static-data/na/v1.2/champion/'}
+from settings import API_KEY, URLS
 
 # Match class created as the match table in the database. stores basic information about
 # the match.
@@ -113,7 +111,6 @@ class PlayerData(Base):
             if query == None:
                 print("Did not find a champion name at all. Requesting name...")
                 import requests, database
-                from crawler import API_KEY
                 try:
                     r = requests.get(URLS['champion'] + str(self.champion_id), params = {'api_key': API_KEY})
                     self.champion_name = r.json()['name']
@@ -202,7 +199,6 @@ class ChampionData(Base):
         if self.champion_name == None:
             print("Did not find a champion name at all. Requesting name...")
             import requests, database
-            from crawler import API_KEY
 
             r = requests.get(URLS['champion'] + str(self.champion_id), params = {'api_key': API_KEY})
             self.champion_name = r.json()['name']
@@ -265,7 +261,6 @@ class ChampionData(Base):
     def get_image(self):
         if self.image == None:
             import requests, database
-            from crawler import API_KEY
 
             # todo: try to match the image with already generated champions. no need
             # to request servers if it has already been found. also gives an error!

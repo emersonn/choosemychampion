@@ -1,6 +1,6 @@
 from flask import Flask, abort, jsonify, send_file
 from time import sleep
-import requests, datetime
+import requests, datetime, urllib
 
 from models import PlayerData, ChampionData
 from database import db_session
@@ -54,12 +54,13 @@ def profile(username):
     if len(query) == 0:
         try:
             print(username + " does not exist in the system. Getting user id...")
-            r = requests.get(URLS['ids'] + username, params = {'api_key': API_KEY})
-            user_id = r.json()[username]['id']
+            r = requests.get(URLS['ids'] + urllib.pathname2url(username), params = {'api_key': API_KEY})
+            # todo: very hacky, try to figure a better way
+            user_id = r.json()[r.json().keys()[0]]['id']
         # todo: fix this. this catches both 429 and 400 errors. try to catch
         # the status code instead.
         except KeyError:
-            print("Tried to get " + username + "'s id. Got 429.")
+            print("Tried to get " + username + "'s id. Got " + str(r.status_code) + ".")
             abort(429)
     else:
         # todo: multiple usernames? maybe the person has already had the username taken
@@ -86,7 +87,7 @@ def stats(username, user_id):
         # todo: update user data if the data is old.
         if len(query) == 0:
             try:
-                print(str(user_id) + " does not exist as a model. Attempting to create...")
+                print(str(user_id) + "/" + username + " does not exist as a model. Attempting to create...")
                 # todo: catching the errors!
                 r = requests.get(URLS['stats'] % str(user_id), params = {'api_key': API_KEY})
                 user_data = r.json()

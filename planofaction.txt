@@ -101,3 +101,8 @@ Work flow: crawler.py -> analyze.py -> adjustment.py
 
 > lightweight analytics? FAVICON! compress CSS and JS ensure cache management
 > is correct and fine.
+
+> cool data visualization with lots of champion data and interactive data?
+
+> need to encode the username! usernames with spaces are not working! fix the email link?
+> maybe make it a more private email?

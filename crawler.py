@@ -69,7 +69,7 @@ def crawl_player(player, depth, breadth):
         print("Crawling player " + Fore.GREEN + str(player) + Fore.RESET + " at depth of " + Fore.BLUE + str(depth) + Fore.RESET + "...")
 
         # add a try/except in which it catches if the request actually returned an error! do
-        # not want to try to crawl if that happens, b/c program breaks
+        # not want to try to crawl if that happens, b/c program breaks, r.status_code == 429
         r = requests.get(URLS['matches'] + str(player), params = {'api_key': API_KEY, 'rankedQueues': 'RANKED_SOLO_5x5', 'endIndex': BREADTH})
 
         print("Projected processing time on this player: " + Fore.BLUE +

@@ -93,3 +93,11 @@ Work flow: crawler.py -> analyze.py -> adjustment.py
 
 > now their browser has all the data they need so they can navigate between
 > the top lane, mid lane, and the champion names.
+
+
+> todo at the moment: go through all the todos. github this. implement all the
+> "minificiation" techniques and clean up all code! use dependency downloaders
+> such as bower and stuff!
+
+> lightweight analytics? FAVICON! compress CSS and JS ensure cache management
+> is correct and fine.

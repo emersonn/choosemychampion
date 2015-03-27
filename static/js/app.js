@@ -1,4 +1,5 @@
     (function() {
+      // todo: clean this up
       var app = angular.module('league', ['ngMaterial', 'ngRoute', 'ngResource', 'ngAnimate']);
 
       app.config(['$routeProvider', '$httpProvider', '$mdThemingProvider', function($routeProvider, $httpProvider, $mdThemingProvider) {

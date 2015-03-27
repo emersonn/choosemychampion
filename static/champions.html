@@ -6,7 +6,7 @@
     <
   </md-button>
   <div>
-    <md-toolbar style="padding-left: 20px;" class="md-primary" ng-class="{true: 'getting-data', false: 'got-data'}[gettingData]">
+    <md-toolbar class="md-primary padding-sides" ng-class="{true: 'getting-data', false: 'got-data'}[gettingData]">
       <h3>
         <span ng-hide="gettingData">Reccomended champions for <strong>{{playerName}}</strong></span>
         <span ng-show="gettingData && !gotError">Getting data...</span>
@@ -15,7 +15,7 @@
     </md-toolbar>
   </div>
   <div id="after-data" ng-hide="gettingData">
-    <div layout-gt-sm="column" class="tabsdemoStaticTabs sample">
+    <div layout-gt-sm="column" class="tabsStatic sample">
       <md-tabs class="md-primary md-hue-2" md-selected="data.selectedIndex">
         <md-tab id="top" aria-controls="top-content">
           Top

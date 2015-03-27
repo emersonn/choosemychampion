@@ -11,16 +11,7 @@ logging.captureWarnings(True)
 # todo: make this into a module so these are imported less relatively
 from database import db_session
 from models import Match, Champion, BannedChampion, BuiltItems
-
-# todo: put these settings into a settings file dictated by
-# the the module later
-
-# API settings
-API_KEY = "a956dacd-09ed-49d2-a610-dc9597599af3"
-URLS = {'featured': 'https://na.api.pvp.net/observer-mode/rest/featured?api_key=',
-        'ids': 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/',
-        'matches': 'https://na.api.pvp.net/api/lol/na/v2.2/matchhistory/',
-        'match': 'https://na.api.pvp.net/api/lol/na/v2.2/match/'}
+from settings import API_KEY, URLS
 
 # crawler settings
 BREADTH = 5
@@ -193,7 +184,8 @@ def store_match(given_match):
 
         # todo: make this more efficient. although it is easy it is continually
         # attempting to add to the set a banned champion for every single person.
-        # iterates through the bans and adds it to the set.
+        # iterates through the bans and adds it to the set. also this gives an error
+        # sometimes?
         for ban in team['bans']:
             bans.add(ban['championId'])
 

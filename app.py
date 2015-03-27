@@ -4,26 +4,16 @@ import requests, datetime, urllib
 
 from models import PlayerData, ChampionData
 from database import db_session
+from settings import API_KEY, URLS, CACHE
 
 app = Flask(__name__)
-
-# todo: debugging is like... on. i repeat. DEBUGGING IS ON!
-app.debug = True
+app.config.from_object('app_settings')
 
 # todo: fix this. like really. this deals with the warning
 # given by python for not updating python and not installing
 # the SSL library.
 import logging
 logging.captureWarnings(True)
-
-# todo: MemCache?
-from werkzeug.contrib.cache import SimpleCache
-cache = SimpleCache()
-
-# todo: these should be moved into a settings file.
-API_KEY = "a956dacd-09ed-49d2-a610-dc9597599af3"
-URLS = {'ids': 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/',
-        'stats': 'https://na.api.pvp.net/api/lol/na/v1.3/stats/by-summoner/%s/ranked'}
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
@@ -80,7 +70,7 @@ def profile(username):
 # including non played champions
 @app.route('/api/stats/<username>/<user_id>/')
 def stats(username, user_id):
-    rv = cache.get('user_data_' + user_id)
+    rv = CACHE.get('user_data_' + user_id)
     if rv is None:
         query = PlayerData.query.filter_by(player_id = user_id).all()
 
@@ -135,7 +125,7 @@ def stats(username, user_id):
             index += 1
 
         # returns the json of the stats as an array of scores
-        cache.set('user_data_' + user_id, full_stats, timeout = 5 * 60)
+        CACHE.set('user_data_' + user_id, full_stats, timeout = 5 * 60)
         return jsonify(full_stats)
     else:
         return jsonify(rv)

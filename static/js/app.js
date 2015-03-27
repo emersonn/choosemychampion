@@ -1,7 +1,11 @@
     (function() {
       // todo: clean this up
+
+      // defines the app, takes the Material, Route, Resource, and Animate dependencies
       var app = angular.module('league', ['ngMaterial', 'ngRoute', 'ngResource', 'ngAnimate']);
 
+      // configures the app, mostly used to configure routes
+      // routes are used to keep the user in the same page without reloads
       app.config(['$routeProvider', '$httpProvider', '$mdThemingProvider', function($routeProvider, $httpProvider, $mdThemingProvider) {
         $routeProvider.when('/', {
           controller: 'SummonerController',
@@ -13,11 +17,14 @@
           redirectTo: '/'
         });
 
+        // defines the color palette for the material themes
         $mdThemingProvider.theme('default')
           .primaryPalette('cyan')
           .accentPalette('amber');
       }]);
 
+      // main page controller. sets the playername and when the player name is received it
+      // redirects the user to the respective summoner
       app.controller("SummonerController", ['$http', '$location', function($http, $location) {
         this.playerName = "";
 
@@ -27,13 +34,19 @@
         }
       }]);
 
+      // the champions controller. requests the champion data from the server
+      // and routes it to the template for display
       app.controller("ChampionsController", ['$http', '$location', '$routeParams', 'SessionService', 'Champion', '$scope',
         function($http, $location, $routeParams, SessionService, Champion, $scope) {
           $scope.playerName = "";
           $scope.playerName = $routeParams.summonerName;
+
           $scope.playerId = 0;
+
+          // storage for all the data
           $scope.champions = {};
 
+          // used for the tabs
           $scope.data = {
             selectedIndex: 0,
           };
@@ -43,9 +56,11 @@
           $scope.BOTTOM = "BOTTOM";
           $scope.JUNGLE = "JUNGLE";
 
+          // used for template display of particular data messages
           $scope.gettingData = true;
           $scope.gotError = false;
 
+          // tab functions
           $scope.next = function() {
             $scope.data.selectedIndex = Math.min($scope.data.selectedIndex + 1, 3);
           };
@@ -58,11 +73,13 @@
             $location.path("/");
           };
 
+          // requests data from the server and stores it in the controller
           SessionService.StartSession($scope.playerName).then(function(data) {
             console.log("Yay! Found player " + data['data']['user_id'] + " from " + $scope.summonerName + ".");
             $scope.playerId = data['data']['user_id'];
 
-            // need to add handler for this for retries
+            // todo: add handler for retries of the full information and also
+            // giving better error feedback
             console.log("Now requesting full information...");
             $scope.champions = Champion.query({username: $scope.playerName, userId: $scope.playerId}, function(){
               console.log("Finished the query...");
@@ -76,6 +93,7 @@
           });
       }]);
 
+      // starts the session for attempting to query player name data
       app.service('SessionService', ['$http', '$q', '$timeout', function($http, $q, $timeout) {
         var _this = this;
         var _maxRetryCount = 5;
@@ -101,6 +119,11 @@
         }
       }]);
 
+      // todo: implementing more responsive data collection. if it doesn't connect
+      // it doesn't give good error information or even retries.
+
+      // the storage unit for storing champion data. calling .query() returns all
+      // of the data to use.
       app.factory('Champion', ['$resource', function($resource) {
         // return $resource('/api/stats/:username/:user_id', {}, {
         //   query: {method: 'GET', isArray: true}
@@ -110,6 +133,7 @@
           {query: {method: 'GET', params: {username: '@username', userId: '@userId'}}});
       }]);
 
+      // handles the view for the index
       app.directive('summonerLogin', function() {
         return {
           restrict: 'E',
@@ -117,6 +141,8 @@
         }
       });
 
+      // handles the view for the champion listings, and allow for refactoring
+      // of the champion list
       app.directive("filteredChamps", function() {
         return {
           restrict: "E",
@@ -127,6 +153,7 @@
         };
       });
 
+      // filter for encoding URIs
       app.filter('encodeURIComponent', function() {
         return window.encodeURIComponent;
       });

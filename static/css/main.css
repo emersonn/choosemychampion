@@ -1,3 +1,5 @@
+/* minify static/css/ */
+
 .tabsStatic .sample {
   height: 450px; }
 .tabsStatic .tabpanel-container {
@@ -87,76 +89,61 @@ html, body {
   color: rgba(0,0,0,.5);
 }
 
-.light a {
+.light a, .accented {
   color: #FFC107;
   text-decoration: none;
 }
 
-/* .champion-listing.ng-enter,
-.champion-listing.ng-leave,
-.champion-listing.ng-move {
-  -webkit-transition: 0.5s linear all;
-  -moz-transition: 0.5s linear all;
-  -o-transition: 0.5s linear all;
-  transition: 0.5s linear all;
+.light a:hover {
+  text-decoration: underline;
 }
 
-.champion-listing.ng-enter,
-.champion-listing.ng-move {
-  opacity: 0;
-  height: 0;
-  overflow: hidden;
+.player-accented {
+  color: #00BCD4;
 }
 
-.champion-listing.ng-move.ng-move-active,
-.champion-listing.ng-enter.ng-enter-active {
-  opacity: 1;
-  height: 120px;
+/* make this look better and also make it transition */
+md-item-content:hover {
+  box-shadow: 0 0px 5px 0 rgba(0,0,0,.26);
 }
-
-.champion-listing.ng-leave {
-  opacity: 1;
-  overflow: hidden;
-}
-
-.champion-listing.ng-leave.ng-leave-active {
-  opacity: 0;
-  height: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-} */
-
-/* .ng-hide-add { -webkit-animation: 0.5s lightSpeedOut, ease; } */
-/* .ng-hide-remove { -webkit-animation: 0.5s bounceInDown ease; } */
-
-/* todo: add other browser dependencies too */
 
 .champion-listing.ng-enter {
   -webkit-animation: 0.2s bounceInDown ease;
+  -moz-animation: 0.2s bounceInDown ease;
+  -ms-animation: 0.2s bounceInDown ease;
+  -o-animation: 0.2s bounceInDown ease;
+  animation: 0.2s bounceInDown ease;
 }
 
 .champion-listing.ng-enter-stagger {
   -webkit-animation-delay: .05s;
+  -moz-animation-delay: .05s;
+  -ms-animation-delay: .05s;
+  -o-animation-delay: .05s;
+  animation-delay: .05s;
 }
 
 .getting-data {
   -webkit-animation: 2s pulse ease;
   -webkit-animation-iteration-count: infinite;
+
+  -moz-animation: 2s pulse ease;
+  -moz-animation-iteration-count: infinite;
+
+  -ms-animation: 2s pulse ease;
+  -ms-animation-iteration-count: infinite;
+
+  -o-animation: 2s pulse ease;
+  -o-animation-iteration-count: infinite;
+
+  animation: 2s pulse ease;
+  animation-iteration-count: infinite;
 }
 
 .padding-sides {
   padding-left: 20px;
   padding-right: 20px;
 }
-
-/* #after-data.ng-hide-add, #after-data.ng-hide-remove {
-  transition: 0s linear all;
-}
-
-#after-data.ng-hide-add-active,
-#after-data.ng-hide-remove-active {
-  transition: 1s linear all;
-} */
 
 /* from 88, 50, 53
         14, 100, 57 */

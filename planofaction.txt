@@ -95,14 +95,16 @@ Work flow: crawler.py -> analyze.py -> adjustment.py
 > the top lane, mid lane, and the champion names.
 
 
-> todo at the moment: go through all the todos. github this. implement all the
-> "minificiation" techniques and clean up all code! use dependency downloaders
-> such as bower and stuff!
+> todo at the moment: go through all the todos. (for later) github this. (fixed) implement all the
+> "minificiation" techniques and clean up all code! (fixed) use dependency downloaders
+> such as bower and stuff! (for later)
 
-> lightweight analytics? FAVICON! compress CSS and JS ensure cache management
-> is correct and fine.
+> lightweight analytics? FAVICON! (done) compress CSS and JS ensure cache management
+> is correct and fine. (?)
 
-> cool data visualization with lots of champion data and interactive data?
+> cool data visualization with lots of champion data and interactive data? (for later)
 
-> need to encode the username! usernames with spaces are not working! fix the email link?
-> maybe make it a more private email?
+> need to encode the username! usernames with spaces are not working! (fixed) fix the email link?
+> maybe make it a more private email? (fixed)
+
+> settings files and decomposing some extra code.

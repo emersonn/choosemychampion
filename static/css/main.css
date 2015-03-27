@@ -1,0 +1,165 @@
+.tabsdemoStaticTabs {
+  /*
+ * Animation styles
+ */ }
+  .tabsdemoStaticTabs .sample {
+    height: 450px; }
+  .tabsdemoStaticTabs .tabpanel-container {
+    display: block;
+    position: relative;
+    background: white;
+    border: 0px solid black;
+    height: 300px;
+    overflow: hidden; }
+  .tabsdemoStaticTabs [role="tabpanel"] {
+    color: white;
+    width: 100%;
+    height: 100%;
+    -webkit-transition: all cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s;
+    transition: all cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s;
+    position: absolute; }
+  .tabsdemoStaticTabs [role="tabpanel"].ng-leave.ng-leave-active, .tabsdemoStaticTabs [role="tabpanel"].ng-enter {
+    top: -300px; }
+  .tabsdemoStaticTabs [role="tabpanel"].ng-leave, .tabsdemoStaticTabs [role="tabpanel"].ng-enter.ng-enter-active {
+    top: 0; }
+  .tabsdemoStaticTabs [role="tabpanel"].ng-leave {
+    z-index: 100; }
+  .tabsdemoStaticTabs .tabpanel-container [role="tabpanel"] {
+    padding: 20px; }
+  .tabsdemoStaticTabs .after-tabs-area {
+    padding: 25px; }
+  .tabsdemoStaticTabs .after-tabs-area > span {
+    margin-top: 25px;
+    padding-right: 15px;
+    vertical-align: middle;
+    line-height: 30px;
+    height: 35px; }
+  .tabsdemoStaticTabs .after-tabs-area > md-checkbox {
+    margin-top: 26px;
+    margin-left: 0px; }
+  /* .tabsdemoStaticTabs .md-header {
+    background-color: #1976D2 !important; } */
+  .tabsdemoStaticTabs md-tab {
+    color: #90caf9 !important; }
+  .tabsdemoStaticTabs md-tab.active, .tabsdemoStaticTabs md-tab:focus {
+    color: white !important; }
+  .tabsdemoStaticTabs md-tab[disabled] {
+    opacity: 0.5; }
+  .tabsdemoStaticTabs .md-header .md-ripple {
+    border-color: #FFFF8D !important; }
+  .tabsdemoStaticTabs md-tabs-ink-bar {
+    background-color: #FFFF8D !important; }
+  .tabsdemoStaticTabs md-tabs .md-paginator {
+    color: white; }
+
+html, body {
+  background-color: #F5F5F5;
+}
+
+#main-window {
+  margin-top: 20px;
+  /* padding: 20px; */
+}
+
+.champion-icon {
+  width: 48px;
+  margin: 15px;
+  border-radius: 48px;
+  border: 1px solid #ddd;
+}
+
+.champion-score {
+  /* background-color: #009688; */
+  background-color: #8BC34A;
+  color: #E0F2F1;
+  padding: 10px;
+
+  /* border-bottom-color: rgba(0, 150, 136, .4); */
+}
+
+.champion-score.score-medium {
+  background-color: #FFEB3B;
+}
+
+.champion-score.score-hard {
+  background-color: #FF5722;
+}
+
+#after-data {
+  transition: 400ms ease-out 50ms;
+}
+
+.light {
+  color: rgba(0,0,0,.5);
+}
+
+.light a {
+  color: #FFC107;
+  text-decoration: none;
+}
+
+/* .champion-listing.ng-enter,
+.champion-listing.ng-leave,
+.champion-listing.ng-move {
+  -webkit-transition: 0.5s linear all;
+  -moz-transition: 0.5s linear all;
+  -o-transition: 0.5s linear all;
+  transition: 0.5s linear all;
+}
+
+.champion-listing.ng-enter,
+.champion-listing.ng-move {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.champion-listing.ng-move.ng-move-active,
+.champion-listing.ng-enter.ng-enter-active {
+  opacity: 1;
+  height: 120px;
+}
+
+.champion-listing.ng-leave {
+  opacity: 1;
+  overflow: hidden;
+}
+
+.champion-listing.ng-leave.ng-leave-active {
+  opacity: 0;
+  height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+} */
+
+/* .ng-hide-add { -webkit-animation: 0.5s lightSpeedOut, ease; } */
+/* .ng-hide-remove { -webkit-animation: 0.5s bounceInDown ease; } */
+
+.champion-listing.ng-enter {
+  -webkit-animation: 0.2s bounceInDown ease;
+}
+
+.champion-listing.ng-enter-stagger {
+  -webkit-animation-delay: .05s;
+}
+
+.getting-data {
+  -webkit-animation: 2s pulse ease;
+  -webkit-animation-iteration-count: infinite;
+}
+
+/* #after-data.ng-hide-add, #after-data.ng-hide-remove {
+  transition: 0s linear all;
+}
+
+#after-data.ng-hide-add-active,
+#after-data.ng-hide-remove-active {
+  transition: 1s linear all;
+} */
+
+/* from 88, 50, 53
+        14, 100, 57 */
+/* 14-88 / 100 > -00.74 + 88
+               > 00.50 + 50
+               > 00.04 + 53
+*/

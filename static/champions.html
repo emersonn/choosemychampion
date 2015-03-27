@@ -1,0 +1,72 @@
+<div flex="50" class="champions">
+  <md-button class="md-fab md-fab-top-right">
+    ?
+  </md-button>
+  <md-button ng-click="backToFront()" class="md-fab md-fab-top-left">
+    <
+  </md-button>
+  <div>
+    <md-toolbar style="padding-left: 20px;" class="md-primary" ng-class="{true: 'getting-data', false: 'got-data'}[gettingData]">
+      <h3>
+        <span ng-hide="gettingData">Reccomended champions for <strong>{{playerName}}</strong></span>
+        <span ng-show="gettingData && !gotError">Getting data...</span>
+        <span ng-show="gettingData && gotError">Error! Try again later.</span>
+      </h3>
+    </md-toolbar>
+  </div>
+  <div id="after-data" ng-hide="gettingData">
+    <div layout-gt-sm="column" class="tabsdemoStaticTabs sample">
+      <md-tabs class="md-primary md-hue-2" md-selected="data.selectedIndex">
+        <md-tab id="top" aria-controls="top-content">
+          Top
+        </md-tab>
+        <md-tab id="middle" aria-controls="middle-content">
+          Mid
+        </md-tab>
+        <md-tab id="bottom" aria-controls="bottom-content">
+          Bottom
+        </md-tab>
+        <md-tab id="jungle" aria-controls="jungle-content">
+          Jungle
+        </md-tab>
+      </md-tabs>
+    </div>
+    <md-content layout="column">
+      <ng-switch on="data.selectedIndex" class="tabpanel-container">
+        <div role="tabpanel"
+            id="top-content"
+            aria-labelledby="top"
+            ng-switch-when="0"
+            md-swipe-left="next()"
+            md-swipe-right="previous()">
+            <!-- Statistics? <div style="padding-left: 20px; padding-right: 20px; background-color: #F5F5F5;">Testing..</div> -->
+            <filtered-champs certain-filter="TOP"></filtered-champs>
+      </div>
+      <div role="tabpanel"
+          id="middle-content"
+          aria-labelledby="middle"
+          ng-switch-when="1"
+          md-swipe-left="next()"
+          md-swipe-right="previous()">
+          <filtered-champs certain-filter="MIDDLE"></filtered-champs>
+      </div>
+      <div role="tabpanel"
+          id="bottom-content"
+          aria-labelledby="bottom"
+          ng-switch-when="2"
+          md-swipe-left="next()"
+          md-swipe-right="previous()">
+          <filtered-champs certain-filter="BOTTOM"></filtered-champs>
+      </div>
+      <div role="tabpanel"
+          id="jungle-content"
+          aria-labelledby="jungle"
+          ng-switch-when="3"
+          md-swipe-left="next()"
+          md-swipe-right="previous()">
+          <filtered-champs certain-filter="JUNGLE"></filtered-champs>
+      </div>
+      </ng-switch>
+    </md-content>
+  </div>
+</div>

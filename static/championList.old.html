@@ -1,0 +1,22 @@
+      <md-list>
+        <md-item ng-repeat="champion in $parent.champions.scores | filter:champion.role = certainFilter | orderBy:'-score' | limitTo: 10 ">
+          <md-item-content>
+            <div class="md-tile-left">
+              <img ng-src="http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/{{champion.image}}" class="champion-icon" />
+            </div>
+            <div class="md-tile-content" layout="row">
+              <div flex>
+                <h3>{{champion.championName}}</h3>
+                <h4><a ng-href="penistawt">Champion Profile</a> - Your adjustment: <strong class="md-accent">{{champion.playerAdjust|number:0}}</strong> Lorem ipsum doloar amet penis penis penis penis penis big fat penis </h4>
+              </div>
+            </div>
+            <div flex="10" class="champion-score"
+              style="background-color: hsla({{champion.score * 0.74 + 14}}, {{champion.score * -0.50 + 100}}%, {{champion.score * -.04 + 57}}%, 1);"
+              layout-align="center center">
+              <center><h3>{{champion.score | number: 0}}</h3></center>
+            </div>
+          </md-item-content>
+
+          <md-divider ng-if="!$last"></md-divider>
+        </md-item>
+      </md-list>

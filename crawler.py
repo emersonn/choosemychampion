@@ -77,7 +77,13 @@ def crawl_player(player, depth, breadth):
         try:
             r.json()['matches']
         except KeyError:
-            print("No matches found in this request.")
+            print("No matches found in this request. ]")
+            print("Exiting this user and sleeping for 20 seconds.")
+
+            sleep(20)
+            return
+        except ValueError:
+            print("No JSON in this request. ]")
             print("Exiting this user and sleeping for 20 seconds.")
 
             sleep(20)
@@ -96,7 +102,9 @@ def crawl_player(player, depth, breadth):
             try:
                 match_data = get_match_data.json()
             except ValueError:
-                print("Could not get match data, breaking...")
+                print("Could not get match data, sleeping for 20 then breaking...")
+                sleep(20)
+
                 break
 
             # todo: separates the match printing. may need to fix w/ python 3+
@@ -129,6 +137,8 @@ def crawl_player(player, depth, breadth):
             Fore.BLUE + str(len(players)) + Fore.RESET + " other players." +
             " Player list is now: " + Fore.YELLOW + str(PLAYER_LIST) + Fore.RESET +
             ". " + Fore.YELLOW + str(MATCH_COUNT) + Fore.RESET + " matches have been counted.")
+
+        # todo: error? ValueError, sample larger than population
 
         # recursive call. goes through a random sample of players in the breadth
         # and crawls those players.

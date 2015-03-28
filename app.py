@@ -133,7 +133,10 @@ def stats(username, user_id):
 # defines the API route to reset the user's stats. to be implemented as a button?
 @app.route('/api/stats/<username>/<user_id>/reset/')
 def reset_stats(username, user_id):
-    pass
+    # query = PlayerData.query.filter_by(player_id = user_id).delete()
+    # db_session.commit()
+
+    return "clean"
 
 @app.route('/api/internal/stats/')
 def internal_stats():
@@ -144,7 +147,7 @@ def internal_stats():
             'champ_count': Champion.query.count(),
             'match_count': Match.query.count()
         }
-        CACHE.set('internal_stats', stats, timeout = 120 * 60)
+        CACHE.set('internal_stats', stats, timeout = 10 * 60)
         return jsonify(stats)
 
     return jsonify(rv)

@@ -141,14 +141,44 @@ class PlayerData(Base):
     # returns the adjustment of a particular player in the database. calculates
     # their strength of a particular champion and used for calculations in adjustment
     # of a particular champion score.
-    def get_adjustment(self):
-        adjustment = 0
+    def get_adjustment(self, force_update=False):
+        if self.adjustment == None or force_update:
+            if self.adjustment == None:
+                print("Did not find adjustment for " + self.player_name + " with " + str(self.champion_id))
+            elif force_update:
+                print("Forced update for " + self.player_name + " on champion " + str(self.champion_id) + ".")
 
-        adjustment += .4 * self.get_kda()
-        adjustment += .2 * self.sessions_played
-        adjustment += ((self.won * 1.0) / self.sessions_played) * 10
+            adjustment = 0
 
-        return adjustment
+            import statistics
+            from scipy import stats
+
+            """
+            adjustment += .4 * self.get_kda()
+            adjustment += .2 * self.sessions_played
+            adjustment += ((self.won * 1.0) / self.sessions_played) * 10
+            """
+
+            player_champions = PlayerData.query.filter_by(player_name = self.player_name)
+
+            champions_seen = [data.sessions_played for data in player_champions]
+            zscore = (self.sessions_played - statistics.mean(champions_seen)) / statistics.stdev(champions_seen)
+            percentile = stats.norm.sf(zscore)
+
+            adjustment += (self.won / sum(champions_seen)) * 12 * (1 - percentile)
+
+            champions_kda = [data.get_kda() for data in player_champions]
+            kda_zscore = (self.get_kda() - statistics.mean(champions_kda) / statistics.stdev(champions_kda))
+            kda_percentile = stats.norm.sf(kda_zscore)
+            adjustment += 14 * (1 - kda_percentile) * (1 - percentile)
+
+            adjustment += .49 * self.sessions_played / statistics.mean(champions_seen) + 2 * self.sessions_played / 100
+
+            import database
+            self.adjustment = adjustment
+            database.db_session.commit()
+
+        return self.adjustment
 
 # class championdata. stored as champion_data in the database. stores summary
 # information about a particular champion and the role that the particular champion
@@ -277,7 +307,7 @@ class ChampionData(Base):
     def get_calculated_win(self, user_id):
         wins = 0.0
         seen = 0.0
-        multiplier = 1.1
+        multiplier = 1.15
 
         player = PlayerData.query.filter_by(player_id = user_id)
 
@@ -293,9 +323,11 @@ class ChampionData(Base):
         for champion in player:
             wins += champion.won
             seen += champion.sessions_played
+            # todo: causes lots of lag
+            # multiplier += champion.get_adjustment() / 140
 
         if self.role == "MIDDLE" or self.role == "BOTTOM":
-            multiplier = 1.15
+            multiplier = 1.18
 
         return (self.get_score(False) + self.get_kda() +
             self.objective_score + self.tower_score) * min(multiplier * (wins * 1.0 / seen), 1.0)

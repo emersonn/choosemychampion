@@ -161,18 +161,22 @@ class PlayerData(Base):
 
             player_champions = PlayerData.query.filter_by(player_name = self.player_name)
 
+            # todo: temporary fix to the zero division error
             champions_seen = [data.sessions_played for data in player_champions]
-            zscore = (self.sessions_played - statistics.mean(champions_seen)) / statistics.stdev(champions_seen)
+            zscore = (self.sessions_played - statistics.mean(champions_seen)) / (statistics.stdev(champions_seen) + 1)
             percentile = stats.norm.sf(zscore)
 
-            adjustment += (self.won / sum(champions_seen)) * 12 * (1 - percentile)
+            # todo: temporary fix to zero division error
+            adjustment += (self.won / (self.sessions_played + 1)) * 15 * (1 - percentile)
 
+            # todo: temporary fix to zero division error
             champions_kda = [data.get_kda() for data in player_champions]
-            kda_zscore = (self.get_kda() - statistics.mean(champions_kda) / statistics.stdev(champions_kda))
+            kda_zscore = (self.get_kda() - statistics.mean(champions_kda) / (statistics.stdev(champions_kda) + 1))
             kda_percentile = stats.norm.sf(kda_zscore)
-            adjustment += 14 * (1 - kda_percentile) * (1 - percentile)
+            adjustment += 15 * (1 - kda_percentile) * (1 - percentile)
 
-            adjustment += .49 * self.sessions_played / statistics.mean(champions_seen) + 2 * self.sessions_played / 100
+            # todo: temporary fix to zero division error
+            adjustment += .49 * self.sessions_played / (statistics.mean(champions_seen) + 1) + 3.9 * self.sessions_played / 100
 
             import database
             self.adjustment = adjustment

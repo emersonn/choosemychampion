@@ -94,7 +94,6 @@ Work flow: crawler.py -> analyze.py -> adjustment.py
 > now their browser has all the data they need so they can navigate between
 > the top lane, mid lane, and the champion names.
 
-
 > todo at the moment: go through all the todos. (for later) github this. (fixed) implement all the
 > "minificiation" techniques and clean up all code! (fixed) use dependency downloaders
 > such as bower and stuff! (for later)
@@ -108,3 +107,20 @@ Work flow: crawler.py -> analyze.py -> adjustment.py
 > maybe make it a more private email? (fixed)
 
 > settings files and decomposing some extra code, add ssh key to webfaction and sshkey from webfaction to git.
+
+> set up memcached on the server. migrate current db on my side to mysql. Live statistics of how many matches
+> or champions have been recorded. (done) set up database backups. consider next month moving to digitalocean. need
+> to consider moving database, and also the settings files. everything else should git pull fine.
+
+> don’t push settings files, don't push database files! and then do git pull
+> database: tartio/soup12
+
+> update all the data on the server now! try to adjust the adjustment so it's more weighted, raise the
+> expected win rates. wins under 20 minutes? damage and meta? cs numbers and economy of items
+
+> indepth champion details. could show user data could not? shows the champion profile and more details statistics
+> about that champion in particular? could navigate to a new page or could open under that particular
+> champion. it would be easier to make a new page while putting under the champion would be easier for users.
+> could show statistics about that champion over time from win rates. pick rates of that champion over time.
+> show the score values over time? would cause need to have historical data for scores? show the user's
+> champion data.

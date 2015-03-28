@@ -161,7 +161,8 @@ class PlayerData(Base):
 
             player_champions = PlayerData.query.filter_by(player_name = self.player_name)
 
-            # todo: temporary fix to the zero division error
+            # todo: temporary fix to the zero division error, and the fix to MySQL actually
+            # returning integers
             champions_seen = [data.sessions_played for data in player_champions]
             try:
                 zscore = (self.sessions_played - statistics.mean(champions_seen)) / (statistics.stdev(champions_seen))
@@ -173,7 +174,7 @@ class PlayerData(Base):
 
             # todo: temporary fix to zero division error
             try:
-                adjustment += (self.won / (self.sessions_played)) * 15 * (1 - percentile)
+                adjustment += (self.won * 1.0 / (self.sessions_played)) * 15 * (1 - percentile)
             except ZeroDivisionError:
                 percentile = 0
 

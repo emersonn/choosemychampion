@@ -159,6 +159,49 @@ def internal_stats():
 
     return jsonify(rv)
 
+@app.route('/api/internal/stats/random')
+def random_stats():
+    rv = CACHE.get('random_stats')
+    if rv is None:
+        query = ChampionData.query.filter(ChampionData.num_seen >= 10).all()
+
+        import random
+        sample = random.sample(query, 4)
+        colors = ['green', 'blue', 'red', 'amber', 'cyan', 'purple', 'pink', 'indigo', 'light-blue']
+
+        stats = {'scores': []}
+        for champion in sample:
+            stats['scores'].append({
+                'name': champion.get_name(),
+                'id': champion.champion_id,
+                'image': champion.get_image(),
+                'won': champion.won * 100,
+                'kda': champion.get_kda(),
+                'role': champion.role,
+                'background': random.sample(colors, 1)[0],
+                'span': {'row': 1, 'col': 1}
+            })
+
+        # sample = random.sample(range(1, 11), 3)
+        # for number in sample[:2]:
+        #     stats['scores'][number]['span']['row'] = 2
+        #     stats['scores'][number]['span']['col'] = 2
+
+        # stats['scores'][sample[2]]['span']['col'] = 2
+
+        stats['scores'][0]['span']['row'] = 2
+        stats['scores'][0]['span']['col'] = 2
+        # stats['scores'][4]['span']['row'] = 2
+        # stats['scores'][4]['span']['col'] = 2
+        stats['scores'][3]['span']['col'] = 2
+
+        CACHE.set('random_stats', stats, timeout = 5)
+        return jsonify(stats)
+
+
+
+    return jsonify(rv)
+
 # builds the stats of a user to put into the PlayerData model. saves the data
 # into the database from a parameter of champion data from the servers, and
 # the username.

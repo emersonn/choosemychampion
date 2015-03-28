@@ -11,7 +11,7 @@
       League Champion Suggestion Engine - Choose My Champion!
     </title>
 
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/0.7.0/angular-material.min.css">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/0.8.0/angular-material.min.css">
     <link rel="stylesheet" href="/static/css/animate.min.css">
     <link rel="stylesheet" href="/static/css/main.min.css">
   </head>
@@ -24,6 +24,21 @@
         </md-whiteframe>
         <!-- turn this into a directive -->
         <md-whiteframe class="padding-sides md-whiteframe-z1" style="margin-top: 20px; background-color: white !important;">
+          <div ng-controller="RandomController as vm" class="show-move">
+            <md-grid-list
+            md-cols-sm="1" md-cols-md="2" md-cols-gt-md="4"
+            md-row-height-gt-md="1:1" md-row-height="4:3"
+            md-gutter="8px" md-gutter-gt-sm="4px" class="random-scores">
+              <md-grid-tile ng-repeat="tile in stats.scores"
+              md-rowspan="{{tile.span.row}}"
+              md-colspan="{{tile.span.col}}"
+              ng-class="tile.background">
+              <img src="http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/{{tile.image}}" alt="{{tile.name}}">
+              <md-grid-tile-footer><h3>{{tile.name}} {{tile.role|capitalize}}</h3> <h4>Wins: {{tile.won|number:2}}% KDA: {{tile.kda|number:1}}</h4></md-grid-tile-footer>
+              </md-grid-tile>
+            </md-grid-list>
+          </div>
+
           <h4>
             Wait, tell me again, what does this do?
           </h4>
@@ -99,6 +114,6 @@
     ga('create', 'UA-61257396-1', 'auto');
     ga('send', 'pageview');
 
-    </script>    
+    </script>
   </body>
 </html>

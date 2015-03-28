@@ -93,7 +93,11 @@ def crawl_player(player, depth, breadth):
             # session or another session. multiple matches may obscufate data. and match_data
             # returns an error if get_match_data.json() does not exist.
             get_match_data = requests.get(URLS['match'] + str(match['matchId']), params = {'api_key': API_KEY})
-            match_data = get_match_data.json()
+            try:
+                match_data = get_match_data.json()
+            except ValueError:
+                print("Could not get match data, breaking...")
+                break
 
             # todo: separates the match printing. may need to fix w/ python 3+
             print("."),

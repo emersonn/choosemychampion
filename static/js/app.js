@@ -38,8 +38,8 @@
 
       // the champions controller. requests the champion data from the server
       // and routes it to the template for display
-      app.controller("ChampionsController", ['$http', '$location', '$routeParams', 'SessionService', 'Champion', '$scope',
-        function($http, $location, $routeParams, SessionService, Champion, $scope) {
+      app.controller("ChampionsController", ['$http', '$location', '$routeParams', 'SessionService', 'Champion', '$scope', 'ChampionReset',
+        function($http, $location, $routeParams, SessionService, Champion, $scope, ChampionReset) {
           $scope.playerName = "";
           $scope.playerName = $routeParams.summonerName;
 
@@ -74,6 +74,13 @@
           $scope.backToFront = function() {
             $location.path("/");
           };
+
+          $scope.resetStats = function() {
+            console.log("Attempting to reset user...");
+            $scope.champions = ChampionReset.query({username: $scope.playerName, userId: $scope.playerId}, function() {
+              console.log("Got player...");
+            });
+          }
 
           // requests data from the server and stores it in the controller
           SessionService.StartSession($scope.playerName).then(function(data) {
@@ -131,6 +138,12 @@
         //   query: {method: 'GET', isArray: true}
         // });
         return $resource('/api/stats/:username/:userId',
+          {username: '@username', userId: '@userId'},
+          {query: {method: 'GET', params: {username: '@username', userId: '@userId'}}});
+      }]);
+
+      app.factory('ChampionReset', ['$resource', function($resource) {
+        return $resource('/api/stats/:username/:userId/reset',
           {username: '@username', userId: '@userId'},
           {query: {method: 'GET', params: {username: '@username', userId: '@userId'}}});
       }]);

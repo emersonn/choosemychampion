@@ -70,7 +70,7 @@ def profile(username):
 # including non played champions
 @app.route('/api/stats/<username>/<user_id>/')
 def stats(username, user_id):
-    rv = CACHE.get('user_data_' + user_id)
+    rv = CACHE.get('user_data_' + str(user_id))
     if rv is None:
         query = PlayerData.query.filter_by(player_id = user_id).all()
 
@@ -125,7 +125,7 @@ def stats(username, user_id):
             index += 1
 
         # returns the json of the stats as an array of scores
-        CACHE.set('user_data_' + user_id, full_stats, timeout = 5 * 60)
+        CACHE.set('user_data_' + str(user_id), full_stats, timeout = 5 * 60)
         return jsonify(full_stats)
     else:
         return jsonify(rv)
@@ -136,10 +136,14 @@ def stats(username, user_id):
 # defines the API route to reset the user's stats. to be implemented as a button?
 @app.route('/api/stats/<username>/<user_id>/reset/')
 def reset_stats(username, user_id):
-    # query = PlayerData.query.filter_by(player_id = user_id).delete()
-    # db_session.commit()
+    query = PlayerData.query.filter_by(player_id = user_id).delete()
+    db_session.commit()
 
-    return "clean"
+    rv = CACHE.delete('user_data_' + str(user_id))
+
+    print("Resetting stats for " + username + ".")
+
+    return stats(username, user_id)
 
 @app.route('/api/internal/stats/')
 def internal_stats():

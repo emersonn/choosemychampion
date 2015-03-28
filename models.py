@@ -102,7 +102,7 @@ class PlayerData(Base):
 
     won = Column(Integer)
 
-    adjustment = Column(Integer)
+    adjustment = Column(Float)
 
     def get_name(self):
         if self.champion_name == None:
@@ -148,7 +148,7 @@ class PlayerData(Base):
             elif force_update:
                 print("Forced update for " + self.player_name + " on champion " + str(self.champion_id) + ".")
 
-            adjustment = 0
+            adjustment = 0.0
 
             import statistics
             from scipy import stats
@@ -162,15 +162,16 @@ class PlayerData(Base):
             player_champions = PlayerData.query.filter_by(player_name = self.player_name)
 
             # todo: temporary fix to the zero division error, and the fix to MySQL actually
-            # returning integers
+            # returning integers. MYSQL GIVES INTEGERS FOR THIS AND THE GET SCORE! FURTHERMORE
+            # SOMETIMES THERE ARE HUGELY NEGATIVE NUMBERS BEING RETURNED FOR THIS!!!!
             champions_seen = [data.sessions_played for data in player_champions]
             try:
                 zscore = (self.sessions_played - statistics.mean(champions_seen)) / (statistics.stdev(champions_seen))
                 percentile = stats.norm.sf(zscore)
             except ZeroDivisionError:
-                percentile = 100
+                percentile = 1
             except statistics.StatisticsError:
-                percentile = 100
+                percentile = 1
 
             # todo: temporary fix to zero division error
             try:
@@ -184,9 +185,9 @@ class PlayerData(Base):
                 kda_zscore = (self.get_kda() - statistics.mean(champions_kda) / (statistics.stdev(champions_kda)))
                 kda_percentile = stats.norm.sf(kda_zscore)
             except ZeroDivisionError:
-                kda_percentile = 100
+                kda_percentile = 1
             except statistics.StatisticsError:
-                kda_percentile = 100
+                kda_percentile = 1
 
             adjustment += 15 * (1 - kda_percentile) * (1 - percentile)
 
@@ -227,8 +228,8 @@ class ChampionData(Base):
 
     pick_rate = Column(Float)
 
-    adjustment = Column(Integer)
-    score = Column(Integer)
+    adjustment = Column(Float)
+    score = Column(Float)
 
     image = Column(String(100))
 

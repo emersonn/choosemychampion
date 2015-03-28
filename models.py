@@ -141,7 +141,7 @@ class PlayerData(Base):
     # returns the adjustment of a particular player in the database. calculates
     # their strength of a particular champion and used for calculations in adjustment
     # of a particular champion score.
-    def get_adjustment(self, force_update=False):
+    def get_adjustment(self, force_update=False): # double check if force_update is on
         if self.adjustment == None or force_update:
             if self.adjustment == None:
                 print("Did not find adjustment for " + self.player_name + " with " + str(self.champion_id))
@@ -190,7 +190,6 @@ class PlayerData(Base):
                 kda_percentile = 1
 
             adjustment += 15 * (1 - kda_percentile) * (1 - percentile)
-
 
             # todo: temporary fix to zero division error
             try:

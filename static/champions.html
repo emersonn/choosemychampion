@@ -29,6 +29,9 @@
         <md-tab id="jungle" aria-controls="jungle-content">
           Jungle
         </md-tab>
+        <md-tab id="settings" aria-controls="settings">
+          Settings
+        </md-tab>
       </md-tabs>
     </div>
     <div layout="column" class="champion-holder">
@@ -65,6 +68,20 @@
           md-swipe-left="next()"
           md-swipe-right="previous()">
           <filtered-champs certain-filter="JUNGLE"></filtered-champs>
+      </div>
+      <div role="tabpanel"
+        id="settings-content"
+        aria-labelledby="settings"
+        ng-switch-when="4"
+        md-swipe-left="next()"
+        md-swipe-right="previous()">
+        <div class="padding-sides">
+          <h4>Settings</h4>
+          <md-button class="md-raised md-warn" ng-click="resetStats()">Reset Stats</md-button>
+          <p>This will reset your stats and generate new data for you. This is especially useful
+            if you have new ranked games you want to be recalculated! It requests a lot of new calculations
+            so it can be a bit heavy on the server and it might take a few seconds.</p>
+        </div>
       </div>
       </ng-switch>
     </div>

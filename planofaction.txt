@@ -106,7 +106,7 @@ Work flow: crawler.py -> analyze.py -> adjustment.py
 > need to encode the username! usernames with spaces are not working! (fixed) fix the email link?
 > maybe make it a more private email? (fixed)
 
-> settings files and decomposing some extra code, add ssh key to webfaction and sshkey from webfaction to git.
+> settings files and decomposing some extra code (fixed), add ssh key to webfaction and sshkey from webfaction to git. (done)
 
 > set up memcached on the server. migrate current db on my side to mysql. Live statistics of how many matches
 > or champions have been recorded. (done) set up database backups. consider next month moving to digitalocean. need
@@ -124,3 +124,39 @@ Work flow: crawler.py -> analyze.py -> adjustment.py
 > could show statistics about that champion over time from win rates. pick rates of that champion over time.
 > show the score values over time? would cause need to have historical data for scores? show the user's
 > champion data.
+
+> also comment on all new things. need to fix IE stuff. all the /stats/reset stuff too! clarify it's based on a 100 pt scale. weight played champions more
+> maybe give featured champions esp. rising new stars (highlighted in yellow borders and a star) and maybe maybe something they've never
+> played before! also keep in mind champions they may not have
+
+> keep in mind champion skill levels. reksai harder to play but vi easier to pick up and win with in which
+> win rates may not relate too. green to red skill bar. the score count is gold for champion score and
+> added on top is the adjustment. hardest champs for a particular champ. optional include of other seasons and normal games.
+
+> todo list:
+> adjust the adjustment and expected win rate to be more favorable to played champions
+> wins under 20 minutes? damage and meta? cs numbers and economy of items?
+> comment on all new things
+
+> fix IE stuff
+> set up database backups
+> memcached?
+
+> migrate current database on local side to mysql (not done but workaround)
+> implement /stats/reset (implemented w/out creating new data)
+> implement a reset button (AJAX to reset and once complete reload the data) (added)
+> make the settings page nicer
+> make the reset button not delete things but just edit the availability of data
+
+> featured champions, rising new stars, and random suggested champs
+
+> extra page for champion data
+> champion skill level
+> data visualization and interactive data
+
+> go through all the todos in the code!
+
+> optional other seasons and normal games
+
+> dependency downloaders?
+> digitalocean?

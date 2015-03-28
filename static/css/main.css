@@ -57,6 +57,10 @@ html, body {
   /* padding: 20px; */
 }
 
+.champion-holder {
+  background-color: #FFF !important;
+}
+
 .champion-icon {
   width: 48px;
   margin: 15px;

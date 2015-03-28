@@ -25,8 +25,10 @@
 
       // main page controller. sets the playername and when the player name is received it
       // redirects the user to the respective summoner
-      app.controller("SummonerController", ['$http', '$location', function($http, $location) {
+      app.controller("SummonerController", ['$http', '$location', '$scope', 'Stats', function($http, $location, $scope, Stats) {
         this.playerName = "";
+
+        $scope.stats = Stats.get();
 
         this.getSummoner = function() {
           console.log("Getting summoner " + this.playerName);
@@ -131,6 +133,10 @@
         return $resource('/api/stats/:username/:userId',
           {username: '@username', userId: '@userId'},
           {query: {method: 'GET', params: {username: '@username', userId: '@userId'}}});
+      }]);
+
+      app.factory('Stats', ['$resource', function($resource) {
+        return $resource('/api/internal/stats');
       }]);
 
       // handles the view for the index

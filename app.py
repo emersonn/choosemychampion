@@ -135,6 +135,20 @@ def stats(username, user_id):
 def reset_stats(username, user_id):
     pass
 
+@app.route('/api/internal/stats/')
+def internal_stats():
+    rv = CACHE.get('internal_stats')
+    if rv is None:
+        from models import Champion, Match
+        stats = {
+            'champ_count': Champion.query.count(),
+            'match_count': Match.query.count()
+        }
+        CACHE.set('internal_stats', stats, timeout = 120 * 60)
+        return jsonify(stats)
+
+    return jsonify(rv)
+
 # builds the stats of a user to put into the PlayerData model. saves the data
 # into the database from a parameter of champion data from the servers, and
 # the username.

@@ -36,6 +36,10 @@
         }
       }]);
 
+      app.controller("RandomController", ['$http', '$scope', 'RandomStats', function($http, $scope, RandomStats) {
+        $scope.stats = RandomStats.get();
+      }]);
+
       // the champions controller. requests the champion data from the server
       // and routes it to the template for display
       app.controller("ChampionsController", ['$http', '$location', '$routeParams', 'SessionService', 'Champion', '$scope', 'ChampionReset',
@@ -152,6 +156,10 @@
         return $resource('/api/internal/stats');
       }]);
 
+      app.factory('RandomStats', ['$resource', function($resource) {
+        return $resource('/api/internal/stats/random');
+      }]);
+
       // handles the view for the index
       app.directive('summonerLogin', function() {
         return {
@@ -175,5 +183,12 @@
       // filter for encoding URIs
       app.filter('encodeURIComponent', function() {
         return window.encodeURIComponent;
+      });
+
+      app.filter('capitalize', function() {
+        return function(input, scope) {
+          input = input.toLowerCase();
+          return input.substring(0, 1).toUpperCase() + input.substring(1);
+        };
       });
     })();

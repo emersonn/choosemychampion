@@ -163,20 +163,38 @@ class PlayerData(Base):
 
             # todo: temporary fix to the zero division error
             champions_seen = [data.sessions_played for data in player_champions]
-            zscore = (self.sessions_played - statistics.mean(champions_seen)) / (statistics.stdev(champions_seen) + 1)
-            percentile = stats.norm.sf(zscore)
+            try:
+                zscore = (self.sessions_played - statistics.mean(champions_seen)) / (statistics.stdev(champions_seen))
+                percentile = stats.norm.sf(zscore)
+            except ZeroDivisionError:
+                percentile = 100
+            except statistics.StatisticsError:
+                percentile = 100
 
             # todo: temporary fix to zero division error
-            adjustment += (self.won / (self.sessions_played + 1)) * 15 * (1 - percentile)
+            try:
+                adjustment += (self.won / (self.sessions_played)) * 15 * (1 - percentile)
+            except ZeroDivisionError:
+                percentile = 0
 
             # todo: temporary fix to zero division error
             champions_kda = [data.get_kda() for data in player_champions]
-            kda_zscore = (self.get_kda() - statistics.mean(champions_kda) / (statistics.stdev(champions_kda) + 1))
-            kda_percentile = stats.norm.sf(kda_zscore)
+            try:
+                kda_zscore = (self.get_kda() - statistics.mean(champions_kda) / (statistics.stdev(champions_kda)))
+                kda_percentile = stats.norm.sf(kda_zscore)
+            except ZeroDivisionError:
+                kda_percentile = 100
+            except statistics.StatisticsError:
+                kda_percentile = 100
+
             adjustment += 15 * (1 - kda_percentile) * (1 - percentile)
 
+
             # todo: temporary fix to zero division error
-            adjustment += .49 * self.sessions_played / (statistics.mean(champions_seen) + 1) + 3.9 * self.sessions_played / 100
+            try:
+                adjustment += .49 * self.sessions_played / (statistics.mean(champions_seen)) + 3.9 * self.sessions_played / 100
+            except ZeroDivisionError:
+                pass
 
             import database
             self.adjustment = adjustment

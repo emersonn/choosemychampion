@@ -130,6 +130,9 @@ def stats(username, user_id):
     else:
         return jsonify(rv)
 
+# todo: implement this. needs to delete all the player data and remake it from
+# scratch. maybe could also call new adjustments? maybe decompose this a bit?
+
 # defines the API route to reset the user's stats. to be implemented as a button?
 @app.route('/api/stats/<username>/<user_id>/reset/')
 def reset_stats(username, user_id):

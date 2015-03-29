@@ -146,10 +146,10 @@ def crawl_player(player, depth, breadth):
             for person in random.sample(players, BREADTH):
                 crawl_player(person, depth - 1, BREADTH)
         except ValueError:
-            print("Reached sample error, sleeping for 20 then breaking...")
+            print("Reached sample error, sleeping for 20 then fixing...")
             sleep(20)
-            
-            break
+
+            pass
 
     else:
         global PLAYER_LIST

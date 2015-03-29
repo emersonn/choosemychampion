@@ -142,8 +142,14 @@ def crawl_player(player, depth, breadth):
 
         # recursive call. goes through a random sample of players in the breadth
         # and crawls those players.
-        for person in random.sample(players, BREADTH):
-            crawl_player(person, depth - 1, BREADTH)
+        try:
+            for person in random.sample(players, BREADTH):
+                crawl_player(person, depth - 1, BREADTH)
+        except ValueError:
+            print("Reached sample error, sleeping for 20 then breaking...")
+            sleep(20)
+            
+            break
 
     else:
         global PLAYER_LIST

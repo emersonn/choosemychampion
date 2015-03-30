@@ -151,7 +151,8 @@ def analyze_db():
             query.tower_score = data['tower_score']
             query.pick_rate = data['pick_rate']
 
-    db_session.commit()
+        db_session.commit()
+    db_session.commit()        
 
 if __name__ == '__main__':
     analyze_db()

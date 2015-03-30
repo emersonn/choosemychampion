@@ -110,7 +110,13 @@ def crawl_player(player, depth, breadth):
             # todo: separates the match printing. may need to fix w/ python 3+
             print("."),
 
-            store_match(match_data)
+            try:
+                store_match(match_data)
+            except KeyError:
+                print("Could not store match... Sleeping for 20 then breaking.")
+                sleep(20)
+
+                break
 
             # adds the players in the match to the crawl list
             participants = match_data['participantIdentities']

@@ -33,7 +33,7 @@
               md-rowspan="{{tile.span.row}}"
               md-colspan="{{tile.span.col}}"
               ng-class="tile.background">
-              <img src="http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/{{tile.image}}" alt="{{tile.name}}">
+              <img ng-src="http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/{{tile.image}}" alt="{{tile.name}}">
               <md-grid-tile-footer><h3>{{tile.name}} {{tile.role|capitalize}}</h3> <h4>Wins: {{tile.won|number:2}}% KDA: {{tile.kda|number:1}}</h4></md-grid-tile-footer>
               </md-grid-tile>
             </md-grid-list>

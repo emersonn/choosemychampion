@@ -1,6 +1,6 @@
 Project #2: League Champion Suggestion System (LCSS) LEL
   > Technologies to use: Flask (maybe Django), Ember, Foundations, SASS (gulp.js)
-                         SQL Alchemy?, Colorama hehe, Statistics, Scipy
+                         SQL Alchemy?, Colorama hehe, Statistics, Scipy, Requests
   > The page takes a user name, their role (top lane, mid lane...),
     and maybe what role they are trying to fill (optional)?
     > They are given a main champion and the ranking of the champion
@@ -134,13 +134,13 @@ Work flow: crawler.py -> analyze.py -> adjustment.py
 > added on top is the adjustment. hardest champs for a particular champ. optional include of other seasons and normal games.
 
 > todo list:
-> adjust the adjustment and expected win rate to be more favorable to played champions
+> adjust the adjustment and expected win rate (!!!!) to be more favorable to played champions
 > wins under 20 minutes? damage and meta? cs numbers and economy of items?
 > comment on all new things
 
 > fix IE stuff
 > set up database backups
-> memcached?
+> memcached? (https://docs.webfaction.com/software/memcached.html)
 
 > migrate current database on local side to mysql (not done but workaround)
 > implement /stats/reset (implemented w/out creating new data)
@@ -156,7 +156,104 @@ Work flow: crawler.py -> analyze.py -> adjustment.py
 
 > go through all the todos in the code!
 
-> optional other seasons and normal games
+> implement settings: other season data and normal games, color theme?
 
 > dependency downloaders?
-> digitalocean?
+
+todo list for digitalocean deployment:
+> install a firewall and all the security systems suggested by digitalocean
+> modify settings so everything matches (settings.py)
+> change to only pubkey login
+> fix ~/.ssh/config
+
+> modify the crawler.py, analyze.py, and adjustments.py to use db_session.execute() statements to
+> make it more efficient and not actually crash when trying to run them (done)
+> make all the .all() requests more efficient with execute statements
+> indicies in the MySQL
+> double check the new function produces correct data
+
+> transfer the db from webfaction
+
+> make sure everything matches
+> make sure everything works and conduct tests
+
+> sudo nano /etc/apache2/sites-available
+> change pointing of nameservers and restart apache2
+
+
+>>>>>>>>>>>>>>
+
+> digitalocean? need to install Flask (done), all the dependencies (done), MySQL (done), and a firewall
+> fix digitalocean billing and get it set up. (done) need to add static file serving and change the settings (done)
+> steps before deploying, need to change the sudo nano /etc/apache2/sites-available
+/league.conf, need to change pointing of domains, need to add domains! need to restart apache sudo service apache2 restart
+> modify settings so it's right
+
+> "Geoffrey Chan:
+  SELECT champion_name, AVG(kills) FROM champions GROUP BY champion_name
+  GROUP BY splits your data into groups of that column
+  https://dev.mysql.com/doc/refman/5.0/en/group-by-functions.html
+  supports SUM
+  COUNT
+Emerson Matson:
+  OH OK THAT’S ACTUALLY BETTER SENCE
+Geoffrey Chan:
+  STD
+  MIN
+  MAX
+  etc."
+
+  > look into creating indexes for mysql to make the calculation faster
+
+  SELECT champion_name, AVG(kills) FROM champions GROUP BY champion_name
+GROUP BY splits your data into groups of that column
+https://dev.mysql.com/doc/refman/5.0/en/group-by-functions.html
+supports SUM
+COUNT
+
+// need won stats and pick rate
+r = s.execute("SELECT champion_id, role, " +
+                "CAST(SUM(kills) AS FLOAT) / COUNT(*), " +
+                "CAST(SUM(deaths) AS FLOAT) / COUNT(*), " +
+                "CAST(SUM(assists) AS FLOAT) / COUNT(*), " +
+                "CAST(SUM(damage) AS FLOAT) / COUNT(*), " +
+                "CAST(SUM(objective_score) AS FLOAT) / COUNT(*), " +
+                "CAST(SUM(tower_score) AS FLOAT) / COUNT(*), " +
+                "CAST(SUM(won) AS FLOAT) / COUNT(*), " +
+                "CAST(COUNT(*) AS FLOAT) / " + str(match_num) + " " +
+                "FROM champion GROUP BY champion_id, role")
+
+// working on computer w/ sqllite3
+r = s.execute("""
+    SELECT champion_id, role,
+        CAST(SUM(kills) AS FLOAT) / COUNT(*),
+        CAST(SUM(deaths) AS FLOAT) / COUNT(*),
+        CAST(SUM(assists) AS FLOAT) / COUNT(*),
+        CAST(SUM(damage) AS FLOAT) / COUNT(*),
+        CAST(SUM(objective_score) AS FLOAT) / COUNT(*),
+        CAST(SUM(tower_score) AS FLOAT) / COUNT(*),
+        CAST(SUM(won) AS FLOAT) / COUNT(*),
+        CAST(COUNT(*) AS FLOAT) / {match_num}
+        FROM champion GROUP BY champion_id, role
+        """.format(match_num = str(match_num)))
+
+// trying to fix server side code
+r = s.execute("""
+    SELECT champion_id, role,
+        SUM(kills) / COUNT(*),
+        SUM(deaths) / COUNT(*),
+        SUM(assists) / COUNT(*),
+        SUM(damage) / COUNT(*),
+        SUM(objective_score) / COUNT(*),
+        SUM(tower_score) / COUNT(*),
+        SUM(won) / COUNT(*),
+        COUNT(*) / {match_num},
+        COUNT(*)
+        FROM champion GROUP BY champion_id, role
+        """.format(match_num = str(match_num)))
+
+figure out the problem with RAM usage and the database issues, test test test the program
+and then try to check every single thing and see if it outputs correct data, transfer the new
+database and then deploy!
+
+> increase the pick rate

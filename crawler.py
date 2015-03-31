@@ -15,7 +15,7 @@ from settings import API_KEY, URLS
 
 # crawler settings
 BREADTH = 5
-DEPTH = 3
+DEPTH = 5
 
 # trackers
 PLAYER_LIST = 0

@@ -198,8 +198,6 @@ def random_stats():
         CACHE.set('random_stats', stats, timeout = 5)
         return jsonify(stats)
 
-
-
     return jsonify(rv)
 
 # builds the stats of a user to put into the PlayerData model. saves the data

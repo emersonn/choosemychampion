@@ -296,7 +296,7 @@ class ChampionData(Base):
 
             # bottom or middle roles are more likely to win so a higher score
             if self.role == "BOTTOM" or self.role == "MIDDLE":
-                calculated_score *= 1.2
+                calculated_score *= 1.10
 
             calculated_score += self.adjustment
 
@@ -330,7 +330,7 @@ class ChampionData(Base):
     def get_calculated_win(self, user_id):
         wins = 0.0
         seen = 0.0
-        multiplier = 1.15
+        multiplier = 1.18
 
         player = PlayerData.query.filter_by(player_id = user_id)
 

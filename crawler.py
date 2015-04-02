@@ -53,7 +53,9 @@ def get_featured():
 # and store data related to the matches
 def crawl_player(player, depth, breadth):
     # this is to avoid overloading the servers and being timed out
-    sleep(1)
+
+    # commented because of new API key
+    # sleep(1)
 
     # if not the base case. we are in the recursive case
     if depth != 0:
@@ -93,7 +95,9 @@ def crawl_player(player, depth, breadth):
             # print(Fore.GREEN + "Found match: " + Fore.RESET + str(match['matchId']) + " " +
             #    str(datetime.datetime.fromtimestamp(match['matchCreation'] / 1000)) + " " +
             #    str(match['matchDuration']))
-            sleep(1)
+
+            # commenting because of new API key
+            # sleep(1)
 
             # todo: implement skipping matches if the match has already been crawled in this
             # session or another session. multiple matches may obscufate data. and match_data
@@ -233,7 +237,9 @@ def crawl_database():
     # todo: maybe put all requests in a particular method to regulate sleeping of the
     # program and make it more consistent. also it would be easier to catch if errors
     # had occurred and sleep because of that.
-    sleep(1)
+
+    # commented because of new API key
+    # sleep(1)
 
     # only 40 summoners can be requested at a time
     del participants[40:]

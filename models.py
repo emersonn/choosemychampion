@@ -294,9 +294,11 @@ class ChampionData(Base):
 
             calculated_score += 10 * self.pick_rate
 
+            calculated_score *= 1.15
+
             # bottom or middle roles are more likely to win so a higher score
             if self.role == "BOTTOM" or self.role == "MIDDLE":
-                calculated_score *= 1.10
+                calculated_score *= 1.04
 
             calculated_score += self.adjustment
 
@@ -353,4 +355,4 @@ class ChampionData(Base):
             multiplier = 1.18
 
         return (self.get_score(False) + self.get_kda() +
-            self.objective_score + self.tower_score) * min(multiplier * (wins * 1.0 / seen), 1.0)
+            self.objective_score + self.tower_score) * min(multiplier * (wins * 1.15 / seen), 1.0)

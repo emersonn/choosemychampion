@@ -151,7 +151,7 @@ def internal_stats():
     if rv is None:
         from models import Champion, Match
         stats = {
-            'champ_count': Champion.query.count(),
+            'champ_count': Match.query.count() * 10, # Champion.query.count(),
             'match_count': Match.query.count()
         }
         CACHE.set('internal_stats', stats, timeout = 10 * 60)

@@ -137,6 +137,7 @@ Work flow: crawler.py -> analyze.py -> adjustment.py
 > adjust the adjustment and expected win rate (!!!!) to be more favorable to played champions
 > wins under 20 minutes? damage and meta? cs numbers and economy of items?
 > comment on all new things
+> change md-toolbar on the champions.html page to not have a box-shadow !important
 
 > fix IE stuff
 > set up database backups
@@ -156,11 +157,19 @@ Work flow: crawler.py -> analyze.py -> adjustment.py
 
 > go through all the todos in the code!
 
+> change crawler so it doesn't add duplicate matches, and also implement
+> multithreading for it and also pruning duplicate matches
+
+> set up database backups
+
 > implement settings: other season data and normal games, color theme?
+> fix the description on the front page about having champions that may
+> not be played at the moment
 
 > dependency downloaders?
 
 todo list for digitalocean deployment:
+> stuff doesn't actually load....
 > install a firewall and all the security systems suggested by digitalocean
 > modify settings so everything matches (settings.py)
 > change to only pubkey login

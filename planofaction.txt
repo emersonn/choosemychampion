@@ -166,6 +166,8 @@ Work flow: crawler.py -> analyze.py -> adjustment.py
 > fix the description on the front page about having champions that may
 > not be played at the moment
 
+> add a version history
+
 > dependency downloaders?
 
 todo list for digitalocean deployment:

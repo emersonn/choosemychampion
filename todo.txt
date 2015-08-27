@@ -1,0 +1,59 @@
+> Production To Do:
+  > install circus and set up crawler
+  > set up dependency manager
+    > set up compressor for javascript/css (gulp, bower)
+      > minify, uglify?
+  > firewall
+
+> Development To Do:
+  > set up Alembic
+
+> To Do List:
+  > start cleaning up planofaction.txt and directory of files
+    > delete files that aren't used anymore
+
+  > start cleaning up crawler and models
+    > abstract out connection to Riot API
+
+  > fix analysis so it can actually work on the large number of matches played
+
+  > fix front page player count to accurate
+  > comment on all new additions in code
+
+  > change adjustment and expected win rate to favor played champions
+  > factors to consider: wins under 20 minutes? damage? meta? cs numbers? economy of items?
+
+  > remake website
+
+  > set up database backups
+  > memcached? (https://docs.webfaction.com/software/memcached.html)
+
+  > migrate current database on local side to mysql (not done but workaround)
+  > implement /stats/reset (implemented w/out creating new data)
+  > implement a reset button (AJAX to reset and once complete reload the data) (added)
+  > make the settings page nicer
+  > make the reset button not delete things but just edit the availability of data
+
+  > featured champions, rising new stars, and random suggested champs
+
+  > redesign the website. make it nicer looking...
+
+  > extra page for champion data
+  > personal champion skill level
+  > data visualization and interactive data over time
+
+  > change crawler to avoid duplicate matches
+
+  > set up database backups
+
+  > implement settings: other season data and normal games, color theme?
+
+  > add a version history for public
+
+  > modify the crawler.py, analyze.py, and adjustments.py to use db_session.execute() statements to
+  > make it more efficient and not actually crash when trying to run them (done)
+  > make all the .all() requests more efficient with execute statements
+  > indicies in the MySQL
+  > double check the new function produces correct data
+  
+  > go through todos in the code

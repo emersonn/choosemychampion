@@ -1,8 +1,13 @@
+# Data analysis script
+# Emerson Matson
+
+# Used for moving the database into a more accessible size for analysis and
+# data presentation
+
 import datetime
 import math
 
 from colorama import Fore
-import requests
 from sqlalchemy import func, Integer
 import sqlalchemy
 
@@ -15,21 +20,17 @@ from settings import API_KEY, URLS
 #       filter the query to the most recent matches (30 days)
 #       limit the query to a good amount ~10 mill?
 #       prune the database every so often
+
+# analyzes the champion database and condenses the statistics for easy retrieval
 def analyze():
     print("Using new script...")
 
     match_num = get_match_count()
 
-    # Multiple ways to go about this
-    #   Group by champion/role and find distinct rows and then filter to aggragate
-    #   Aggragate right away with a .query() with func.sum, func.count
-    #   Filter then aggragate (order by date, limit by a large number)
-
-    # champion_id, role, kills, deaths, assists, damage, objective_score, tower_score, won
-    # pick_rate, num_seen, adjustment = 0
-
-    # avg function
-
+    # NOTE: Multiple ways to go about this
+    #       Group by champion/role and find distinct rows and then filter to aggragate
+    #       Aggragate right away with a .query() with func.sum, func.count
+    #       Filter then aggragate (order by date, limit by a large number)
     champions = (db_session.query(
                         Champion.champion_id.label("champion_id"),
                         Champion.role.label("role"),
@@ -62,7 +63,7 @@ def analyze():
             db_session.add(new_champion)
 
         else:
-            print("Found " + str(champion.champion_id) + ". Updating data...")
+            print("Found " + str(found.get_name()) + ". Updating data...")
 
             found.kills = champion.kills
             found.deaths = champion.deaths

@@ -60,17 +60,21 @@ def crawl_player(player, depth, breadth):
         players = set()
 
         for match in matches:
-            # TODO: implement skipping matches if this match already exists in the database
+            # TODO: inefficient. checks every match, maybe check by player match history for all of them?
+            check_match = db_session.query(Match).filter(Match.match_id == match['matchId']).all()
+            if check_match == []:
+                print(str(match['matchId']) + " already exists in the database. Skipping.")
+                continue
+
             match_data = SESSION.get_match(match['matchId'])
 
-            if match_data == []:
-                pass
+            if match_data == {}:
+                break
 
             try:
                 store_match(match_data)
             except KeyError:
-                print("Could not store match. Sleeping for 5 then breaking.")
-                sleep(5)
+                print("Could not store match. Breaking...")
 
                 break
 
@@ -95,8 +99,7 @@ def crawl_player(player, depth, breadth):
             for person in random.sample(players, BREADTH):
                 crawl_player(person, depth - 1, BREADTH)
         except ValueError:
-            print("Reached sample error, sleeping for 5 then continuing...")
-            sleep(5)
+            print("Reached sample error, continuing...")
 
             pass
 

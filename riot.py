@@ -52,7 +52,7 @@ class RiotSession(requests.Session):
         try:
             return self.get(URLS['match'].format(location = self.location, match = str(match))).json()
         except ValueError:
-            return []
+            return {}
 
     def get_ids(self, players):
         return self.get(URLS['ids'].format(location = self.location, players = ','.join(players))).json()

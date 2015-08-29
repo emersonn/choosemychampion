@@ -1,6 +1,6 @@
 Project #2: League Champion Suggestion System (LCSS) LEL
   > Technologies to use: Flask (maybe Django), Ember, Foundations, SASS (gulp.js)
-                         SQL Alchemy?, Colorama hehe, Statistics, Scipy, Requests
+                         SQL Alchemy?, Colorama hehe, Statistics, Scipy, Numpy, Requests, uwsgi, Alembic
   > The page takes a user name, their role (top lane, mid lane...),
     and maybe what role they are trying to fill (optional)?
     > They are given a main champion and the ranking of the champion
@@ -13,8 +13,8 @@ Project #2: League Champion Suggestion System (LCSS) LEL
       > Would have to integrate what role they're trying to fill and
         the current team status? What their team needs? This would be good
         to know because they might need a tank...?
-    > Algorithim would take the working database (updated nightly)
-      > The algorithim would then update the current RANKINGS of
+    > Algorithm would take the working database (updated nightly)
+      > The algorithm would then update the current RANKINGS of
         particular champions based on win rates and also multiple other
         sources from things such as nerfplz.com, or other tier lists.
       > The champions would be put into point rankings for particular
@@ -134,12 +134,14 @@ Work flow: crawler.py -> analyze.py -> adjustment.py
 > added on top is the adjustment. hardest champs for a particular champ. optional include of other seasons and normal games.
 
 > todo list:
-> adjust the adjustment and expected win rate (!!!!) to be more favorable to played champions
-> wins under 20 minutes? damage and meta? cs numbers and economy of items?
-> comment on all new things
+> fix analysis so it can actually work on the large number of matches played
+> fix front page player count to accurate
+> comment on all new additions in code
+> change adjustment and expected win rate to favor played champions
+> factors to consider: wins under 20 minutes? damage? meta? cs numbers? economy of items?
 > change md-toolbar on the champions.html page to not have a box-shadow !important
 
-> fix IE stuff
+> fix IE stuff (????)
 > set up database backups
 > memcached? (https://docs.webfaction.com/software/memcached.html)
 
@@ -151,9 +153,11 @@ Work flow: crawler.py -> analyze.py -> adjustment.py
 
 > featured champions, rising new stars, and random suggested champs
 
+> redesign the website. make it nicer looking...
+
 > extra page for champion data
-> champion skill level
-> data visualization and interactive data
+> personal champion skill level
+> data visualization and interactive data over time
 
 > go through all the todos in the code!
 

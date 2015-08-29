@@ -63,6 +63,9 @@ def crawl_player(player, depth, breadth):
             # TODO: implement skipping matches if this match already exists in the database
             match_data = SESSION.get_match(match['matchId'])
 
+            if match_data == []:
+                pass
+
             try:
                 store_match(match_data)
             except KeyError:
@@ -173,7 +176,7 @@ def crawl_database():
 
     ids = SESSION.get_ids(participants)
     search_players = [ids[player]['id'] for player in ids.keys()]
-    
+
     print("Now attempting to crawl players with breadth of " + str(BREADTH) + " and depth of " + str(DEPTH) + "...")
 
     # creates the original call stack to crawl players

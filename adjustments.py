@@ -1,12 +1,17 @@
+# Champion Score Analysis
+# Emerson Matson
+
+# Analyzes each champions score
+
 import requests
 
 from models import ChampionData
 
-# takes all the champion data on file and attempts to create a score.
+# takes all the champion data and creates a score
 def make_adjustments():
     champions = ChampionData.query.all()
 
-    # todo: look at pro players? look at nerfplz.com and analyze their
+    # TODO: look at pro players? look at nerfplz.com and analyze their
     # algorithim for assigning tier lists. look at popularity on twitter?
 
     for champion in champions:

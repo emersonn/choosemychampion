@@ -1,9 +1,11 @@
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Float
 from sqlalchemy.orm import relationship, backref
 
-# todo: make this into a module
-from database import Base
+from database import Base, db_session
+from riot import RiotSession
 from settings import API_KEY, URLS
+
+SESSION = RiotSession(API_KEY)
 
 # Match class created as the match table in the database. stores basic information about
 # the match.
@@ -87,6 +89,7 @@ class PlayerData(Base):
     id = Column(Integer, primary_key = True)
     player_id = Column(Integer)
     player_name = Column(String(40))
+    location = Column(String(12))
 
     champion_id = Column(Integer)
     champion_name = Column(String(30))
@@ -232,7 +235,7 @@ class ChampionData(Base):
 
     image = Column(String(100))
 
-    # todo: combine this kda and name with the PlayerData to make it more corresponding
+    # TODO: combine this kda and name with the PlayerData to make it more corresponding
 
     # calculates the kda of a particular champion by taking the addition of kills
     # and assists.
@@ -264,7 +267,11 @@ class ChampionData(Base):
     # attempted to be normalized on a scale of 100.
     def get_score(self, force_update):
         if self.score == None or force_update:
-            print("Did not find score for " + self.get_name() + ". Generating score...")
+            if self.score == None:
+                print("Did not find score for " + self.get_name() + ". Generating score...")
+            else:
+                print(self.get_name() + " was called for a force update of score.")
+
             calculated_score = 0
 
             import statistics
@@ -325,30 +332,27 @@ class ChampionData(Base):
             database.db_session.commit()
         return self.image
 
-    # todo: make this a better calculation. gives a relatively low percentage. should
-    # be normalized around 50%. maybe also calculate champions that share a similar role?
+    def get_full_image(self):
+        return "http://ddragon.leagueoflegends.com/cdn/5.15.1/img/champion/{image}".format(image = self.get_image())
+
+    def get_url(self):
+        return "http://gameinfo.na.leagueoflegends.com/en/game-info/champions/{uri}".format(uri = self.get_image().split('.')[0].lower())
+
+    # TODO: role, archetype of champion
 
     # calculates the percepted win for a particular player with this champion.
-    def get_calculated_win(self, user_id):
+    def get_calculated_win(self, player_id, location):
+        """
         wins = 0.0
         seen = 0.0
         multiplier = 1.18
 
-        player = PlayerData.query.filter_by(player_id = user_id)
-
-        """
-        champions = ChampionData.query.all()
-        champions_list = set()
-        for champion in champions:
-            if champion.role == self.role:
-                wins += champion.won
-                seen += champion.num_seen
-        """
+        player = PlayerData.query.filter_by(player_id = user_id, location = location)
 
         for champion in player:
             wins += champion.won
             seen += champion.sessions_played
-            # todo: causes lots of lag
+            # TODO: make this more efficient
             # multiplier += champion.get_adjustment() / 140
 
         if self.role == "MIDDLE" or self.role == "BOTTOM":
@@ -356,3 +360,10 @@ class ChampionData(Base):
 
         return (self.get_score(False) + self.get_kda() +
             self.objective_score + self.tower_score) * min(multiplier * (wins * 1.15 / seen), 1.0)
+        """
+
+        player = db_session.query(PlayerData).filter_by(player_id = player_id, location = location)
+        return self.won
+
+    def get_counters(self):
+        champion = db_session.query(Champion).filter_by(champion_id = self.champion_id)

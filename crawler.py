@@ -20,7 +20,7 @@ from riot import RiotSession
 
 # crawler settings
 BREADTH = 5
-DEPTH = 5
+DEPTH = 10
 
 # trackers
 PLAYER_LIST = 0

@@ -12,6 +12,7 @@
 # Random match: 1932421719
 
 import requests
+from time import sleep
 
 URLS = {'ids': 'https://{location}.api.pvp.net/api/lol/{location}/v1.4/summoner/by-name/{players}',
         'stats': 'https://{location}.api.pvp.net/api/lol/{location}/v1.3/stats/by-summoner/{player}/ranked/',
@@ -25,6 +26,8 @@ URLS = {'ids': 'https://{location}.api.pvp.net/api/lol/{location}/v1.4/summoner/
 #       changing a lot of code
 
 # TODO: add error checking, error codes, etc. r.status_code = 429
+
+# TODO: rate limiting automatic sleep. only use for this module.
 class RiotSession(requests.Session):
     def __init__(self, api, location = "na"):
         super(RiotSession, self).__init__()
@@ -37,6 +40,7 @@ class RiotSession(requests.Session):
         try:
             return self.get(URLS['featured'].format(location = self.location)).json()['gameList']
         except KeyError:
+            sleep(10)
             return []
 
     # TODO: r['matches'] exists (KeyError), and even if ValueError for if JSON exists
@@ -45,6 +49,7 @@ class RiotSession(requests.Session):
             return self.get(URLS['matches'].format(location = self.location, player = str(player)),
                 params = {'rankedQueues': match_type, 'endIndex': matches}).json()['matches']
         except KeyError:
+            sleep(10)
             return []
 
     # TODO: r['matches'] exists (KeyError), and even if ValueError for if JSON exists
@@ -52,6 +57,7 @@ class RiotSession(requests.Session):
         try:
             return self.get(URLS['match'].format(location = self.location, match = str(match))).json()
         except ValueError:
+            sleep(10)
             return {}
 
     def get_ids(self, players):

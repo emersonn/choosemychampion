@@ -40,7 +40,7 @@ def get_featured():
     participants = []
     for match in matches:
         for participant in match['participants']:
-            participants.append(participant['summonerName'])
+            participants.append(participant['summonerName'].encode('utf-8'))
 
     return participants
 

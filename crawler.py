@@ -19,8 +19,8 @@ from settings import API_KEY, URLS
 from riot import RiotSession
 
 # crawler settings
-BREADTH = 5
-DEPTH = 10
+BREADTH = 15
+DEPTH = 15
 
 # trackers
 PLAYER_LIST = 0

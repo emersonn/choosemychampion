@@ -1,0 +1,16 @@
+> Workflow: crawler.py, analyze.py, adjustments.py
+> Development workflow: app.py, gulp (running while developing)
+> Production workflow
+  > Add, commit, push (gulp file, package.json)
+  > Pull on the server
+  > (npm update, npm install), gulp
+  > Alembic (if needed)
+
+> Technologies in Use
+  > Flask, MySQL
+    > sqlalchemy, colorama, statistics
+    > scipy, numpy, requests, uwsgi, nginx, virutalenv, Alembic, pip
+  > Angular, jQuery
+    > chart.js, angular-chart
+    > skeleton.css, normalize.css
+  > Gulp, npm

@@ -1,0 +1,186 @@
+input, select, button {
+  border-radius: 0 !important;
+  font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+
+  -webkit-appearance: none;
+  -webkit-border-radius: 0px;
+}
+
+input {
+  color: #222 !important;
+}
+
+select {
+  background-color: #222 !important;
+  border: none !important;
+  color: #FFF !important;
+}
+
+button {
+  background-color: #2980b9;
+  border: none;
+  color: #FFF !important;
+}
+
+.landing {
+  background: url(/static/images/howling.jpg) no-repeat;
+  background-size: cover;
+
+  color: #FFF;
+
+  height: 350px;
+  padding-top: 28rem;
+}
+
+.information {
+  padding: 20rem 0 20rem 0;
+}
+
+h6.info-text {
+  font-size: 3.6rem;
+}
+
+.info-text {
+  text-transform: uppercase;
+  letter-spacing: .2rem;
+  font-weight: 200;
+}
+
+.side-text {
+  color: #bdc3c7;
+}
+
+.clear-text {
+  font-weight: 400;
+}
+
+.spaced {
+  padding: 5rem 0 5rem 0;
+}
+
+.highlight {
+  background-color: #c0392b;
+  color: #FFF;
+}
+
+.intro {
+  max-width: 60%;
+}
+
+.intro input {
+  width: 50%;
+}
+
+.intro input, select, button {
+  vertical-align: top !important;
+}
+
+.stats.ng-animate {
+  animation: fadeInDown 1s;
+}
+
+.subtle.ng-animate {
+  animation: fadeIn 1s;
+}
+
+.stats-control.ng-hide-remove {
+  animation: fadeInDown 1s;
+}
+
+.stats-control.ng-show-remove {
+  animation: fadeOut 1s;
+}
+
+.navigation {
+  background: url(/static/images/howling.jpg) no-repeat;
+  background-size: cover;
+
+  color: #FFF;
+}
+
+.navigation a {
+  display: inline;
+
+  color: #FFF;
+  font-size: 3.2rem;
+  text-decoration: none;
+}
+
+.navigation ul, .navigation li {
+  vertical-align: middle;
+  display: inline;
+}
+
+.navigation-champion {
+  background-color: rgba(0, 0, 0, .5);
+  color: #FFF;
+}
+
+.navigation-champion .md-tab {
+  color: #FFF;
+}
+
+.navigation-champion .md-tab.md-active {
+  color: #3498db;
+}
+
+.champion-listing, .spacing-upwards {
+  padding: 2rem 0 2rem 0;
+}
+
+.champion-listing .heading {
+  margin-bottom: .4rem;
+}
+
+.no-space {
+  margin-bottom: 0;
+}
+
+/* TODO: very hacky code with the transform and position relatives. */
+.champion-icon {
+  height: 5rem;
+
+  position: relative;
+  top: 50%;
+  transform: translateY(25%);
+
+  border-radius: 5rem;
+}
+
+.champion-icon-listing {
+  height: 5rem;
+
+  border-radius: 5rem;
+}
+
+.champion-score {
+  color: #FFF;
+  font-size: 3.6rem;
+
+  height: 6rem;
+  width: 6rem;
+
+  position: relative;
+  top: 50%;
+  transform: translateY(10%);
+
+  border-radius: 5rem;
+}
+
+.quick-info {
+  display: block;
+
+  cursor: pointer;
+}
+
+.highlight-orange {
+  color: #e67e22;
+}
+
+.highlight-blue {
+  color: #2980b9
+}
+
+.width-image {
+  width: 100%;
+}

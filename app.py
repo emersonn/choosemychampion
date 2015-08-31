@@ -48,10 +48,12 @@ def profile(username, location):
         #       make a function for a single id?
         user_id = response[response.keys()[0]]['id']
     # TODO: fix this. this catches both 429 and 400 errors. try to catch
-    # the status code instead. or handle it through the module
-    except KeyError:
-        print("Tried to get " + username + "'s id. Got " + str(response.status_code) + ".")
-        abort(response.status_code)
+    #       the status code instead. or handle it through the module. KeyError?
+    #       catch the error too. raise new exception! need more info about
+    #       what riot responded.
+    except ValueError:
+        print("Tried to get " + username + "'s id. Got an error.")
+        abort(400)
 
     return stats(username, user_id, location)
 

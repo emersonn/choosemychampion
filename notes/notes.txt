@@ -2,9 +2,11 @@
 > Development workflow: app.py, gulp (running while developing)
 > Production workflow
   > Add, commit, push (gulp file, package.json)
-  > Pull on the server
-  > (npm update, npm install), gulp
-  > Alembic (if needed)
+  > Connect to server
+    > Pull on the server
+    > (npm update, npm install), gulp (may need to nvm ls, nvm use)
+    > Alembic (if needed)
+    > sudo service nginx restart, sudo service league restart
 
 > Technologies in Use
   > Flask, MySQL

@@ -1,29 +1,31 @@
-from flask import Flask, abort, jsonify, send_file
+import datetime
+import operator
 from time import sleep
-import requests, datetime, urllib
+import urllib
 
-from models import PlayerData, ChampionData
+# TODO: fix this.
+import logging
+logging.captureWarnings(True)
+
+from flask import Flask, abort, jsonify, send_file
+import requests
+from sqlalchemy import func, Integer
+
+from models import PlayerData, ChampionData, Champion, Match
 from database import db_session
+from riot import RiotSession
 from settings import API_KEY, URLS, CACHE
 
 app = Flask(__name__)
 app.config.from_object('app_settings')
 
-# todo: fix this. like really. this deals with the warning
-# given by python for not updating python and not installing
-# the SSL library.
-import logging
-logging.captureWarnings(True)
-
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     db_session.remove()
 
-# todo: try to find a way to combine these two..
+# TODO: try to find a way to combine these two..
 
-# if the user is in the index or the route /summoner/<username>/ it
-# directs them to the index html page. their request is handled client
-# side.
+# requests to both of these urls are handled client side
 @app.route('/')
 def index():
     return send_file('static/index.html')
@@ -32,73 +34,60 @@ def index():
 def username(username):
     return index()
 
-# todo: maybe try to find their username in the database if they already
-# have been crawled by the database. maybe they might exist in it?
+# TODO: maybe try to find their username in the database if they already
+# have been crawled. reduce api load?
 
-# defines the API route for the username. attempts to find their user_id
-# and returns a json with ['user_id']
-@app.route('/api/<username>/')
-def profile(username):
-    query = PlayerData.query.filter_by(player_name = username).all()
+# gathers champion statistics given their username and location
+@app.route('/api/champions/<username>/<location>/')
+def profile(username, location):
+    try:
+        print(username + " from " + location + " is requesting their user ID.")
+        session = RiotSession(API_KEY, location)
+        response = session.get_ids([urllib.pathname2url(username)])
+        # TODO: very dependent on API. abstract this out into the module?
+        #       make a function for a single id?
+        user_id = response[response.keys()[0]]['id']
+    # TODO: fix this. this catches both 429 and 400 errors. try to catch
+    # the status code instead. or handle it through the module
+    except KeyError:
+        print("Tried to get " + username + "'s id. Got " + str(response.status_code) + ".")
+        abort(response.status_code)
 
-    if len(query) == 0:
-        try:
-            print(username + " does not exist in the system. Getting user id...")
-            r = requests.get(URLS['ids'] + urllib.pathname2url(username), params = {'api_key': API_KEY})
-            # todo: very hacky, try to figure a better way
-            user_id = r.json()[r.json().keys()[0]]['id']
-        # todo: fix this. this catches both 429 and 400 errors. try to catch
-        # the status code instead.
-        except KeyError:
-            print("Tried to get " + username + "'s id. Got " + str(r.status_code) + ".")
-            abort(429)
-    else:
-        # todo: multiple usernames? maybe the person has already had the username taken
-        # by someone else?
-        user_id = query[0].player_id
+    return stats(username, user_id, location)
 
-    return jsonify({'user_id': user_id})
-
-# todo: kind of not... clean. the only purpose of putting this as
-# username and user_id was to know if their username has already
-# been requested but that's handled client side. it would
-# be cleaner to just have the ID. but maybe this handles multiple
-# ids? maybe it can be used in the future to handle region?
-
-# defines the API route in which the username and the user id has been
-# supplied. returns a json of all of the player stats for every champion
-# including non played champions
-@app.route('/api/stats/<username>/<user_id>/')
-def stats(username, user_id):
+# gathers champion statistics given an username, user id, and location
+def stats(username, user_id, location):
     rv = CACHE.get('user_data_' + str(user_id))
     if rv is None:
-        query = PlayerData.query.filter_by(player_id = user_id).all()
+        query = db_session.query(PlayerData).filter_by(player_id = user_id, location = location).all()
 
-        # todo: update user data if the data is old.
+        # TODO: abstract this timer out into a constant
+        thirty_minutes_ago = datetime.datetime.now() - datetime.timedelta(minutes = 30)
+        if len(query) > 0 and query[0].updated < thirty_minutes_ago:
+            print("Player in question has old data. Resetting stats.")
+            reset_stats(username, user_id, location)
+            query = []
+
         if len(query) == 0:
             try:
-                print(str(user_id) + "/" + username + " does not exist as a model. Attempting to create...")
-                # todo: catching the errors!
-                r = requests.get(URLS['stats'] % str(user_id), params = {'api_key': API_KEY})
-                user_data = r.json()
-                build_stats(user_data, username)
+                print(username + " (" + str(user_id) + ") from " + location + " does not exist as a model. Attempting to create...")
 
-                query = PlayerData.query.filter_by(player_id = user_id).all()
-            # todo: not very descriptive error. the name could not exist or maybe
-            # there was an actual overload of requests!
+                session = RiotSession(API_KEY, location)
+                user_data = session.get_stats(user_id)
+                build_stats(user_data, username, location)
+
+                query = PlayerData.query.filter_by(player_id = user_id, location = location).all()
+
+            # TODO: make this a more descriptive error
             except KeyError:
                 abort(429)
 
         full_stats = {'scores': []}
-        query = ChampionData.query.all()
-
-        # todo: depricated. remove this! no need for this anymore.
         index = 1
 
-        # todo: this is vastly inefficient. it goes through a LOT of data to
-        # generate this. maybe cache this? maybe not? it's user specific, so
-        # maybe cache another function that just gets champion data and adjust
-        # certain key values after it has been given?
+        query = ChampionData.query.all()
+
+        # TODO: this is vastly inefficient.
 
         # attempts to go through all the champion data and generate the
         # array of score information for each champion. this also appends
@@ -106,112 +95,198 @@ def stats(username, user_id):
         for champion in query:
             # attempts to go through each of the players champions when playing
             # this champion and gets their adjustment for the score
-            user_query = PlayerData.query.filter_by(player_id = user_id, champion_id = champion.champion_id).first()
+            user_query = PlayerData.query.filter_by(player_id = user_id, location = location, champion_id = champion.champion_id).first()
             if user_query == None:
                 adjustment = 0
             else:
                 adjustment = user_query.get_adjustment()
 
-            # todo: implement quick notes. quick information jabs of what they should play
-            # what they like to play and some analysis about that.
-            full_stats['scores'].append({'championName': champion.get_name(), 'championId': champion.champion_id,
+            # TODO: implement quick notes. quick information jabs of what they should play
+            # what they like to play and some analysis about that. add as a function for the model of
+            # PlayerData. maybe even add general champion quick infos.
+            full_stats['scores'].append({
+                'championName': champion.get_name(),
+                'championId': champion.champion_id,
                 'score': champion.get_score(False) + adjustment,
-                'role': champion.role, 'id': index, 'image': champion.get_image(),
-                'playerAdjust': adjustment, 'uriname': champion.get_image().split('.')[0],
-                'kills': champion.kills, 'deaths': champion.deaths, 'assists': champion.assists,
-                'kda': champion.get_kda(), 'winRate': champion.won * 100, 'pickRate': champion.pick_rate * 100,
-                'calculated': champion.get_calculated_win(user_id), 'player': username})
+                'role': champion.role,
+                'id': index,
+                'image': champion.get_full_image(),
+                'playerAdjust': adjustment,
+                'url': champion.get_url(),
+                'kills': champion.kills,
+                'deaths': champion.deaths,
+                'assists': champion.assists,
+                'kda': champion.get_kda(),
+                'winRate': champion.won * 100,
+                'pickRate': champion.pick_rate * 100,
+                'calculated': champion.get_calculated_win(user_id, location) * 100,
+                'player': username
+            })
 
             index += 1
 
         # returns the json of the stats as an array of scores
-        CACHE.set('user_data_' + str(user_id), full_stats, timeout = 5 * 60)
+        CACHE.set('user_data_' + str(user_id), full_stats, timeout = 1 * 60)
         return jsonify(full_stats)
     else:
         return jsonify(rv)
 
-# todo: implement this. needs to delete all the player data and remake it from
-# scratch. maybe could also call new adjustments? maybe decompose this a bit?
+# TODO: implement personal statistics over time. implement counters to the champion
+#       and good team archetype to have.
+@app.route('/api/stats/<champion>/<role>/')
+def champion_stats(champion, role):
+    champ = db_session.query(ChampionData).filter_by(champion_id = champion, role = role).first()
 
-# defines the API route to reset the user's stats. to be implemented as a button?
-@app.route('/api/stats/<username>/<user_id>/reset/')
-def reset_stats(username, user_id):
-    query = PlayerData.query.filter_by(player_id = user_id).delete()
+    seven_days_ago = datetime.datetime.now() - datetime.timedelta(days = 30)
+    champ_list = (db_session
+        .query(
+            Champion.champion_id.label("champion_id"),
+            func.count(Champion.id).label("num_seen"),
+            func.avg(Champion.won, type_ = Integer).label("won"),
+            Match.match_id.label("match_id"),
+            Match.match_time.label("match_time")
+        )
+        .filter(Champion.champion_id == champion, Champion.role == role)
+        .join(Champion.match)
+        .filter(Match.match_time > seven_days_ago)
+        .group_by(func.day(Match.match_time))
+        .order_by(Match.match_time.desc())
+        .all()
+    )
+
+    counters = compile_sorted_champions(champ.get_counters())
+    assists = compile_sorted_champions(champ.get_assists())
+
+    stats = {
+        'champion_info': {
+            'champion_id': champ.champion_id,
+            'champion_name': champ.get_name()
+        },
+
+        'counters': counters,
+        'assists': assists,
+
+        'days_seen': {
+            'labels': [data.match_time.strftime("%b %d (%A)") for data in champ_list],
+            'data': [data.num_seen for data in champ_list]
+        },
+
+        'days_won': {
+            'labels': [data.match_time.strftime("%b %d (%A)") for data in champ_list],
+            'data': [round(data.won, 2) for data in champ_list]
+        }
+    }
+
+
+
+    return jsonify(stats)
+
+# TODO: maybe do this at the model level?
+def compile_sorted_champions(listing, reverse = True):
+    sorted_listing = sorted(listing.items(), key = operator.itemgetter(1), reverse = reverse)
+    listing = []
+
+    for champion in sorted_listing:
+        num_seen = champion[1]
+        champ = champion[0]
+
+        listing.append({
+            'champion_id': champ.champion_id,
+            'champion_name': champ.get_name(),
+            'num_seen': num_seen,
+            'won': champ.won * 100,
+            'kda': champ.get_kda(),
+            'image': champ.get_full_image()
+        })
+
+    return listing
+
+
+# TODO: call all new adjustments
+
+# resets the users statistics in the database
+def reset_stats(username, user_id, location):
+    query = PlayerData.query.filter_by(player_id = user_id, location = location).delete()
     db_session.commit()
 
     rv = CACHE.delete('user_data_' + str(user_id))
 
-    print("Resetting stats for " + username + ".")
+    print("Resetting stats for " + username + " (" + str(user_id) + ") from " + location + ".")
 
-    return stats(username, user_id)
-
-@app.route('/api/internal/stats/')
-def internal_stats():
-    rv = CACHE.get('internal_stats')
+@app.route('/api/numbers/')
+def numbers():
+    rv = CACHE.get('numbers')
     if rv is None:
-        from models import Champion, Match
+        popular_champ = db_session.query(ChampionData).order_by(ChampionData.num_seen.desc()).first()
+        popular_champs = db_session.query(ChampionData).order_by(ChampionData.num_seen.desc()).limit(15).all()
+        random_champ = db_session.query(ChampionData).order_by(func.rand()).first()
+        winning_champ = db_session.query(ChampionData).filter(ChampionData.num_seen > 10).order_by(ChampionData.score.desc()).first()
+        winning_champ_roles = (
+            db_session.query(
+                Champion.role.label("role"),
+                func.count(Champion.id).label("seen")
+            )
+            .filter(Champion.champion_id == winning_champ.champion_id)
+            .group_by(Champion.role).all()
+        )
+
+        # Stats, Date Stats, Case Study of Popular or Highest Win Rate
         stats = {
-            'champ_count': (Match.query.count() * 1.0 * 10 + 1) / 1000000, # Champion.query.count(),
-            'match_count': Match.query.count()
+            'stats': {
+                    'match_count': Match.query.count(),
+                    'popular_champ': popular_champ.get_name(),
+                    'popular_champ_kda': round(popular_champ.get_kda(), 2),
+                    'random_champ': random_champ.get_name(),
+                    'random_champ_role': random_champ.role.capitalize(),
+                    'random_champ_seen': random_champ.num_seen,
+                    'average_kills': round(db_session.query(func.avg(ChampionData.kills)).first()[0], 2),
+                    'average_towers': round(db_session.query(func.avg(ChampionData.tower_score)).first()[0], 2)
+            },
+
+            'champion_picks': {
+                    'labels': [champ.get_name() + " (" + champ.role.capitalize() + ")" for champ in popular_champs],
+                    'data': [champ.num_seen for champ in popular_champs],
+                    'images': [champ.get_full_image() for champ in popular_champs]
+            },
+
+            # Time graph of pick rate over a week, group by date picked
+            'winning_champ': {
+                    'name': winning_champ.get_name(),
+                    'role': winning_champ.role.capitalize(),
+                    'image': winning_champ.get_full_image(),
+                    'seen': winning_champ.num_seen,
+                    'won': winning_champ.won * 100,
+                    'assists': compile_sorted_champions(champ.get_assists()),
+                    'kda': winning_champ.get_kda(),
+
+                    'role_distribution': {
+                        'labels': [data.role.capitalize() for data in winning_champ_roles],
+                        'data': [data.seen for data in winning_champ_roles]
+                    }
+            }
         }
-        CACHE.set('internal_stats', stats, timeout = 10 * 60)
+        CACHE.set('numbers', stats, timeout = 10 * 60)
         return jsonify(stats)
 
     return jsonify(rv)
 
-@app.route('/api/internal/stats/random')
-def random_stats():
-    rv = CACHE.get('random_stats')
-    if rv is None:
-        query = ChampionData.query.filter(ChampionData.num_seen >= 10).all()
-
-        import random
-        sample = random.sample(query, 4)
-        colors = ['green', 'blue', 'red', 'amber', 'cyan', 'purple', 'pink', 'indigo', 'light-blue']
-
-        stats = {'scores': []}
-        for champion in sample:
-            stats['scores'].append({
-                'name': champion.get_name(),
-                'id': champion.champion_id,
-                'image': champion.get_image(),
-                'won': champion.won * 100,
-                'kda': champion.get_kda(),
-                'role': champion.role,
-                'background': random.sample(colors, 1)[0],
-                'span': {'row': 1, 'col': 1}
-            })
-
-        # sample = random.sample(range(1, 11), 3)
-        # for number in sample[:2]:
-        #     stats['scores'][number]['span']['row'] = 2
-        #     stats['scores'][number]['span']['col'] = 2
-
-        # stats['scores'][sample[2]]['span']['col'] = 2
-
-        stats['scores'][0]['span']['row'] = 2
-        stats['scores'][0]['span']['col'] = 2
-        # stats['scores'][4]['span']['row'] = 2
-        # stats['scores'][4]['span']['col'] = 2
-        stats['scores'][3]['span']['col'] = 2
-
-        CACHE.set('random_stats', stats, timeout = 5)
-        return jsonify(stats)
-
-    return jsonify(rv)
-
-# builds the stats of a user to put into the PlayerData model. saves the data
-# into the database from a parameter of champion data from the servers, and
-# the username.
-def build_stats(data, username):
+# builds the stats of a user given a player's performance
+def build_stats(data, username, location):
     for champion in data['champions']:
         if champion['id'] != 0:
             total_stats = champion['stats']
-            new_player = PlayerData(player_id = data['summonerId'],
-                player_name = username, champion_id = champion['id'],
-                updated = datetime.datetime.today(), sessions_played = total_stats['totalSessionsPlayed'],
-                kills = total_stats['totalChampionKills'], deaths = total_stats['totalDeathsPerSession'],
-                assists = total_stats['totalAssists'], won = total_stats['totalSessionsWon'])
+            new_player = PlayerData(
+                player_id = data['summonerId'],
+                player_name = username,
+                location = location,
+                champion_id = champion['id'],
+                updated = datetime.datetime.today(),
+                sessions_played = total_stats['totalSessionsPlayed'],
+                kills = total_stats['totalChampionKills'],
+                deaths = total_stats['totalDeathsPerSession'],
+                assists = total_stats['totalAssists'],
+                won = total_stats['totalSessionsWon']
+            )
             db_session.add(new_player)
     db_session.commit()
 

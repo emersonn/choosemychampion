@@ -48,7 +48,7 @@ class RiotSession(requests.Session):
         try:
             return self.get(URLS['matches'].format(location = self.location, player = str(player)),
                 params = {'rankedQueues': match_type, 'endIndex': matches}).json()['matches']
-        except KeyError:
+        except KeyError, ValueError:
             sleep(10)
             return []
 
@@ -60,6 +60,8 @@ class RiotSession(requests.Session):
             sleep(10)
             return {}
 
+    # TODO: UnicodeEncodeError: 'ascii' codec can't encode character u'\xfc' in position 218: ordinal not in range(128)
+    #       maybe grab a random set from the featured players?
     def get_ids(self, players):
         return self.get(URLS['ids'].format(location = self.location, players = ','.join(players))).json()
 

@@ -206,6 +206,12 @@ class PlayerData(Base):
 
         return self.adjustment
 
+    # TODO: implement this. make this into a paragraph and graphs that discuss how the player is at this
+    #       champion compared to other people. show distributions and highlight where they are. such as tower scores
+    #       or kda and such.
+    def player_analysis(self):
+        pass
+
 # class championdata. stored as champion_data in the database. stores summary
 # information about a particular champion and the role that the particular champion
 # fills. the data is stored as average values over all the calculations.
@@ -365,5 +371,43 @@ class ChampionData(Base):
         player = db_session.query(PlayerData).filter_by(player_id = player_id, location = location)
         return self.won
 
+    # TODO: implement this. search for champions in the same matches and see patterns
+    #       store this as a one to many relation along with the assisting champions
+    #       improve this so it is not limited but rather stored.
+    #       reverse search through matches that contain that champion by joining the tables?
+    #       then filter by wins? then aggragating is easy. only problem is joining costs a lot...?
     def get_counters(self):
-        champion = db_session.query(Champion).filter_by(champion_id = self.champion_id)
+        champion = db_session.query(Champion).filter_by(champion_id = self.champion_id, role = self.role, won = False).limit(100).all()
+        condition = lambda x: x.champion_id != self.champion_id and x.role == self.role and x.won
+        return self.process_champion_query(champion, condition)
+
+    def get_assists(self):
+        champion = db_session.query(Champion).filter_by(champion_id = self.champion_id, role = self.role, won = True).limit(100).all()
+        condition = lambda x: x.champion_id != self.champion_id and x.won
+        return self.process_champion_query(champion, condition)
+
+    def process_champion_query(self, champion, condition):
+        matches = [champ.match for champ in champion]
+        champions = []
+        for match in matches:
+            champions.extend(match.champion)
+
+        teams = {}
+
+        for champion in champions:
+            if condition(champion):
+                try:
+                    teams[champion.champion_id] = teams[champion.champion_id] + 1
+                except KeyError:
+                    teams[champion.champion_id] = 1
+
+        compiled = {}
+
+        for champion in teams.keys():
+            champ = db_session.query(ChampionData).filter_by(champion_id = champion, role = self.role).first()
+            # TODO: fixes error where a champion may show up as None? FIX THIS. maybe search doesn't work?
+            #       some champion is not created as a ChampionData yet?
+            if champ is not None:
+                compiled[champ] = teams[champion]
+
+        return compiled

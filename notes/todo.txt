@@ -8,8 +8,18 @@
   > set up Alembic
   > set up gulp jshint, sourcemaps
   > set up Python Linter
+  > start using unittests
 
 > To Do List:
+  > make post on League Reddit, League Group UW about new update
+
+  > cache the detailed champion statistics? speed it up somehow.
+
+  > invalid summoner name it just keeps running and returns a 500
+    > write a unit test and make travis-ci run tests on commit, 404 or 400 invalid
+
+  > make about page available on the outside
+
   > clean up git directory on gitlab
 
   > start cleaning up planofaction.txt and directory of files

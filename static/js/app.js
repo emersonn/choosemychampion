@@ -22,7 +22,8 @@
       '$scope',
       'ChampionDetail',
       '$timeout',
-  function($routeParams, Champion, $scope, ChampionDetail, $timeout) {
+      '$location',
+  function($routeParams, Champion, $scope, ChampionDetail, $timeout, $location) {
     $scope.playerName = $routeParams.playerName;
     $scope.summoner_stats = false;
 
@@ -58,8 +59,18 @@
     $scope.champions = Champion.query({username: $scope.playerName, location: $routeParams.locationName}, function(){
       console.log("Got champions...");
       $scope.summoner_stats = true;
-    }, function() {
+    }, function(error) {
       console.log("Error in getting champions.");
+
+      if (error.status == 400) {
+        console.log("Summoner name does not exist.");
+        $scope.summoner_stats = true;
+        $scope.error_name = true;
+
+        $timeout(function() {
+          $location.path('/');
+        }, 3000);
+      }
     });
   }]);
 

@@ -42,6 +42,16 @@
   </div>
 </div>
 
+<div ng-show="error_name">
+  <div class="container">
+    <div class="spacing-upwards">
+      <center>
+        <h4><strong>{{ playerName }}</strong> does not exist! Try again. <i>Redirecting you to the home page...</i></h4>
+      </center>
+    </div>
+  </div>
+</div>
+
 <div class="subtle" ng-show="summoner_stats">
   <ng-switch on="selectedIndex">
     <div ng-switch-when="0">

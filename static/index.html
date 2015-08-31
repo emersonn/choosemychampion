@@ -11,134 +11,32 @@
       League Champion Suggestion Engine - Choose My Champion!
     </title>
 
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/0.8.0/angular-material.min.css">
-    <link rel="stylesheet" href="/static/css/animate.min.css">
-    <link rel="stylesheet" href="/static/css/main.min.css">
+    <link href='http://fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css' />
+
+    <link rel="stylesheet" href="/static/css/normalize.css" />
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/0.10.0/angular-material.min.css" />
+    <link rel="stylesheet" href="/static/dist/all.min.css" />
   </head>
   <body>
-    <div layout="row">
-      <div flex="25"></div>
-      <div layout="column" flex>
-        <md-whiteframe id="main-window" flex class="md-whiteframe-z1">
-          <div class="view-frame" ng-view></div>
-        </md-whiteframe>
-        <!-- turn this into a directive -->
-        <md-whiteframe class="padding-sides md-whiteframe-z1" style="margin-top: 20px; background-color: white !important;">
-          <div ng-controller="RandomController as vm" class="show-move">
-            <md-grid-list
-            md-cols-sm="1" md-cols-md="2" md-cols-gt-md="4"
-            md-row-height-gt-md="1:1" md-row-height="4:3"
-            md-gutter="8px" md-gutter-gt-sm="4px" class="random-scores">
-              <md-grid-tile ng-repeat="tile in stats.scores"
-              md-rowspan="{{tile.span.row}}"
-              md-colspan="{{tile.span.col}}"
-              ng-class="tile.background">
-              <img ng-src="http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/{{tile.image}}" alt="{{tile.name}}">
-              <md-grid-tile-footer><h3>{{tile.name}} {{tile.role|capitalize}}</h3> <h4>Wins: {{tile.won|number:2}}% KDA: {{tile.kda|number:1}}</h4></md-grid-tile-footer>
-              </md-grid-tile>
-            </md-grid-list>
-          </div>
+    <div ng-view></div>
 
-          <h4>
-            Updates
-          </h4>
-          <p>
-            Sorry for the outage! The server has been moved and now there is some coding to do! <i>(8.27.15)</i>
-          </p>
-
-          <p>
-            Hey guys. I have decided I will be rewriting a ton of code foundation for the site.
-            So it may be a while before anything "new" new but you will see really cool transformations going on
-            in the next few weeks. Also I will be moving the servers so expect some short outages. <i>(8.21.15)</i>
-          </p>
-
-          <p>
-            New update! Sorry for the super late update guys. I've been abroad for most of this summer but I'll be definitely
-            working hard on making this even more amazing. Keep sending me some suggestions and I'll try my best to implement
-            them. <i>(8.15.15)</i>
-          </p>
-
-          <p>
-            This is a temporary spot for updates. Until I get a good place to put a version history I'll just talk about some
-            recent changes! I am still working on this! Don't worry! I'm still fine tuning the statistics that are returned to
-            you, and there are a whole slew of things I'm working on, like a lot more personalized stats! Stay tuned. <i>(4.18.15)</i>
-          </p>
-
-          <h4>
-            Wait, tell me again, what does this do?
-          </h4>
-          <p>
-            We've all had that moment. We are never sure what to play until the clock hits 10 seconds. Kind of
-            freak out a <i>little</i> bit and then we pick some randy champion that we <i>think</i> might be able to do well with.
-            But, we're never quite sure because sometimes we get absolutely destroyed. Why not let the computer
-            help us decide the best champion to play, because winning is the only thing that counts... Right? Right?
-          </p>
-          <h4>
-            How does this work?
-          </h4>
-          <p>
-            Well, long story short, the system gathers not only your play information but gathers information of tons
-            of other players' results. Using the mighty power of statistics, and a bit of
-            magic, you are presented with a list of champions for each role ordered by a <strong>champion
-              score</strong>.
-            </p>
-            <h4>
-              What does this champion score represent?
-            </h4>
-            <p>
-              The champion score encompasses a lot of things. From the actual win rate of the champion, the pick rate of the
-              champion, to even the ability for the champion to acquire objectives. Most importantly the champion score also
-              includes an adjustment that represents the champions compatibility with you!
-            </p>
-            <h4>
-              I'm getting an error, try again later message!
-            </h4>
-            <p>
-              Something must have gone wrong! There are two possible reasons for this: you may have typed in the wrong summoner
-              name! If the typo'd summoner name didn't exist the system will go crazy and go kaput. Just kidding, it would
-              just say there's an error since it couldn't find it. Another reason for this is that the system is currently
-              overloaded. It automatically tries to reconnect and pull your data, but sometimes those retries may not always
-              work, also! Try again in a minute or two.
-            </p>
-            </md-whiteframe>
-
-            <md-whiteframe class="padding-sides md-whiteframe-z1" style="margin-top: 20px; background-color: white !important;">
-            <h4>
-              Who made this?
-            </h4>
-            <p>
-              Hi. I'm Emerson Matson. I'm a student at the University of Washington. I like to make apps for fun and hope they help people
-              out! If you have any questions, comments, or you would like to report some bugs send me an email
-              at <a href="mailto:emersonmatson@gmail.com">emersonmatson@gmail.com</a>!
-            </p>
-            <h4>
-              Legal Jibber Jabber
-            </h4>
-            <p>
-              League Champion Suggestion Engine isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends. League of Legends and Riot Games are trademarks or registered trademarks of Riot Games, Inc. League of Legends © Riot Games, Inc.
-            </p>
-        </md-whiteframe>
-      </div>
-      <div flex="25"></div>
-    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-aria.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-aria.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-resource.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-route.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-animate.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/0.8.2/angular-material.min.js"></script>
-
-    <script src="/static/js/app.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/0.10.0/angular-material.min.js"></script>
+    <script src="/static/dist/all.min.js"></script>
 
     <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-61257396-1', 'auto');
-    ga('send', 'pageview');
-
+      ga('create', 'UA-61257396-1', 'auto');
+      ga('send', 'pageview');
     </script>
   </body>
 </html>

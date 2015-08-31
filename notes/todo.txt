@@ -1,0 +1,94 @@
+> Production To Do:
+  > install circus and set up crawler
+  > install node, npm and gulp globally
+  > firewall
+  > start cleaning up gulp file and make a python distribution setup.py
+
+> Development To Do:
+  > set up Alembic
+  > set up gulp jshint, sourcemaps
+  > set up Python Linter
+
+> To Do List:
+  > clean up git directory on gitlab
+
+  > start cleaning up planofaction.txt and directory of files
+    > delete files that aren't used anymore
+
+  > start cleaning up crawler and models
+  > find better way to fix errors in riot.py
+
+  > comment on all new code
+
+  > fix front page player count to accurate
+
+  > fix models.py and clean it up and add abstract riot API
+    > improve the calculated win rate to actually include personal data
+    > add counters/champions that work
+    > add messages of information
+    > tips to improve play, looks at recent matches with the champion
+
+  > improve get_counters() and get_assists()
+    > reduce server load by putting it as a column (one to many relation?)
+    > go reverse from matches to the champions to make the compilation easier
+  > improve compilation of the data in the app.py by abstraction
+
+  > implement player_analysis
+
+  > implement league in the database
+
+  > improve the crawler by having different starting points
+
+  > start using pylint and unit testing
+  > start using gulp
+    > download the cloud files during building with bower or npm
+      > npm -S install angular-aria
+        > Gulp: npm install, copy module files into build folder, build css, build js
+          create the distribution
+        > https://travismaynard.com/writing/getting-started-with-gulp (tips)
+          > concatenate and minify js
+          > gulp.src('node_modules/**/*.js').pipe('all.js').pipe(uglify())
+    > keep gulpfile in git repo and when distributing, use gulp build
+
+  > championList shows things only if certain values. calculate these server side instead?
+    > enable a feature where it randomly talks about the champion server side instead.
+
+  > FIX PARENTING! It seems to be a problem when surrounded ng statements. Adding more statments
+    breaks the situation.
+
+  > make discussion paragraphs more complex with a lot more configurations
+
+  > first screen should be a "quick view" or "quick pick" screen
+    > portrait summary with highest winning champions and can click on the actual roles
+      when necessary.
+
+  > generate phrases server side to make it more complex and easier to manage
+
+  > put in the legal jibber jabber, faq, and contact information
+
+  > change adjustment and expected win rate to favor played champions, a lot more. A LOT MORE.
+  > add more factors into champion win rates
+    > factors to consider: wins under 20 minutes? damage? meta? cs numbers? economy of items?
+
+  > remake website
+    > detailed champion statistics needs more PERSONAL and IMPROVEMENT statistics of the player
+
+  > set up database backups
+  > memcached? (https://docs.webfaction.com/software/memcached.html)
+
+  > make the settings page nicer
+    > implement /stats/reset (implemented w/out creating new data)
+  > make the reset button not delete things but just edit the availability of data
+
+  > featured champions, rising new stars, and random suggested champs
+
+  > personal champion skill level
+  > data visualization and interactive data over time
+
+  > implement settings: other season data and normal games, color theme?
+
+  > add a version history for public
+
+  > set up suggestions/bugs form
+
+  > go through todos in the code

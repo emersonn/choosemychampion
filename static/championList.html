@@ -1,30 +1,131 @@
-<md-list>
-  <md-item>
-    <md-item-content style="height: 5em;" class="champion-listing" ng-repeat="champion in $parent.champions.scores | filter:champion.role = certainFilter | orderBy:'-score' | limitTo: 10 ">
-      <div class="md-tile-left">
-        <img ng-src="http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/{{champion.image}}" class="champion-icon" />
+<div
+  class="champion-listing"
+  ng-repeat="champion in $parent.champions.scores | filter:champion.role = certainFilter | orderBy:'-score' | limitTo: 15"
+>
+  <div class="container">
+    <div class="row quick-info hvr-grow" ng-click="$parent.$parent.getChampionData(champion)">
+      <div class="one column">
+        <img ng-src="{{ champion.image }}" class="champion-icon" />
       </div>
-      <div class="md-tile-content" layout="row">
-        <div flex>
-          <h3>{{champion.championName}}</h3>
-          <h4 class="light"><a ng-href="http://gameinfo.na.leagueoflegends.com/en/game-info/champions/{{champion.uriname|lowercase}}">Champion Profile</a>
-            <span ng-if="champion.playerAdjust != 0">- Your adjustment: <strong class="player-accented">{{champion.playerAdjust|number:2}} points</strong></span>
-            <span ng-if="champion.playerAdjust == 0">- Your calculated win rate: <strong class="accented">{{champion.calculated|number:2}}%</strong></span>
-            <br />
-            KDA: <strong>{{champion.kills|number:0}}/{{champion.deaths|number:0}}/{{champion.assists|number:0}} ({{champion.kda|number:2}})</strong> |
-            Win rate: <strong>{{champion.winRate|number:0}}%</strong> |
-            Pick rate: <strong>{{champion.pickRate|number:0}}%</strong>
-          </h4>
+
+      <div class="three columns">
+        <p class="info-text heading">{{ champion.championName }}</p>
+        <p class="no-space"><a ng-href="{{ champion.url }}">Champion Profile</a></p>
+        <p class="side-text">Click to show more statistics</p>
+      </div>
+
+      <div class="six columns">
+        <p class="info-text heading">Statistics</p>
+
+        <p class="no-space">
+          <span ng-if="champion.playerAdjust != 0">Your adjustment: <strong class="highlight-orange">{{ champion.playerAdjust|number:2 }} points</strong></span>
+          <span ng-if="champion.playerAdjust == 0">Your calculated win rate: <strong class="highlight-blue">{{ champion.calculated|number:2 }}%</strong></span>
+        </p>
+        <p class="no-space">
+          KDA: <strong>{{ champion.kills|number:0 }}/{{ champion.deaths|number:0 }}/{{ champion.assists|number:0 }} ({{ champion.kda|number:2 }})</strong> |
+          Win rate: <strong>{{ champion.winRate|number:0 }}%</strong> |
+          Pick rate: <strong>{{ champion.pickRate|number:0 }}%</strong>
+        </p>
+      </div>
+
+      <div class="two columns">
+        <div
+          class="champion-score"
+          style="background-color: hsla({{champion.score * 0.74 + 14}}, {{champion.score * -0.50 + 100}}%, {{champion.score * -.04 + 57}}%, 1);"
+        >
+          <center>
+            {{ champion.score | number: 0 }}
+          </center>
         </div>
       </div>
-      <div flex="10" class="champion-score"
-      style="background-color: hsla({{champion.score * 0.74 + 14}}, {{champion.score * -0.50 + 100}}%, {{champion.score * -.04 + 57}}%, 1);"
-      layout-align="center center" layout="row" layout-fill>
-      <h3>{{champion.score | number: 0}}</h3>
     </div>
-  </md-item-content>
 
+    <div class="row spaced stats-control" ng-show="$parent.$parent[champion.championId]">
+      <div class="six columns">
+        <p class="info-text">{{ champion.championName }}'s Counters</p>
 
-    <md-divider ng-if="!$last"></md-divider>
-  </md-item>
-</md-list>
+        <p>
+          <span ng-repeat="champ in $parent.$parent[champion.championId + 'Counters'] | limitTo: 5">
+            <img ng-src="{{ champ.image }}" class="champion-icon-listing" />
+          </span>
+        </p>
+
+        <p>
+          <strong>{{ $parent.$parent[champion.championId + 'Counters'][0].champion_name }}</strong> seems to be the biggest counter
+          to {{ champion.championName }} in the role of {{ champion.role }}.
+          {{ $parent.$parent[champion.championId + 'Counters'][0].champion_name }} has a win rate of
+          <strong>{{ $parent.$parent[champion.championId + 'Counters'][0].won|number:2 }}%</strong> with a KDA of
+          <i>{{ $parent.$parent[champion.championId + 'Counters'][0].kda|number:2 }}</i> against {{ champion.championName }}.
+          <span ng-if="$parent.$parent[champion.championId + 'Counters'][0].won > 60">
+            It is reccomended <strong>not</strong> to choose {{ champion.championName }}
+            against {{ $parent.$parent.$parent[champion.championId + 'Counters'][0].champion_name }}.
+          </span>
+          <span ng-if="$parent.$parent[champion.championId + 'Counters'][0].won <= 60">
+            It doesn't seem like {{ $parent.$parent.$parent[champion.championId + 'Counters'][0].champion_name }}
+            is too much of a threat. Be cautious playing as {{ champion.championName }}, however.
+          </span>
+        </p>
+      </div>
+
+      <div class="six columns">
+        <p class="info-text">{{ champion.championName }}'s Best Teammates</p>
+
+        <p>
+          <span ng-repeat="champ in $parent.$parent[champion.championId + 'Assists'] | limitTo: 5">
+            <img ng-src="{{ champ.image }}" class="champion-icon-listing" />
+          </span>
+        </p>
+
+        <p>
+          <strong ng-repeat="champ in $parent.$parent[champion.championId + 'Assists'] | limitTo: 5">{{ $last ? 'or ' : ''}}{{ champ.champion_name }}{{ $last ? '' : ', '}}</strong>
+          all seem to be good teammates for {{ champion.championName }}.
+          <strong>{{ $parent.$parent[champion.championId + 'Assists'][0].champion_name }}</strong> seems to have the highest winrate
+          with {{ champion.championName }} at a win rate of
+          <strong>{{ $parent.$parent.$parent[champion.championId + 'Assists'][0].won }}%</strong>.
+        </p>
+      </div>
+    </div>
+
+    <div class="row spaced stats-control" ng-show="$parent.$parent[champion.championId]">
+      <div class="four columns">
+        <p class="info-text">{{ champion.championName }}'s Pick Rate</p>
+        <p ng-if="champion.pickRate > 15">
+          {{ champion.championName }} seems to be a pretty <strong>popular</strong> champion. Be careful in choosing
+          {{ champion.championName }} because many players who are playing {{ champion.role }} may know how to counter him
+          well. Play carefully and build appropriately.
+        </p>
+
+        <p ng-if="champion.pickRate <= 15">
+          {{ champion.championName }} doesn't seem too popular. You may be able to outplay your opponent simply by
+          taking advantage of unique combos that may surprise the other person playing {{ champion.role }}. However,
+          be careful of overextending and playing too aggressively. It may cause more trouble than it may be worth.
+        </p>
+      </div>
+
+      <div class="eight columns">
+        <canvas id="bar" class="chart chart-bar" data="$parent.$parent[champion.championId + 'Data']" labels="$parent.$parent[champion.championId + 'Labels']"></canvas>
+      </div>
+    </div>
+
+    <div class="row spaced stats-control" ng-show="$parent.$parent[champion.championId]">
+      <div class="eight columns">
+        <canvas id="bar" class="chart chart-bar" data="$parent.$parent[champion.championId + 'WonData']" labels="$parent.$parent[champion.championId + 'WonLabels']"></canvas>
+      </div>
+
+      <div class="four columns">
+        <p class="info-text">{{ champion.championName }}'s Win Rate</p>
+        <p ng-if="champion.winRate > 50">
+          {{ champion.championName }} seems to be a champion that <i>likes to win</i>. Although it may be attributed to a number of
+          factors, the plain fact is that this champion wins. Take care in when you choose {{ champion.championName }} and who you
+          choose it against and with. Win rates can be deceptive sometimes!
+        </p>
+
+        <p ng-if="champion.winRate <= 50">
+          {{ champion.championName }} may seem like an uphill battle. However this can be to your advantage. Take a look at the
+          pick rate and see if you can take advantage of the relative unpopularity of {{ champion.championName }}. Also,
+          choosing exponentially good factors for this champion may actually in theory have a larger win rate than some
+          other champions who win more often in a "general sense."
+      </div>
+    </div>
+  </div>
+</div>

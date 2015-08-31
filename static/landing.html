@@ -1,0 +1,137 @@
+<div class="section landing">
+  <div class="container">
+    <center>
+      <div class="intro">
+        <h6 class="info-text">Choose My Champion</h6>
+        <p class="clear-text">
+          Find some champions that can help you <strong>win more games</strong>. <strong>Enter your summoner name and region below</strong>
+          to take a look at what champions
+          may be working for you and the ones that may not from a database of over <strong>100,000</strong> matches
+          and counting. Or, <strong>scroll down</strong> for some statistics!
+        </p>
+        <div ng-controller="SummonerController" class="row">
+          <form ng-submit="getSummoner()">
+            <input required ng-model="playerName" id="summonerName" type="text" placeholder="Summoner Name" autofocus />
+
+            <select ng-model="locationName">
+              <option value="na">North America</option>
+              <option value="euw">EU West</option>
+              <option value="eune">EU NE</option>
+              <option value="kr">Korea</option>
+              <option value="br">Brazil</option>
+              <option value="oce">Oceania</option>
+              <option value="ru">Russia</option>
+            </select>
+
+            <button ng-click="getSummoner()">Choose!</button>
+          </form>
+        </div>
+      </div>
+    </center>
+  </div>
+</div>
+
+<div ng-controller="StatsController">
+  <div id="first-info" class="section information first-info">
+    <div class="container">
+      <div class="row">
+        <div class="four columns">
+          <h5>Did you know that the most popular champion is <strong>{{ stats.popular_champ }}</strong> with an average of a <i>{{ stats.popular_champ_kda }}</i> KDA?</h5>
+        </div>
+        <div class="eight columns">
+          Have you ever had that moment where you were just at a loss at what champion to choose? We've all been there.
+          Usually we just click
+          through champions wondering what would be the most fun, but also trying to consider what would help
+          us win. This is what Choose My Champion is here for. All you have to do is enter your summoner
+          name above and it spits out a ton of personalized statistics, and suggestions on how to improve
+          your League game!
+        </div>
+      </div>
+
+      <div class="row spaced stats animated" ng-show="initial_stats">
+        <div class="four columns">
+          <center>
+            <h3 class="info-text">{{ stats.average_kills }}</h3>
+            <p class="info-text">Average Champion Kills</p>
+          </center>
+        </div>
+        <div class="four columns">
+          <center>
+            <h3 class="info-text">{{ stats.match_count }}</h3>
+            <p class="info-text">Number of Matches Counted</p>
+          </center>
+        </div>
+        <div class="four columns">
+          <center>
+            <h3 class="info-text">{{ stats.average_towers }}</h3>
+            <p class="info-text">Average Towers Per Game</p>
+          </center>
+        </div>
+      </div>
+
+      <div>
+        <div class="row spaced">
+          <div class="four columns stats" ng-show="initial_stats">
+            <p class="info-text">Most Popular Picks</p>
+            <p>
+              <span ng-repeat="image_link in picks_images | limitTo: 5">
+                <img ng-src="{{ image_link }}" class="champion-icon-listing" />
+              </span>
+            </p>
+
+            <p>
+              We can see that <strong ng-repeat="pick in picks_labels | limitTo: 5">{{ $last ? 'and ': '' }}{{ pick }} {{ $last ? '' : ', '}}</strong> seem
+              to be dominating ranked in pick statistics with {{ picks_labels[0] }} being the top pick. Something to keep in mind:
+              <i>just because a champion is picked often doesn't they are necessarily good!</i>
+            </p>
+          </div>
+
+          <div class="eight columns">
+            <canvas id="bar" class="chart chart-bar" data="picks_data" labels="picks_labels"></canvas>
+          </div>
+        </div>
+
+        <div class="row spaced">
+          <div class="eight columns stats" ng-show="initial_stats">
+            <p class="info-text">{{ winning_champ.name }}'s Friends'</p>
+
+            <p>
+              <span ng-repeat="champ in winning_champ_assists | limitTo: 5">
+                <img ng-src="{{ champ.image }}" class="champion-icon-listing" />
+              </span>
+            </p>
+
+            <p>
+              {{ winning_champ.name }} has a lot of friends. These are just a few examples of who helps {{ winning_champ.name }} win the most.
+              Find out your favorite champion's friends to help give some suggestions to your duo queue on who to play! Maybe you
+              can become the strongest duo queue in League!
+            </p>
+          </div>
+
+          <div class="four columns stats" ng-show="initial_stats">
+            <h5>
+                The most powerful champion seems to be <strong>{{ winning_champ.name }}</strong> ({{ winning_champ.role}})
+                with a win rate of <i>{{ winning_champ.won }}</i>.
+            </h5>
+          </div>
+        </div>
+
+        <div class="row spaced">
+          <div class="four columns stats" ng-show="initial_stats">
+            <p class="info-text">#{{ winning_champ.name }}ISOP Roles</p>
+
+            <p>
+              You should start playing {{ winning_champ.name }} ({{ winning_champ.role }}). {{ winning_champ.name }} has a KDA of
+              <strong>{{ winning_champ.kda|number:2 }}%</strong>! Take a look at the graph to the right and see if you can play
+              {{ winning_champ.name }} anywhere else and take advantage of this strong champion.
+            </p>
+          </div>
+
+          <div class="eight columns">
+            <canvas id="pie" class="chart chart-pie" data="winning_champ_data" labels="winning_champ_labels"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

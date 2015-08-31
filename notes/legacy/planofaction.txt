@@ -1,0 +1,274 @@
+Project #2: League Champion Suggestion System (LCSS) LEL
+  > Technologies to use: Flask (maybe Django), Ember, Foundations, SASS (gulp.js)
+                         SQL Alchemy?, Colorama hehe, Statistics, Scipy, Numpy, Requests, uwsgi, Alembic
+  > The page takes a user name, their role (top lane, mid lane...),
+    and maybe what role they are trying to fill (optional)?
+    > They are given a main champion and the ranking of the champion
+      supported with win rate data, their win rate data, and the ranking
+      of the champion. Link to guides? Affiliate links?
+  > How does this work?
+    > WORKING database would be updated twice weekly...
+      > These would be updated with win rates of particular champions
+        in solo queue, also in particular roles.
+      > Would have to integrate what role they're trying to fill and
+        the current team status? What their team needs? This would be good
+        to know because they might need a tank...?
+    > Algorithm would take the working database (updated nightly)
+      > The algorithm would then update the current RANKINGS of
+        particular champions based on win rates and also multiple other
+        sources from things such as nerfplz.com, or other tier lists.
+      > The champions would be put into point rankings for particular
+        listings such as top lane, mid lane, bottom lane...
+      > Maybe the person can just put in their name? Top lane, bottom lane
+        etc would be put into different tabs?
+    > The person's data can be gathered from multiple sources...
+      > League's servers, LOLKing, or op.gg
+        > Avoid overloading League's servers and would have to
+          aggregate own data and make ranking of each champion
+          for that particular person...
+        > LolKing would give aggregated data and op.gg too.....
+      > After the person's data is gathered (maybe stored in database?)
+        > They are deleted every week if not updated?
+        > Their rankings are then put into each ranking individually. These
+          would simply update the point rankings of singular champions
+          to allow more customized data.
+    > Updated data flow: Weekly request night -> .py file that runs this in console
+      -> gets champion data from League (maybe 1000 seed matches) -> aggregates
+      data and puts point values to champions in certain roles -> crawls web for
+      opinions and FOTMS and champions that might be good maybe some input crawler
+      for nerfplz.com -> generates a table of champion, and top lane, mid lane and
+      bottom lane values -> user request -> generate user champion table and adjust
+      values in the database after retrieved -> give data back
+    > Champion -> Meta (could be multiple) -> Their Point Value
+      > Factors for consideration:
+        ban rate (good), win rate (good), pick rate (medium, could be not good to play
+        if everyone plays the champion so they know how to pick against, maybe look
+        at top counter picks?)
+    > Crawling
+      > Go to featured game, go 10 players deep, then take another featured game
+        then go ten players deep, to 100,000 players
+      > Go to featured game and then increment match to go to a solo queue game
+        then go from there. (/observer-mode/rest/featured)
+    > from time import sleep
+    > Counter picking, team composition
+    > later, the data can be used to analyze a person's play style in ranked and how
+      they can become better. like what role are they playing? is their CS good at certain
+      times? what about their K/d/A? etc.....
+  > Display of the page
+    > Silvery overlay of champion splash arts? Glass over the
+      art and maybe dark black League page for actual input.
+      Maybe look at the League pages, such as the League Fantasy
+      or maybe surr at 20 site.
+    > Gold trims? Good custom backgrounds? White page on glassy? Look at
+      dribbble and saved photos and favorited photos. Good UI to look at.
+    > Customize Foundations before using it!
+
+Testing:
+  > a956dacd-09ed-49d2-a610-dc9597599af3
+  > curl --request GET 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/RiotSchmick?api_key=$APIkey' --include
+  > curl --request GET 'https://na.api.pvp.net/observer-mode/rest/featured?api_key=$APIkey' --include
+  > curl --request GET 'https://na.api.pvp.net/api/lol/na/v2.2/match/1769073754/?api_key=$APIkey' --include
+
+  1769073753
+https://na.api.pvp.net/observer-mode/rest/featured?api_key=a956dacd-09ed-49d2-a610-dc9597599af3
+
+get_match_data = requests.get(URLS['match'] + str(1769073753), params = {'api_key': API_KEY})
+
+API_KEY = "a956dacd-09ed-49d2-a610-dc9597599af3"
+get_player_data = requests.get("https://na.api.pvp.net/api/lol/na/v1.3/stats/by-summoner/21887220/ranked", params = {'api_key': API_KEY})
+
+
+Work flow: crawler.py -> analyze.py -> adjustment.py
+
+> / -> /username/ -> /username/top/ /username/mid/ -> /username/top/Akali/ (expanded)
+> maybe in list format. when they request lists come up with top mid jungle, etc...
+> then more nested lists.
+
+> / has a form where the user inputs their username
+> it transitionsTo or link-to the URL corresponding to their username
+
+> /username/ then sets its model or uses some type of EmberData to get their information from
+> the server at /username/. somehow i need to tell the difference between an AJAX request
+> and their /username/ that they want originally. or maybe just /api/username/
+
+> now their browser has all the data they need so they can navigate between
+> the top lane, mid lane, and the champion names.
+
+> todo at the moment: go through all the todos. (for later) github this. (fixed) implement all the
+> "minificiation" techniques and clean up all code! (fixed) use dependency downloaders
+> such as bower and stuff! (for later)
+
+> lightweight analytics? FAVICON! (done) compress CSS and JS ensure cache management
+> is correct and fine. (?)
+
+> cool data visualization with lots of champion data and interactive data? (for later)
+
+> need to encode the username! usernames with spaces are not working! (fixed) fix the email link?
+> maybe make it a more private email? (fixed)
+
+> settings files and decomposing some extra code (fixed), add ssh key to webfaction and sshkey from webfaction to git. (done)
+
+> set up memcached on the server. migrate current db on my side to mysql. Live statistics of how many matches
+> or champions have been recorded. (done) set up database backups. consider next month moving to digitalocean. need
+> to consider moving database, and also the settings files. everything else should git pull fine.
+
+> don’t push settings files, don't push database files! and then do git pull
+> database: tartio/soup12
+
+> update all the data on the server now! try to adjust the adjustment so it's more weighted, raise the
+> expected win rates. wins under 20 minutes? damage and meta? cs numbers and economy of items
+
+> indepth champion details. could show user data could not? shows the champion profile and more details statistics
+> about that champion in particular? could navigate to a new page or could open under that particular
+> champion. it would be easier to make a new page while putting under the champion would be easier for users.
+> could show statistics about that champion over time from win rates. pick rates of that champion over time.
+> show the score values over time? would cause need to have historical data for scores? show the user's
+> champion data.
+
+> also comment on all new things. need to fix IE stuff. all the /stats/reset stuff too! clarify it's based on a 100 pt scale. weight played champions more
+> maybe give featured champions esp. rising new stars (highlighted in yellow borders and a star) and maybe maybe something they've never
+> played before! also keep in mind champions they may not have
+
+> keep in mind champion skill levels. reksai harder to play but vi easier to pick up and win with in which
+> win rates may not relate too. green to red skill bar. the score count is gold for champion score and
+> added on top is the adjustment. hardest champs for a particular champ. optional include of other seasons and normal games.
+
+> todo list:
+> fix analysis so it can actually work on the large number of matches played
+> fix front page player count to accurate
+> comment on all new additions in code
+> change adjustment and expected win rate to favor played champions
+> factors to consider: wins under 20 minutes? damage? meta? cs numbers? economy of items?
+> change md-toolbar on the champions.html page to not have a box-shadow !important
+
+> fix IE stuff (????)
+> set up database backups
+> memcached? (https://docs.webfaction.com/software/memcached.html)
+
+> migrate current database on local side to mysql (not done but workaround)
+> implement /stats/reset (implemented w/out creating new data)
+> implement a reset button (AJAX to reset and once complete reload the data) (added)
+> make the settings page nicer
+> make the reset button not delete things but just edit the availability of data
+
+> featured champions, rising new stars, and random suggested champs
+
+> redesign the website. make it nicer looking...
+
+> extra page for champion data
+> personal champion skill level
+> data visualization and interactive data over time
+
+> go through all the todos in the code!
+
+> change crawler so it doesn't add duplicate matches, and also implement
+> multithreading for it and also pruning duplicate matches
+
+> set up database backups
+
+> implement settings: other season data and normal games, color theme?
+> fix the description on the front page about having champions that may
+> not be played at the moment
+
+> add a version history
+
+> dependency downloaders?
+
+todo list for digitalocean deployment:
+> stuff doesn't actually load....
+> install a firewall and all the security systems suggested by digitalocean
+> modify settings so everything matches (settings.py)
+> change to only pubkey login
+> fix ~/.ssh/config
+
+> modify the crawler.py, analyze.py, and adjustments.py to use db_session.execute() statements to
+> make it more efficient and not actually crash when trying to run them (done)
+> make all the .all() requests more efficient with execute statements
+> indicies in the MySQL
+> double check the new function produces correct data
+
+> transfer the db from webfaction
+
+> make sure everything matches
+> make sure everything works and conduct tests
+
+> sudo nano /etc/apache2/sites-available
+> change pointing of nameservers and restart apache2
+
+
+>>>>>>>>>>>>>>
+
+> digitalocean? need to install Flask (done), all the dependencies (done), MySQL (done), and a firewall
+> fix digitalocean billing and get it set up. (done) need to add static file serving and change the settings (done)
+> steps before deploying, need to change the sudo nano /etc/apache2/sites-available
+/league.conf, need to change pointing of domains, need to add domains! need to restart apache sudo service apache2 restart
+> modify settings so it's right
+
+> "Geoffrey Chan:
+  SELECT champion_name, AVG(kills) FROM champions GROUP BY champion_name
+  GROUP BY splits your data into groups of that column
+  https://dev.mysql.com/doc/refman/5.0/en/group-by-functions.html
+  supports SUM
+  COUNT
+Emerson Matson:
+  OH OK THAT’S ACTUALLY BETTER SENCE
+Geoffrey Chan:
+  STD
+  MIN
+  MAX
+  etc."
+
+  > look into creating indexes for mysql to make the calculation faster
+
+  SELECT champion_name, AVG(kills) FROM champions GROUP BY champion_name
+GROUP BY splits your data into groups of that column
+https://dev.mysql.com/doc/refman/5.0/en/group-by-functions.html
+supports SUM
+COUNT
+
+// need won stats and pick rate
+r = s.execute("SELECT champion_id, role, " +
+                "CAST(SUM(kills) AS FLOAT) / COUNT(*), " +
+                "CAST(SUM(deaths) AS FLOAT) / COUNT(*), " +
+                "CAST(SUM(assists) AS FLOAT) / COUNT(*), " +
+                "CAST(SUM(damage) AS FLOAT) / COUNT(*), " +
+                "CAST(SUM(objective_score) AS FLOAT) / COUNT(*), " +
+                "CAST(SUM(tower_score) AS FLOAT) / COUNT(*), " +
+                "CAST(SUM(won) AS FLOAT) / COUNT(*), " +
+                "CAST(COUNT(*) AS FLOAT) / " + str(match_num) + " " +
+                "FROM champion GROUP BY champion_id, role")
+
+// working on computer w/ sqllite3
+r = s.execute("""
+    SELECT champion_id, role,
+        CAST(SUM(kills) AS FLOAT) / COUNT(*),
+        CAST(SUM(deaths) AS FLOAT) / COUNT(*),
+        CAST(SUM(assists) AS FLOAT) / COUNT(*),
+        CAST(SUM(damage) AS FLOAT) / COUNT(*),
+        CAST(SUM(objective_score) AS FLOAT) / COUNT(*),
+        CAST(SUM(tower_score) AS FLOAT) / COUNT(*),
+        CAST(SUM(won) AS FLOAT) / COUNT(*),
+        CAST(COUNT(*) AS FLOAT) / {match_num}
+        FROM champion GROUP BY champion_id, role
+        """.format(match_num = str(match_num)))
+
+// trying to fix server side code
+r = s.execute("""
+    SELECT champion_id, role,
+        SUM(kills) / COUNT(*),
+        SUM(deaths) / COUNT(*),
+        SUM(assists) / COUNT(*),
+        SUM(damage) / COUNT(*),
+        SUM(objective_score) / COUNT(*),
+        SUM(tower_score) / COUNT(*),
+        SUM(won) / COUNT(*),
+        COUNT(*) / {match_num},
+        COUNT(*)
+        FROM champion GROUP BY champion_id, role
+        """.format(match_num = str(match_num)))
+
+figure out the problem with RAM usage and the database issues, test test test the program
+and then try to check every single thing and see if it outputs correct data, transfer the new
+database and then deploy!
+
+> increase the pick rate

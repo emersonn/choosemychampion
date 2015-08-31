@@ -1,0 +1,11 @@
+> Tips for coding:
+  > Package Managers
+    > NPM, Gulp
+      > npm init
+      > sudo npm install -g gulp
+      > npm install --save-dev gulp
+      > npm install gulp-concat gulp-uglify gulp-rename --save-dev
+
+      > npm install package --save (for non development dependencies)
+
+      > "gulp.src('node_modules/**/*.js').pipe('all.js').pipe(uglify())"

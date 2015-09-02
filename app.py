@@ -155,8 +155,7 @@ def stats(username, user_id, location):
 def champion_stats(champion, role):
     champ = db_session.query(ChampionData).filter_by(champion_id = champion, role = role).first()
 
-    # TODO: change to more appropriate name
-    days_ago = datetime.datetime.now() - datetime.timedelta(days = 5)
+    days_ago = datetime.datetime.now() - datetime.timedelta(days = 7)
     champ_list = (db_session
         .query(
             Champion.champion_id.label("champion_id"),
@@ -272,7 +271,7 @@ def numbers():
                     'image': winning_champ.get_full_image(),
                     'seen': winning_champ.num_seen,
                     'won': winning_champ.won * 100,
-                    'assists': compile_sorted_champions(champ.get_assists()),
+                    'assists': compile_sorted_champions(champ.get_compiled_weights("assists")),
                     'kda': winning_champ.get_kda(),
 
                     'role_distribution': {

@@ -155,7 +155,8 @@ def stats(username, user_id, location):
 def champion_stats(champion, role):
     champ = db_session.query(ChampionData).filter_by(champion_id = champion, role = role).first()
 
-    seven_days_ago = datetime.datetime.now() - datetime.timedelta(days = 30)
+    # TODO: change to more appropriate name
+    days_ago = datetime.datetime.now() - datetime.timedelta(days = 5)
     champ_list = (db_session
         .query(
             Champion.champion_id.label("champion_id"),
@@ -166,7 +167,7 @@ def champion_stats(champion, role):
         )
         .filter(Champion.champion_id == champion, Champion.role == role)
         .join(Champion.match)
-        .filter(Match.match_time > seven_days_ago)
+        .filter(Match.match_time > days_ago)
         .group_by(func.day(Match.match_time))
         .order_by(Match.match_time.desc())
         .all()

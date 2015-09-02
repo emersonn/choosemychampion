@@ -48,7 +48,7 @@ class RiotSession(requests.Session):
         try:
             return self.get(URLS['matches'].format(location = self.location, player = str(player)),
                 params = {'rankedQueues': match_type, 'endIndex': matches}).json()['matches']
-        except KeyError, ValueError:
+        except (KeyError, ValueError) as err:
             sleep(10)
             return []
 

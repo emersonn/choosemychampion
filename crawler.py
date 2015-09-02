@@ -54,6 +54,12 @@ def crawl_player(player, depth, breadth):
     if depth != 0:
         print("Crawling player " + Fore.GREEN + str(player) + Fore.RESET + " at depth of " + Fore.BLUE + str(depth) + Fore.RESET + "...")
 
+        check_player = db_session.query(Champion).filter(Champion.player_id == player).count()
+        if check_player > 5:
+            print("Player already has past five matches. Skipping player.")
+            return
+
+
         matches = SESSION.get_matches(player = player, matches = breadth)
         print(Fore.GREEN + "Got match history. Crawling matches..." + Fore.RESET)
 
@@ -175,7 +181,7 @@ def crawl_database():
     print("Got " + Fore.GREEN + str(len(participants)) + Fore.RESET + " participants.")
 
     # only 40 summoners can be requested at a time
-    del participants[40:]
+    participants = random.sample(participants, min(40, len(participants)))
 
     ids = SESSION.get_ids(participants)
     search_players = [ids[player]['id'] for player in ids.keys()]

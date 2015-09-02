@@ -16,10 +16,16 @@
   > cache the detailed champion statistics? speed it up somehow.
     > very slow, could be attributed to calculating the assists
       and the counters
+    > store the assists and counters
+      > association table with the weight of the counter/assist
 
   > auto load more champions as you scroll down
 
   > write a unit test and make travis-ci run tests on commit, 404 or 400 invalid
+    > https://flask-webtest.readthedocs.org/en/latest/
+
+  > use better calls for sqlalchemy
+    > .update()
 
   > make about page available on the outside
 

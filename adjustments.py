@@ -18,6 +18,8 @@ def make_adjustments():
         # true is important as it forces an update of the champion data
         # file with respect to the score
         champion.get_score(True)
+        champion.get_counters(True)
+        champion.get_assists(True)
 
 if __name__ == "__main__":
     make_adjustments()

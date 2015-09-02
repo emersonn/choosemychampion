@@ -1,4 +1,5 @@
 import datetime
+from functools import wraps
 import operator
 from time import sleep
 import urllib
@@ -7,7 +8,7 @@ import urllib
 import logging
 logging.captureWarnings(True)
 
-from flask import Flask, abort, jsonify, send_file
+from flask import Flask, abort, jsonify, request, send_file
 import requests
 from sqlalchemy import func, Integer
 
@@ -22,6 +23,20 @@ app.config.from_object('app_settings')
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     db_session.remove()
+
+def cached(timeout = 10 * 60, key = 'view/%s'):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            cache_key = key % request.path
+            rv = CACHE.get(cache_key)
+            if rv is not None:
+                return rv
+            rv = f(*args, **kwargs)
+            CACHE.set(cache_key, rv, timeout = timeout)
+            return rv
+        return decorated_function
+    return decorator
 
 # TODO: try to find a way to combine these two..
 
@@ -136,6 +151,7 @@ def stats(username, user_id, location):
 # TODO: implement personal statistics over time. implement counters to the champion
 #       and good team archetype to have.
 @app.route('/api/stats/<champion>/<role>/')
+@cached()
 def champion_stats(champion, role):
     champ = db_session.query(ChampionData).filter_by(champion_id = champion, role = role).first()
 
@@ -156,17 +172,14 @@ def champion_stats(champion, role):
         .all()
     )
 
-    counters = compile_sorted_champions(champ.get_counters())
-    assists = compile_sorted_champions(champ.get_assists())
-
     stats = {
         'champion_info': {
             'champion_id': champ.champion_id,
             'champion_name': champ.get_name()
         },
 
-        'counters': counters,
-        'assists': assists,
+        'counters': compile_sorted_champions(champ.get_compiled_weights("counters")),
+        'assists': compile_sorted_champions(champ.get_compiled_weights("assists")),
 
         'days_seen': {
             'labels': [data.match_time.strftime("%b %d (%A)") for data in champ_list],

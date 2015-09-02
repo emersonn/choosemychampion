@@ -54,10 +54,11 @@ def crawl_player(player, depth, breadth):
     if depth != 0:
         print("Crawling player " + Fore.GREEN + str(player) + Fore.RESET + " at depth of " + Fore.BLUE + str(depth) + Fore.RESET + "...")
 
-        check_player = db_session.query(Champion).filter(Champion.player_id == player).count()
-        if check_player > 5:
-            print("Player already has past five matches. Skipping player.")
-            return
+        # TODO: reconsider this implementation. this database query is expensive.
+        # check_player = db_session.query(Champion).filter(Champion.player_id == player).count()
+        # if check_player > 5:
+        #     print("Player already has past five matches. Skipping player.")
+        #     return
 
 
         matches = SESSION.get_matches(player = player, matches = breadth)
@@ -67,22 +68,20 @@ def crawl_player(player, depth, breadth):
 
         for match in matches:
             # TODO: inefficient. checks every match, maybe check by player match history for all of them?
-            check_match = db_session.query(Match).filter(Match.match_id == match['matchId']).all()
-            if check_match == []:
-                print(str(match['matchId']) + " already exists in the database. Skipping.")
-                continue
-
+            check_match = db_session.query(Match).filter(Match.match_id == match['matchId']).count()
             match_data = SESSION.get_match(match['matchId'])
 
             if match_data == {}:
                 break
 
             try:
-                store_match(match_data)
+                if check_match >= 1:
+                    print(str(match['matchId']) + " already exists in the database. Skipping storage.")
+                elif check_match == 0:
+                    store_match(match_data)
             except KeyError:
-                print("Could not store match. Breaking...")
-
-                break
+                print("Could not store match. Continuing...")
+                continue
 
             # adds the players in the match to the crawl list
             players.update([person['player']['summonerId'] for person in match_data['participantIdentities']])
@@ -101,13 +100,8 @@ def crawl_player(player, depth, breadth):
             " Player list is now: " + Fore.YELLOW + str(PLAYER_LIST) + Fore.RESET +
             ". " + Fore.YELLOW + str(MATCH_COUNT) + Fore.RESET + " matches have been counted.")
 
-        try:
-            for person in random.sample(players, BREADTH):
-                crawl_player(person, depth - 1, BREADTH)
-        except ValueError:
-            print("Reached sample error, continuing...")
-
-            pass
+        for person in random.sample(players, min(BREADTH, len(players))):
+            crawl_player(person, depth - 1, BREADTH)
 
     else:
         PLAYER_LIST -= 1

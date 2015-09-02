@@ -13,11 +13,12 @@
 > To Do List:
   > make post on League Reddit, League Group UW about new update
 
-  > cache the detailed champion statistics? speed it up somehow.
-    > very slow, could be attributed to calculating the assists
-      and the counters
-    > store the assists and counters
-      > association table with the weight of the counter/assist
+  > use cached for the other views
+
+  > make a section for "champions this champion is good against"
+    > aka who does this champion counter
+
+  > implement skipping players in the crawler
 
   > auto load more champions as you scroll down
 

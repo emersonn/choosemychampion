@@ -1,5 +1,7 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Float
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Float, Table, func
 from sqlalchemy.orm import relationship, backref
+
+from sqlalchemy.ext.associationproxy import association_proxy
 
 from database import Base, db_session
 from riot import RiotSession
@@ -241,6 +243,9 @@ class ChampionData(Base):
 
     image = Column(String(100))
 
+    counters = association_proxy('champion_counters', 'counter')
+    assisters = association_proxy('champion_assists', 'assist')
+
     # TODO: combine this kda and name with the PlayerData to make it more corresponding
 
     # calculates the kda of a particular champion by taking the addition of kills
@@ -371,21 +376,85 @@ class ChampionData(Base):
         player = db_session.query(PlayerData).filter_by(player_id = player_id, location = location)
         return self.won
 
-    # TODO: implement this. search for champions in the same matches and see patterns
-    #       store this as a one to many relation along with the assisting champions
-    #       improve this so it is not limited but rather stored.
-    #       reverse search through matches that contain that champion by joining the tables?
-    #       then filter by wins? then aggragating is easy. only problem is joining costs a lot...?
-    def get_counters(self):
-        champion = db_session.query(Champion).filter_by(champion_id = self.champion_id, role = self.role, won = False).limit(100).all()
-        condition = lambda x: x.champion_id != self.champion_id and x.role == self.role and x.won
-        return self.process_champion_query(champion, condition)
+    def get_counters(self, force_update = False):
+        # TODO: implement updating of old counters (or self.champion_counters[0].updated)
+        counters = self.counters
+        if counters == [] or force_update:
+            print(self.get_name() + " has been called for a force update, or there are no counters existing at the moment.")
+            Counter.query.filter(Counter.original == self).delete()
+            db_session.commit()
 
-    def get_assists(self):
-        champion = db_session.query(Champion).filter_by(champion_id = self.champion_id, role = self.role, won = True).limit(100).all()
-        condition = lambda x: x.champion_id != self.champion_id and x.won
-        return self.process_champion_query(champion, condition)
+            champions = (db_session
+                .query(
+                    Champion,
+                    func.count(Champion.champion_id).label("num_seen")
+                )
+                .group_by(Champion.champion_id)
+                .filter_by(won = True, role = self.role) # counter champion
+                .join(Match)
+                .filter(Match.champion.any(champion_id = self.champion_id, role = self.role, won = False)) # self
+                .all()
+            )
 
+            for champion in champions:
+                champion_data = ChampionData.query.filter_by(champion_id = champion[0].champion_id, role = champion[0].role).first()
+                new_counter = Counter(
+                    original = self,
+                    counter = champion_data,
+                    weight = champion.num_seen
+                )
+                db_session.add(new_counter)
+            db_session.commit()
+
+        return counters
+
+    # TODO: kind of weird abstraction...
+    def get_compiled_weights(self, process):
+        compiled = {}
+
+        for champion in getattr(self, "get_" + process)():
+            # TODO: Abstract this out more
+            if process == "counters":
+                current_counter = Counter.query.filter_by(original = self, **{process[:-1]: champion}).first()
+            else: # elif process == "assists":
+                current_counter = Assist.query.filter_by(original = self, **{process[:-1]: champion}).first()
+            compiled[champion] = current_counter.weight
+
+        return compiled
+
+    def get_assists(self, force_update = False):
+        assists = self.assisters
+        if assists == [] or force_update:
+            print(self.get_name() + " has been called for a force update or assisters do not exist.")
+            Assist.query.filter(Assist.original == self).delete()
+            db_session.commit()
+
+            champions = (db_session
+                .query(
+                    Champion,
+                    func.count(Champion.champion_id).label("num_seen")
+                )
+                .group_by(Champion.champion_id)
+                .filter_by(won = True)
+                .join(Match)
+                .filter(Match.champion.any(champion_id = self.champion_id, role = self.role, won = True))
+                .all()
+            )
+
+            for champion in champions:
+                champion_data = ChampionData.query.filter_by(champion_id = champion[0].champion_id, role = champion[0].role).first()
+                if champion_data is not self:
+                    new_assist = Assist(
+                        original = self,
+                        assist = champion_data,
+                        weight = champion.num_seen
+                    )
+                    db_session.add(new_assist)
+            db_session.commit()
+
+        return assists
+
+    # TODO: depricated. will delete soon.
     def process_champion_query(self, champion, condition):
         matches = [champ.match for champ in champion]
         champions = []
@@ -411,3 +480,27 @@ class ChampionData(Base):
                 compiled[champ] = teams[champion]
 
         return compiled
+
+class Counter(Base):
+    __tablename__ = 'counter_champions'
+
+    original_id = Column(Integer, ForeignKey('champion_data.id'), primary_key = True)
+    counter_id = Column(Integer, ForeignKey('champion_data.id'), primary_key = True)
+
+    weight = Column(Integer)
+    updated = Column(DateTime, default = func.now())
+
+    original = relationship(ChampionData, backref = backref("champion_counters"), foreign_keys = [original_id])
+    counter = relationship(ChampionData, backref = backref("countered"), foreign_keys = [counter_id])
+
+class Assist(Base):
+    __tablename__ = 'assist_champions'
+
+    original_id = Column(Integer, ForeignKey('champion_data.id'), primary_key = True)
+    assist_id = Column(Integer, ForeignKey('champion_data.id'), primary_key = True)
+
+    weight = Column(Integer)
+    updated = Column(DateTime, default = func.now())
+
+    original = relationship(ChampionData, backref = backref("champion_assists"), foreign_keys = [original_id])
+    assist = relationship(ChampionData, backref = backref("assisted"), foreign_keys = [assist_id])

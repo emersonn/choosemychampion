@@ -13,7 +13,18 @@
 > To Do List:
   > make post on League Reddit, League Group UW about new update
 
+  > start switching over to logging from printing
+    > make a logging wrapper for my purposes
+      > converts signals to colored printing, etc.
+
+  > switch over to using the riot sessions for models.py
+
+  > improve champ detail loading times (the query)
+    > fix champion detail pick rate. should be relative not absolute.
+
   > use cached for the other views
+
+  > improve calculation of counters/assists with large databases
 
   > make a section for "champions this champion is good against"
     > aka who does this champion counter

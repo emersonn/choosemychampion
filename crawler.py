@@ -17,6 +17,7 @@ from database import db_session
 from models import Match, Champion, BannedChampion, BuiltItems
 from settings import API_KEY, URLS
 from riot import RiotSession
+from prettylog import PrettyLog
 
 # crawler settings
 BREADTH = 15
@@ -27,14 +28,14 @@ PLAYER_LIST = 0
 MATCH_COUNT = 0
 
 SESSION = RiotSession(API_KEY)
+LOGGING = PrettyLog()
 
 # grabs all of the featured games available and returns an array of the
 # summoners that participated in each of the games
 def get_featured():
     featured = SESSION.get_featured()
-    print(Fore.GREEN + "SUCCESS! Got featured games." + Fore.RESET)
-
-    print("Gathering participants of featured games...")
+    LOGGING.push("Success. Got featured games.")
+    LOGGING.push("Getting participants of featured games...")
 
     matches = [match for match in featured]
     participants = []
@@ -52,7 +53,7 @@ def crawl_player(player, depth, breadth):
     global PLAYER_LIST
 
     if depth != 0:
-        print("Crawling player " + Fore.GREEN + str(player) + Fore.RESET + " at depth of " + Fore.BLUE + str(depth) + Fore.RESET + "...")
+        LOGGING.push("Crawling player *'" + str(player) + "'* at a depth of @" + str(DEPTH - depth) + "@.")
 
         # TODO: reconsider this implementation. this database query is expensive.
         # check_player = db_session.query(Champion).filter(Champion.player_id == player).count()
@@ -62,7 +63,7 @@ def crawl_player(player, depth, breadth):
 
 
         matches = SESSION.get_matches(player = player, matches = breadth)
-        print(Fore.GREEN + "Got match history. Crawling matches..." + Fore.RESET)
+        LOGGING.push("Got match history. Logging matches.")
 
         players = set()
 
@@ -76,11 +77,11 @@ def crawl_player(player, depth, breadth):
 
             try:
                 if check_match >= 1:
-                    print(str(match['matchId']) + " already exists in the database. Skipping storage.")
+                    LOGGING.push("*" + str(match['matchId']) + "* already exists in the database. Skipping storage.")
                 elif check_match == 0:
                     store_match(match_data)
             except KeyError:
-                print("Could not store match. Continuing...")
+                LOGGING.push("#Could not store match. Continuing.#")
                 continue
 
             # adds the players in the match to the crawl list
@@ -94,11 +95,16 @@ def crawl_player(player, depth, breadth):
         PLAYER_LIST += BREADTH - 1
         MATCH_COUNT += len(matches)
 
-        print("Finished crawling player " + Fore.GREEN + str(player) +
-            Fore.RESET + ". Now crawling " +
-            Fore.BLUE + str(len(players)) + Fore.RESET + " other players." +
-            " Player list is now: " + Fore.YELLOW + str(PLAYER_LIST) + Fore.RESET +
-            ". " + Fore.YELLOW + str(MATCH_COUNT) + Fore.RESET + " matches have been counted.")
+        # TODO: implement player list count. player list is now: example.
+        LOGGING.push(
+            "Finished crawling player *'" +
+            str(player) +
+            "'*. Now crawling @" +
+            str(len(players)) +
+            "@ other players. ^" +
+            str(MATCH_COUNT) +
+            "^ matches have been counted."
+        )
 
         for person in random.sample(players, min(BREADTH, len(players))):
             crawl_player(person, depth - 1, BREADTH)
@@ -108,7 +114,7 @@ def crawl_player(player, depth, breadth):
 
 # stores the given match data into the database.
 def store_match(given_match):
-    print("Made row for match: " + Fore.MAGENTA + str(given_match['matchId']) + Fore.RESET + ".")
+    LOGGING.push("Made row for match *'" + str(given_match['matchId']) + "'*.")
 
     # generates the match and saves it in the database.
     match = Match(match_id = given_match['matchId'],
@@ -170,9 +176,9 @@ def store_match(given_match):
 # attempts to crawl the API using the featured games as a starting point and going
 # deeper through player matches and their relative coplayers
 def crawl_database():
-    print("Attempting to request featured games...")
+    LOGGING.push("Attempting to request featured games.")
     participants = get_featured()
-    print("Got " + Fore.GREEN + str(len(participants)) + Fore.RESET + " participants.")
+    LOGGING.push("Got @" + str(len(participants)) + "@ participants.")
 
     # only 40 summoners can be requested at a time
     participants = random.sample(participants, min(40, len(participants)))
@@ -180,13 +186,13 @@ def crawl_database():
     ids = SESSION.get_ids(participants)
     search_players = [ids[player]['id'] for player in ids.keys()]
 
-    print("Now attempting to crawl players with breadth of " + str(BREADTH) + " and depth of " + str(DEPTH) + "...")
+    LOGGING.push("Now attempting to crawl players with a breadth of @" + str(BREADTH) + "@ and depth of ^" + str(DEPTH) + "^.")
 
     # creates the original call stack to crawl players
     for player in search_players:
         crawl_player(player, DEPTH, BREADTH)
 
-    print("Finished crawling database.")
+    LOGGING.push("Finished crawling database.")
 
 if __name__ == '__main__':
      crawl_database()

@@ -14,6 +14,9 @@ import sqlalchemy
 from models import Match, Champion, BannedChampion, BuiltItems, ChampionData
 from database import db_session
 from settings import API_KEY, URLS
+from prettylog import PrettyLog
+
+LOGGING = PrettyLog()
 
 # TODO: optimize this query for large databases.
 #       window the query. http://stackoverflow.com/questions/7389759/memory-efficient-built-in-sqlalchemy-iterator-generator
@@ -23,8 +26,6 @@ from settings import API_KEY, URLS
 
 # analyzes the champion database and condenses the statistics for easy retrieval
 def analyze():
-    print("Using new script...")
-
     match_num = get_match_count()
 
     # NOTE: Multiple ways to go about this
@@ -46,14 +47,13 @@ def analyze():
                     .all())
 
     for champion in champions:
-        print("Analyzing champion: " + str(champion.champion_id) + ", with role: " + champion.role + ".")
-        # print("Got data " + str(champion) + ".")
+        LOGGING.push("Analyzing champion *'" + str(champion.champion_id) + "'* with role @'" + champion.role + "'@.")
 
         found = db_session.query(ChampionData).filter(ChampionData.champion_id == champion.champion_id,
             ChampionData.role == champion.role).first()
 
         if found is None:
-            print("Did not find " + str(champion.champion_id) + ". Creating row...")
+            LOGGING.push("Did not find *'" + str(champion.champion_id) + "'*. Creating row.")
 
             new_champion = ChampionData(champion_id = champion.champion_id, role = champion.role,
                 kills = champion.kills, deaths = champion.deaths, assists = champion.assists,
@@ -63,7 +63,7 @@ def analyze():
             db_session.add(new_champion)
 
         else:
-            print("Found " + str(found.get_name()) + ". Updating data...")
+            LOGGING.push("Found *'" + str(found.get_name()) + "'*. Updating data.")
 
             found.kills = champion.kills
             found.deaths = champion.deaths
@@ -80,10 +80,10 @@ def analyze():
     db_session.commit()
 
 def get_match_count():
-    print("Getting match count...")
+    LOGGING.push("Getting match count.")
     return db_session.query(Match).count()
-    print(str(match_num) + " matches found in the database.")
+    LOGGING.push("*'" + str(match_num) + "'* matches found in the database.")
 
 if __name__ == '__main__':
-    print("Analyzing database...")
+    LOGGING.push("Analyzing database.")
     analyze()

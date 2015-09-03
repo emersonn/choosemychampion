@@ -1,2 +1,5 @@
 > 2.1
-  > improved performance of counters/assists
+  > improved performance of counters/assists and detailed champion stats
+    > it should not take forever to load all of the detailed data now
+  > fixed major bug with data collection
+    > much more stable numbers for win rates, etc

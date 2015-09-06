@@ -45,12 +45,17 @@ def cached(timeout = 10 * 60, key = 'view/%s'):
 def index():
     return send_file('static/index.html')
 
-@app.route('/summoner/<username>/')
-def username(username):
+@app.route('/summoner/<username>/<location>/')
+def username(username, location):
     return index()
 
-# TODO: maybe try to find their username in the database if they already
-# have been crawled. reduce api load?
+@app.route('/about/')
+def about():
+    return index()
+
+@app.route('/versions/')
+def versions():
+    return index()
 
 # gathers champion statistics given their username and location
 @app.route('/api/champions/<username>/<location>/')
@@ -181,6 +186,7 @@ def champion_stats(champion, role):
         'counters': compile_sorted_champions(champ.get_compiled_weights("counters")),
         'assists': compile_sorted_champions(champ.get_compiled_weights("assists")),
 
+        # TODO: Need to divide this by the number of matches collected that particular day
         'days_seen': {
             'labels': [data.match_time.strftime("%b %d (%A)") for data in champ_list],
             'data': [data.num_seen for data in champ_list]

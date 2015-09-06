@@ -81,7 +81,7 @@
           all seem to be good teammates for {{ champion.championName }}.
           <strong>{{ $parent.$parent[champion.championId + 'Assists'][0].champion_name }}</strong> seems to have the highest winrate
           with {{ champion.championName }} at a win rate of
-          <strong>{{ $parent.$parent.$parent[champion.championId + 'Assists'][0].won }}%</strong>.
+          <strong>{{ $parent.$parent.$parent[champion.championId + 'Assists'][0].won|number: 2 }}%</strong>.
         </p>
       </div>
     </div>

@@ -111,7 +111,7 @@
           <div class="four columns stats" ng-show="initial_stats">
             <h5>
                 The most powerful champion seems to be <strong>{{ winning_champ.name }}</strong> ({{ winning_champ.role}})
-                with a win rate of <i>{{ winning_champ.won }}</i>%.
+                with a win rate of <i>{{ winning_champ.won|number:2 }}</i>%.
             </h5>
           </div>
         </div>

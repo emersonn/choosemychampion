@@ -14,22 +14,31 @@
   > make post on League Reddit, League Group UW about new update
 
   > start switching over to logging from printing
-    > make a logging wrapper for my purposes
-      > converts signals to colored printing, etc.
+    > implement PrettyLog in all places
 
   > switch over to using the riot sessions for models.py
 
   > improve champ detail loading times (the query)
     > fix champion detail pick rate. should be relative not absolute.
+      > group by date and zip the counts.
+
+  > change links in footer to relative links and resolved links with ng-link {{ component }}
+  > hierarchy for championList and About and Version History to avoid redundancy w/ templating
+    > angular-blocks
+  > add highlighting for home page link title
+  > linking without the #?
 
   > use cached for the other views
+
+  > make a "quick info" page
+    > top 3 champions to play in each position
+    > counter top played champions with these champions
+    > "you have been playing these well"
 
   > improve calculation of counters/assists with large databases
 
   > make a section for "champions this champion is good against"
     > aka who does this champion counter
-
-  > implement skipping players in the crawler
 
   > auto load more champions as you scroll down
 

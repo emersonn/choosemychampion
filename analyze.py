@@ -87,3 +87,4 @@ def get_match_count():
 if __name__ == '__main__':
     LOGGING.push("Analyzing database.")
     analyze()
+    LOGGING.push("Database has been analyzed.")

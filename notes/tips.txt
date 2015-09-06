@@ -9,3 +9,6 @@
       > npm install package --save (for non development dependencies)
 
       > "gulp.src('node_modules/**/*.js').pipe('all.js').pipe(uglify())"
+
+  > df -h
+    > disk space in largest possible units

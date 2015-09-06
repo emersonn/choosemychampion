@@ -4,9 +4,11 @@ from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from database import Base, db_session
+from prettylog import PrettyLog
 from riot import RiotSession
 from settings import API_KEY, URLS
 
+LOGGING = PrettyLog()
 SESSION = RiotSession(API_KEY)
 
 # Match class created as the match table in the database. stores basic information about
@@ -114,7 +116,7 @@ class PlayerData(Base):
             # attempts to find an already found champion name in the Champion Data
             query = ChampionData.query.filter_by(champion_id = self.champion_id).first()
             if query == None:
-                print("Did not find a champion name at all. Requesting name...")
+                LOGGING.push("Did not find a champion name at all. Requesting name.")
                 import requests, database
                 try:
                     r = requests.get(URLS['champion'] + str(self.champion_id), params = {'api_key': API_KEY})
@@ -126,7 +128,8 @@ class PlayerData(Base):
                 except ValueError:
                     return "summary"
             else:
-                print("Found a champion name already saved. Using " + query.champion_name + " for " + str(self.champion_id) + ".")
+                # DEPRICATED: Unnecessary logging.
+                # print("Found a champion name already saved. Using " + query.champion_name + " for " + str(self.champion_id) + ".")
                 import database
                 self.champion_name = query.champion_name
                 database.db_session.commit()
@@ -141,7 +144,8 @@ class PlayerData(Base):
             return (1.0 * self.kills + self.assists) / (self.deaths)
 
     # todo: fix this. this needs to be more in depth. temporary solution to the
-    # adjustment of a player.
+    # adjustment of a player. played champions are more favored. needs to be balanced.
+    # also figure out champions that do not fit into the role, not many picks.
 
     # returns the adjustment of a particular player in the database. calculates
     # their strength of a particular champion and used for calculations in adjustment
@@ -149,9 +153,9 @@ class PlayerData(Base):
     def get_adjustment(self, force_update=False): # double check if force_update is on
         if self.adjustment == None or force_update:
             if self.adjustment == None:
-                print("Did not find adjustment for " + self.player_name + " with " + str(self.champion_id))
+                LOGGING.push("Did not find adjustment for *'" + self.player_name + "'* with @'" + str(self.champion_id) + "'@.")
             elif force_update:
-                print("Forced update for " + self.player_name + " on champion " + str(self.champion_id) + ".")
+                LOGGING.push("Forced update for *'" + self.player_name + "'* on champion @'" + str(self.champion_id) + "'@.")
 
             adjustment = 0.0
 
@@ -264,7 +268,7 @@ class ChampionData(Base):
     # servers.
     def get_name(self):
         if self.champion_name == None:
-            print("Did not find a champion name at all. Requesting name...")
+            LOGGING.push("Did not find a champion name at all. Requesting name.")
             import requests, database
 
             r = requests.get(URLS['champion'] + str(self.champion_id), params = {'api_key': API_KEY})
@@ -279,9 +283,9 @@ class ChampionData(Base):
     def get_score(self, force_update):
         if self.score == None or force_update:
             if self.score == None:
-                print("Did not find score for " + self.get_name() + ". Generating score...")
+                LOGGING.push("Did not find score for *'" + self.get_name() + "'*. Generating score.")
             else:
-                print(self.get_name() + " was called for a force update of score.")
+                LOGGING.push("*'" + self.get_name() + "'* was called for a force update of score.")
 
             calculated_score = 0
 
@@ -338,7 +342,8 @@ class ChampionData(Base):
             # todo: try to match the image with already generated champions. no need
             # to request servers if it has already been found. also gives an error!
             r = requests.get(URLS['champion'] + str(self.champion_id), params = {'api_key': API_KEY, 'champData': 'image'})
-            print("Dont have the image for " + self.champion_name + "...")
+            # DEPRICATED: Unnecessary logging.
+            # print("Dont have the image for " + self.champion_name + "...")
             self.image = r.json()['image']['full']
             database.db_session.commit()
         return self.image
@@ -380,7 +385,7 @@ class ChampionData(Base):
         # TODO: implement updating of old counters (or self.champion_counters[0].updated)
         counters = self.counters
         if counters == [] or force_update:
-            print(self.get_name() + " has been called for a force update, or there are no counters existing at the moment.")
+            LOGGING.push("*'" + self.get_name() + "'* has been called for a force update, or there are no counters existing at the moment.")
             Counter.query.filter(Counter.original == self).delete()
             db_session.commit()
 
@@ -425,7 +430,7 @@ class ChampionData(Base):
     def get_assists(self, force_update = False):
         assists = self.assisters
         if assists == [] or force_update:
-            print(self.get_name() + " has been called for a force update or assisters do not exist.")
+            LOGGING.push("*'" + self.get_name() + "'* has been called for a force update or assisters do not exist.")
             Assist.query.filter(Assist.original == self).delete()
             db_session.commit()
 

@@ -6,6 +6,9 @@
 import requests
 
 from models import ChampionData
+from prettylog import PrettyLog
+
+LOGGING = PrettyLog()
 
 # takes all the champion data and creates a score
 def make_adjustments():
@@ -23,3 +26,4 @@ def make_adjustments():
 
 if __name__ == "__main__":
     make_adjustments()
+    LOGGING.push("Adjustments have been completed.")

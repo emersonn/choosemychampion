@@ -4,13 +4,19 @@
   // TODO: use reverse URLs here
   app.config(['$routeProvider', function($routeProvider) {
     $routeProvider.
-      when('/', {
-        templateUrl: '/static/landing.html'
-      }).
       when('/summoner/:playerName/:locationName', {
         controller: 'ChampionController',
         templateUrl: '/static/summoner.html'
       }).
+      when('/about', {
+        templateUrl: '/static/about.html'
+      }).
+      when('/versions', {
+        templateUrl: '/static/versions.html'
+      }).
+      when('/', {
+        templateUrl: '/static/landing.html'
+      }).      
       otherwise({
         redirectTo: '/'
       });

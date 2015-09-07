@@ -160,6 +160,8 @@ def stats(username, user_id, location):
             popular_counters("JUNGLE")
         ]
 
+        full_stats['analyzed_player'] = analyzed_player
+
         # returns the json of the stats as an array of scores
         CACHE.set('user_data_' + str(user_id), full_stats, timeout = 1 * 60)
         return jsonify(full_stats)
@@ -176,6 +178,8 @@ def popular_counters(role, limit = 1, counter_limit = 5):
         'counters': compile_sorted_champions(champion.get_compiled_weights("counters"))[:5]
     }
 
+# TODO: consider exceptions that may occur
+
 def analyze_player(player_id, location):
     flags = {}
 
@@ -184,6 +188,127 @@ def analyze_player(player_id, location):
     # STRATEGY: get match_list, store matches in Match/Champion
     #           filter by match_list. add match_list to player_data object manytomany.
     #           add updated list.
+
+    # TODO: maybe reduce requests by storing the updated time?
+    match_list = session.get_match_list(player_id)
+    match_list = match_list[:min(15, len(match_list))]
+    match_ids = [match['matchId'] for match in match_list]
+
+    print("Match list has been requested for " + str(player_id) + ".")
+
+    # TODO: abstract out store_match to avoid this interlinkage between app/crawler
+    from crawler import store_match
+
+    for match in match_ids:
+        check_match = db_session.query(Match).filter(Match.match_id == match).count()
+        if check_match == 0:
+            match_data = session.get_match(match)
+            try:
+                store_match(match_data)
+            except KeyError:
+                print("Could not store match " + str(match) + ".")
+        else:
+            print(str(match) + " already exists in the database.")
+
+    matches = db_session.query(Champion).join(Match).filter(Match.match_id.in_(match_ids))
+    player_data = (db_session
+        .query(PlayerData.champion_id)
+        .filter_by(player_id = player_id, location = location)
+        .order_by(PlayerData.won.desc())
+        .limit(5)
+        .all()
+    )
+
+    flags['best_champs'] = [champ[0] for champ in player_data]
+    flags['best_champ'] = flags['best_champs'][0]
+    flags['played_best_champ'] = False
+
+    flags['wins'] = 0
+    flags['losses'] = 0
+
+    flags['durations'] = []
+
+    flags['lose_kdas'] = []
+
+    for match in matches.filter(Champion.player_id == player_id).all():
+        if match.won:
+            flags['wins'] += 1
+        else:
+            flags['losses'] += 1
+            flags['lose_kdas'].append(match.get_kda())
+
+        flags['durations'].append(match.match.match_duration / 60)
+
+        if match.champion_id in flags['best_champs']:
+            flags['played_best_champ'] = True
+            flags['best_champ'] = match.champion_id
+            flags['best_champ_kda'] = match.get_kda()
+
+    flags['won'] = flags['wins'] > flags['losses']
+
+    best_champ = db_session.query(ChampionData).filter_by(champion_id = flags['best_champ']).first()
+
+    if flags['best_champ'] is not None:
+        # TODO: kind of arbitrary number of kda. only ensures they're positive
+        flags['best_champ_well'] = flags['best_champ_kda'] > 1
+    else:
+        flags['best_champ_well'] = db_session.query(PlayerData).filter_by(champion_id = flags['best_champ']).first().get_kda() > 1
+
+    flags['average_duration'] = reduce(lambda x, y: x + y, flags['durations']) / float(len(flags['durations']))
+
+    if flags['lose_kdas'] is not None:
+        flags['average_lose_kda'] = reduce(lambda x, y: x + y, flags['lose_kdas']) / float(len(flags['lose_kdas']))
+
+    flags['long_games'] = flags['average_duration'] > 30
+
+    response = ""
+
+    if flags['best_champs'] is not None:
+        response += "You seem to play " + html_surround(best_champ.get_name()) + " a lot. "
+        if flags['played_best_champ']:
+            response += "That's good, because you seem to be winning with that champion. "
+            if flags['best_champ_well']:
+                response += "Even better you end up with a great KDA at " + html_surround(round(flags['best_champ_kda'], 2), "i") + ". "
+        else:
+            response += "However you haven't been playing them recently. "
+            if flags['best_champ_well']:
+                response += ("That kind of sucks because you seem to do well with them with a KDA of "
+                    + html_surround(round(flags['best_champ_kda'], 2), "i") + ". "
+                )
+            else:
+                response += ("Consider, though, that your KDA is okay with them. ")
+
+    if flags['won']:
+        response += ("Looking at your most recent ranked matches, you seem to be winning. You are going "
+            + html_surround(str(flags['wins']) + "-" + str(flags['losses']))
+            + " right now. That's pretty good. "
+        )
+
+        if flags['lose_kdas'] is not None and flags['average_lose_kda'] > 1:
+            response += ("Taking a look at your losses, you don't seem to be doing too badly. Your average KDA in your lost games is "
+                + html_surround(str(round(flags['average_lose_kda'], 2)))
+                + " which isn't bad. Make sure you're capturing lots of objectives in your games and working together with your team. "
+            )
+
+        if flags['long_games']:
+            response += "You seem to be having " + html_surround("long games.") + " This can be a good thing and a bad thing. If you are able to, make sure you close out your games early. A mistake later in the game can be a lot of trouble! "
+    else:
+        response += ("Your most recent ranked matches aren't positive, sadly. You are going "
+            + html_surround(str(flags['wins']) + "-" + str(flags['losses']))
+            + " right now. Consider trying out some new champions in these lists that may spark for you! "
+        )
+        if flags['lose_kdas'] is not None and flags['average_lose_kda'] > 1:
+            response += "However, your average KDA is definitely not bad in these losses. Make sure you're capturing lots of objectives in your games and working together with your team. "
+        else:
+            response += "Your average KDAs in these losing games aren't to great. Make sure to play safe and always ward up if you're getting ganked a lot! "
+
+        if flags['long_games']:
+            response += "You also seem to be having " + html_surround("long games.") + " If you are ahead in lane, make sure you start to close out the game if you can! If you wait too long, "
+            response += "you may be more susceptible to mistakes and champions who scale really well late game, such as Nasus."
+
+    return response
+
+    # return flags
 
     # TOPIC: You seem to do well on x. You also play a lot of x.
 
@@ -203,6 +328,10 @@ def analyze_player(player_id, location):
     # STRATEGY: flags for certain topics and generate a response based on the flags?
     # STRATEGY: generate topics based responses and put it in the dictionary each moment
     #           for each flag individually
+
+# TODO: temporary fix, unsafe
+def html_surround(phrase, tag = "strong"):
+    return "<" + tag + ">" + str(phrase) + "</" + tag + ">"
 
 # TODO: implement personal statistics over time. implement counters to the champion
 #       and good team archetype to have.

@@ -56,6 +56,12 @@ class Champion(Base):
     def __repr__(self):
         return '<Champion %r>' % (self.champion_id)
 
+    def get_kda(self):
+        if self.deaths == 0:
+            return (1.0 * self.kills + self.assists)
+        else:
+            return (1.0 * self.kills + self.assists) / (self.deaths)
+
 # class bannedchampion stored as banned_champion in the database. stores basic
 # information about banned champion in a particular match.
 class BannedChampion(Base):

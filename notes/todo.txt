@@ -17,6 +17,10 @@
     > used in crawler
     > use new endpoint
 
+  > catch exceptions for player analysis
+
+  > error handling with front side
+
   > start switching over to logging from printing
     > implement PrettyLog in all places
 

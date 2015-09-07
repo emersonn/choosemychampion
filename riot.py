@@ -14,12 +14,15 @@
 import requests
 from time import sleep
 
-URLS = {'ids': 'https://{location}.api.pvp.net/api/lol/{location}/v1.4/summoner/by-name/{players}',
-        'stats': 'https://{location}.api.pvp.net/api/lol/{location}/v1.3/stats/by-summoner/{player}/ranked/',
-        'champion': 'https://{location}.api.pvp.net/api/lol/static-data/{location}/v1.2/champion/{champion}/',
-        'featured': 'https://{location}.api.pvp.net/observer-mode/rest/featured/',
-        'matches': 'https://{location}.api.pvp.net/api/lol/{location}/v2.2/matchhistory/{player}/',
-        'match': 'https://{location}.api.pvp.net/api/lol/{location}/v2.2/match/{match}/'}
+URLS = {
+            'ids': 'https://{location}.api.pvp.net/api/lol/{location}/v1.4/summoner/by-name/{players}',
+            'stats': 'https://{location}.api.pvp.net/api/lol/{location}/v1.3/stats/by-summoner/{player}/ranked/',
+            'champion': 'https://{location}.api.pvp.net/api/lol/static-data/{location}/v1.2/champion/{champion}/',
+            'featured': 'https://{location}.api.pvp.net/observer-mode/rest/featured/',
+            'matches': 'https://{location}.api.pvp.net/api/lol/{location}/v2.2/matchhistory/{player}/',
+            'match': 'https://{location}.api.pvp.net/api/lol/{location}/v2.2/match/{match}/',
+            'match_list': 'https://{location}.api.pvp.net/api/lol/{location}/v2.2/matchlist/by-summoner/{player}/'
+        }
 
 # TODO: maybe try abstracting out the games into json.loads with object_hook to make
 #       consistent across the platform, also allowing for update of the riot API without
@@ -67,3 +70,7 @@ class RiotSession(requests.Session):
 
     def get_stats(self, player):
         return self.get(URLS['stats'].format(location = self.location, player = str(player))).json()
+
+    def get_match_list(self, player, match_type = 'RANKED_SOLO_5x5'):
+        return self.get(URLS['match_list'].format(location = self.location, player = str(player)),
+            params = {'rankedQueues': match_type}).json()['matches']

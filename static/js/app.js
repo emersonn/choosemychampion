@@ -16,7 +16,7 @@
       }).
       when('/', {
         templateUrl: '/static/landing.html'
-      }).      
+      }).
       otherwise({
         redirectTo: '/'
       });
@@ -137,6 +137,12 @@
   app.factory('Numbers', ['$resource', function($resource) {
     console.log("Getting stats...");
     return $resource('/api/numbers/');
+  }]);
+
+  app.filter('unsafe', ['$sce', function($sce) {
+    return function(text) {
+      return $sce.trustAsHtml(text);
+    }
   }]);
 
   $("#summonerName").focus();

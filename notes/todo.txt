@@ -21,6 +21,8 @@
 
   > error handling with front side
 
+  > deep clean app.py and models.py
+
   > start switching over to logging from printing
     > implement PrettyLog in all places
 

@@ -178,16 +178,12 @@ def popular_counters(role, limit = 1, counter_limit = 5):
         'counters': compile_sorted_champions(champion.get_compiled_weights("counters"))[:5]
     }
 
-# TODO: consider exceptions that may occur
-
+# TODO: consider exceptions that may occur, use a try/except when getting it.
+#       also clean this up greatly. it can be cleaned up a lot.
 def analyze_player(player_id, location):
     flags = {}
 
     session = RiotSession(API_KEY, location)
-    # matches = session.get_matches(player = player_id, matches = )
-    # STRATEGY: get match_list, store matches in Match/Champion
-    #           filter by match_list. add match_list to player_data object manytomany.
-    #           add updated list.
 
     # TODO: maybe reduce requests by storing the updated time?
     match_list = session.get_match_list(player_id)
@@ -307,27 +303,6 @@ def analyze_player(player_id, location):
             response += "you may be more susceptible to mistakes and champions who scale really well late game, such as Nasus."
 
     return response
-
-    # return flags
-
-    # TOPIC: You seem to do well on x. You also play a lot of x.
-
-    # CASE: Good thing these are the same champion.
-
-    # CASE: Different champions.
-    # INNER CASE: Look at KDAs and see if the popular champion has a sufficient
-    #             score, kda. Suggest playing winning champion instead.
-
-    # TOPIC: Look at recent ranked games. How are they doing? What is happening?
-    #        look at KDAs. Look at whether win > loss. What champions are they
-    #        losing on? Are they playing against counters? Are they playing
-    #        champions that they are supposed to do well on?
-
-    # TOPIC: Consider trying a new champion they haven't played before.
-
-    # STRATEGY: flags for certain topics and generate a response based on the flags?
-    # STRATEGY: generate topics based responses and put it in the dictionary each moment
-    #           for each flag individually
 
 # TODO: temporary fix, unsafe
 def html_surround(phrase, tag = "strong"):

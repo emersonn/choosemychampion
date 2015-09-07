@@ -48,6 +48,8 @@ class RiotSession(requests.Session):
 
     # TODO: r['matches'] exists (KeyError), and even if ValueError for if JSON exists
     def get_matches(self, player, matches = 5, match_type = 'RANKED_SOLO_5x5'):
+        import warnings
+        warnings.warn("Riot will be depricating this URL.")
         try:
             return self.get(URLS['matches'].format(location = self.location, player = str(player)),
                 params = {'rankedQueues': match_type, 'endIndex': matches}).json()['matches']

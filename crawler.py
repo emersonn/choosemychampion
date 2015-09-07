@@ -55,19 +55,12 @@ def crawl_player(player, depth, breadth):
     if depth != 0:
         LOGGING.push("Crawling player *'" + str(player) + "'* at a depth of @" + str(DEPTH - depth) + "@.")
 
-        # TODO: reconsider this implementation. this database query is expensive.
-        # check_player = db_session.query(Champion).filter(Champion.player_id == player).count()
-        # if check_player > 5:
-        #     print("Player already has past five matches. Skipping player.")
-        #     return
-
-
-        matches = SESSION.get_matches(player = player, matches = breadth)
+        matches = SESSION.get_match_list(player = player)
         LOGGING.push("Got match history. Logging matches.")
 
         players = set()
 
-        for match in matches:
+        for match in matches[:min(15, len(matches))]:
             # TODO: inefficient. checks every match, maybe check by player match history for all of them?
             check_match = db_session.query(Match).filter(Match.match_id == match['matchId']).count()
             match_data = SESSION.get_match(match['matchId'])

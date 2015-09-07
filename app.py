@@ -104,6 +104,9 @@ def stats(username, user_id, location):
             except KeyError:
                 abort(429)
 
+        # TODO: restructure this so it doesn't make multiple query requests...
+        analyzed_player = analyze_player(user_id, location)
+
         full_stats = {'scores': []}
         index = 1
 
@@ -117,6 +120,8 @@ def stats(username, user_id, location):
         for champion in query:
             # attempts to go through each of the players champions when playing
             # this champion and gets their adjustment for the score
+
+            # TODO: implement role? is role not included in this calculation? check this.
             user_query = PlayerData.query.filter_by(player_id = user_id, location = location, champion_id = champion.champion_id).first()
             if user_query == None:
                 adjustment = 0
@@ -145,13 +150,59 @@ def stats(username, user_id, location):
                 'player': username
             })
 
+            # DEPRICATED: remove this. not used in front anymore
             index += 1
+
+        full_stats['popular_counters'] = [
+            popular_counters("TOP"),
+            popular_counters("MIDDLE"),
+            popular_counters("BOTTOM"),
+            popular_counters("JUNGLE")
+        ]
 
         # returns the json of the stats as an array of scores
         CACHE.set('user_data_' + str(user_id), full_stats, timeout = 1 * 60)
         return jsonify(full_stats)
     else:
         return jsonify(rv)
+
+# TODO: implement limiting for multiple champions of the same role
+def popular_counters(role, limit = 1, counter_limit = 5):
+    champion = db_session.query(ChampionData).filter_by(role = role).order_by(ChampionData.num_seen.desc()).limit(limit).first()
+    return {
+        'champion': {
+            'champion_name': champion.get_name()
+        },
+        'counters': compile_sorted_champions(champion.get_compiled_weights("counters"))[:5]
+    }
+
+def analyze_player(player_id, location):
+    flags = {}
+
+    session = RiotSession(API_KEY, location)
+    # matches = session.get_matches(player = player_id, matches = )
+    # STRATEGY: get match_list, store matches in Match/Champion
+    #           filter by match_list. add match_list to player_data object manytomany.
+    #           add updated list.
+
+    # TOPIC: You seem to do well on x. You also play a lot of x.
+
+    # CASE: Good thing these are the same champion.
+
+    # CASE: Different champions.
+    # INNER CASE: Look at KDAs and see if the popular champion has a sufficient
+    #             score, kda. Suggest playing winning champion instead.
+
+    # TOPIC: Look at recent ranked games. How are they doing? What is happening?
+    #        look at KDAs. Look at whether win > loss. What champions are they
+    #        losing on? Are they playing against counters? Are they playing
+    #        champions that they are supposed to do well on?
+
+    # TOPIC: Consider trying a new champion they haven't played before.
+
+    # STRATEGY: flags for certain topics and generate a response based on the flags?
+    # STRATEGY: generate topics based responses and put it in the dictionary each moment
+    #           for each flag individually
 
 # TODO: implement personal statistics over time. implement counters to the champion
 #       and good team archetype to have.

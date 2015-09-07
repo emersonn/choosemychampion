@@ -99,3 +99,11 @@ class RiotSession(requests.Session):
             ),
             params={'rankedQueues': match_type}
         ).json()['matches']
+
+    def get_champion(self, champion_id, champ_data="all"):
+        return self.get(
+            URLS['champion'].format(
+                location=self.location, champion=str(champion_id)
+            ),
+            params={'champData': champ_data}
+        ).json()

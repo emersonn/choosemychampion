@@ -9,6 +9,7 @@ import logging
 
 from colorama import Fore
 
+
 class PrettyLog:
     colors = {
         '#': Fore.RED,
@@ -18,7 +19,7 @@ class PrettyLog:
         '@': Fore.MAGENTA
     }
 
-    def __init__(self, filename = "log_general.txt"):
+    def __init__(self, filename="log_general.txt"):
         self.file_logger = logging.getLogger("file_log")
         self.stream_logger = logging.getLogger("stream_log")
 
@@ -28,8 +29,13 @@ class PrettyLog:
         self.file_logger.setLevel(logging.DEBUG)
         self.stream_logger.setLevel(logging.DEBUG)
 
-        self.file_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-        self.stream_formatter = logging.Formatter('[' + Fore.WHITE + '%(asctime)s' + Fore.RESET + '] %(message)s', '%H:%M:%S')
+        self.file_formatter = logging.Formatter(
+            '%(asctime)s - %(levelname)s - %(message)s'
+        )
+        self.stream_formatter = logging.Formatter(
+            '[' + Fore.WHITE + '%(asctime)s' + Fore.RESET +
+            '] %(message)s', '%H:%M:%S'
+        )
 
         self.filehandle = logging.FileHandler(filename)
         self.filehandle.setLevel(logging.DEBUG)
@@ -41,7 +47,7 @@ class PrettyLog:
         self.channel.setFormatter(self.stream_formatter)
         self.stream_logger.addHandler(self.channel)
 
-    def push(self, message, level = "debug"):
+    def push(self, message, level="debug"):
         getattr(self.file_logger, level)(self.clean(message))
         getattr(self.stream_logger, level)(self.format(message))
 

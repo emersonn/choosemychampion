@@ -128,6 +128,10 @@ h6.info-text {
   padding: 2rem 0 2rem 0;
 }
 
+.spacing-bottom {
+  padding: 0 0 2rem 0;
+}
+
 .champion-listing .heading {
   margin-bottom: .4rem;
 }
@@ -222,4 +226,8 @@ h6.info-text {
   color: #3498db;
 
   text-decoration: underline;
+}
+
+.logo-link:hover {
+  color: #3498db;
 }

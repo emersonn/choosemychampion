@@ -1,11 +1,14 @@
 <div class="navigation">
   <div class="container">
-    <a ng-href="#/" class="info-text">Choose My Champion</a>
+    <a ng-href="#/" class="info-text logo-link">Choose My Champion</a>
   </div>
 
   <div class="navigation-champion stats" ng-show="summoner_stats">
     <div class="container">
       <md-tabs md-selected="selectedIndex">
+        <md-tab id="quick-info">
+          Quick Info
+        </md-tab>
         <md-tab id="top">
           Top
         </md-tab>
@@ -49,22 +52,120 @@
 <div class="subtle" ng-show="summoner_stats">
   <ng-switch on="selectedIndex">
     <div ng-switch-when="0">
-        <filtered-champs certain-filter="TOP"></filtered-champs>
+      <div class="container">
+        <div class="spacing-upwards">
+          <h4 class="info-text">Quick Suggestions</h4>
+          <div class="row">
+            <div class="three columns">
+              <p class="info-text">Top</p>
+
+              <span
+                ng-repeat="champion in $parent.champions.scores | filter:champion.role = 'top' | orderBy:'-score' | limitTo: 6"
+              >
+                <img
+                  ng-src="{{ champion.image }}"
+                  class="champion-icon-listing"
+                  style="
+                    border: 3px solid;
+                    border-color: hsla({{champion.score * 0.74 + 14}}, {{champion.score * -0.50 + 100}}%, {{champion.score * -.04 + 57}}%, 1);
+                  "
+                />
+              </span>
+            </div>
+
+            <div class="three columns">
+              <p class="info-text">Mid</p>
+
+              <span
+                ng-repeat="champion in $parent.champions.scores | filter:champion.role = 'mid' | orderBy:'-score' | limitTo: 6"
+              >
+                <img
+                  ng-src="{{ champion.image }}"
+                  class="champion-icon-listing"
+                  style="
+                    border: 3px solid;
+                    border-color: hsla({{champion.score * 0.74 + 14}}, {{champion.score * -0.50 + 100}}%, {{champion.score * -.04 + 57}}%, 1);
+                  "
+                />
+              </span>
+            </div>
+
+            <div class="three columns">
+              <p class="info-text">Bottom</p>
+
+              <span
+                ng-repeat="champion in $parent.champions.scores | filter:champion.role = 'bottom' | orderBy:'-score' | limitTo: 6"
+              >
+                <img
+                  ng-src="{{ champion.image }}"
+                  class="champion-icon-listing"
+                  style="
+                    border: 3px solid;
+                    border-color: hsla({{champion.score * 0.74 + 14}}, {{champion.score * -0.50 + 100}}%, {{champion.score * -.04 + 57}}%, 1);
+                  "
+                />
+              </span>
+            </div>
+
+            <div class="three columns">
+              <p class="info-text">Jungle</p>
+
+              <span
+                ng-repeat="champion in $parent.champions.scores | filter:champion.role = 'jungle' | orderBy:'-score' | limitTo: 6"
+              >
+                <img
+                  ng-src="{{ champion.image }}"
+                  class="champion-icon-listing"
+                  style="
+                    border: 3px solid;
+                    border-color: hsla({{champion.score * 0.74 + 14}}, {{champion.score * -0.50 + 100}}%, {{champion.score * -.04 + 57}}%, 1);
+                  "
+                />
+              </span>
+            </div>
+          </div>
+
+          <div class="row spacing-upwards">
+            <div class="six columns">
+              <h4 class="info-text">Counter the Meta</h4>
+
+              <div class="spacing-bottom" ng-repeat="champion in $parent.champions.popular_counters">
+                <p class="info-text">Counters to <strong>{{ champion.champion.champion_name }}</strong></p>
+                <span ng-repeat="counter in champion.counters">
+                  <img ng-src="{{ counter.image }}" class="champion-icon-listing" />
+                </span>
+              </div>
+            </div>
+
+            <div class="six columns">
+              <h4 class="info-text">Personal Analysis</h4>
+
+              <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tincidunt accumsan rutrum. Mauris tellus lacus, pretium eu sollicitudin in, lacinia et dolor. Cras quis massa ex. Aliquam ultrices maximus ornare. Donec euismod nisl eu augue egestas lacinia. Morbi est massa, dapibus sit amet luctus a, ultricies sed arcu. Proin ut sollicitudin lacus, facilisis venenatis sapien. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed elementum accumsan justo mollis fermentum. Integer convallis elit elit, non malesuada magna malesuada ut. Curabitur lectus lacus, efficitur in convallis quis, blandit tempus lacus.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div ng-switch-when="1">
-        <filtered-champs certain-filter="MIDDLE"></filtered-champs>
+        <filtered-champs certain-filter="TOP"></filtered-champs>
     </div>
 
     <div ng-switch-when="2">
-        <filtered-champs certain-filter="BOTTOM"></filtered-champs>
+        <filtered-champs certain-filter="MIDDLE"></filtered-champs>
     </div>
 
     <div ng-switch-when="3">
-        <filtered-champs certain-filter="JUNGLE"></filtered-champs>
+        <filtered-champs certain-filter="BOTTOM"></filtered-champs>
     </div>
 
     <div ng-switch-when="4">
+        <filtered-champs certain-filter="JUNGLE"></filtered-champs>
+    </div>
+
+    <div ng-switch-when="5">
       <div class="container">
         <div class="spacing-upwards">
           <h2>Settings</h2>

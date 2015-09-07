@@ -3,3 +3,4 @@
     > it should not take forever to load all of the detailed data now
   > fixed major bug with data collection
     > much more stable numbers for win rates, etc
+  > made about and version history pages

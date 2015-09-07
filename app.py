@@ -41,27 +41,12 @@ def cached(timeout=10 * 60, key='view/%s'):
         return decorated_function
     return decorator
 
-# TODO: try to find a way to combine these two..
+# TODO: try to find a way to combine these urls.
 
 
 @app.route('/')
 def index():
     return send_file('static/index.html')
-
-
-@app.route('/summoner/<username>/<location>/')
-def username(username, location):
-    return index()
-
-
-@app.route('/about/')
-def about():
-    return index()
-
-
-@app.route('/versions/')
-def versions():
-    return index()
 
 # TODO: cache this.
 
@@ -82,9 +67,10 @@ def profile(username, location):
         )
         session = RiotSession(API_KEY, location)
         response = session.get_ids([urllib.pathname2url(username)])
-        # TODO: very dependent on API. abstract this out into the module?
-        #       make a function for a single id?
+
+        # TODO: should use the username as the key instead.
         user_id = response[response.keys()[0]]['id']
+
     # TODO: fix this. this catches both 429 and 400 errors. try to catch
     #       the status code instead. or handle it through the module. KeyError?
     #       catch the error too. raise new exception! need more info about

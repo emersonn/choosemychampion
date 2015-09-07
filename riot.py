@@ -5,13 +5,12 @@
 # a session with the riot server
 
 # Temporary tips:
-# Matches: r = requests.get(URLS['matches'] + str(player), params = {'api_key': API_KEY, 'rankedQueues': 'RANKED_SOLO_5x5', 'endIndex': BREADTH})
-# Match: get_match_data = requests.get(URLS['match'] + str(match['matchId']), params = {'api_key': API_KEY})
-# Ids: r = requests.get(URLS['ids'] + ','.join(participants), params = {'api_key': API_KEY})
 # My ID: 27284
 # Random match: 1932421719
 
 import requests
+
+# TODO: put this client side. use warnings instead. unless some type of force_sleep is enabled.
 from time import sleep
 
 URLS = {

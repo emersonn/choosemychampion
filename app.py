@@ -14,11 +14,14 @@ from sqlalchemy import func, Integer
 
 from models import PlayerData, ChampionData, Champion, Match
 from database import db_session
+from prettylog import PrettyLog
 from riot import RiotSession
 from settings import API_KEY, URLS, CACHE
 
 app = Flask(__name__)
 app.config.from_object('app_settings')
+
+LOGGING = PrettyLog()
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
@@ -57,11 +60,13 @@ def about():
 def versions():
     return index()
 
+# TODO: cache this.
+
 # gathers champion statistics given their username and location
 @app.route('/api/champions/<username>/<location>/')
 def profile(username, location):
     try:
-        print(username + " from " + location + " is requesting their user ID.")
+        LOGGING.push("*'" + username + "'* from @'" + location + "'@ is requesting their user ID.")
         session = RiotSession(API_KEY, location)
         response = session.get_ids([urllib.pathname2url(username)])
         # TODO: very dependent on API. abstract this out into the module?
@@ -72,7 +77,7 @@ def profile(username, location):
     #       catch the error too. raise new exception! need more info about
     #       what riot responded.
     except ValueError:
-        print("Tried to get " + username + "'s id. Got an error.")
+        LOGGING.push("Tried to get *'" + username + "'*'s id. Response did not have user id.")
         abort(400)
 
     return stats(username, user_id, location)
@@ -86,13 +91,13 @@ def stats(username, user_id, location):
         # TODO: abstract this timer out into a constant
         thirty_minutes_ago = datetime.datetime.now() - datetime.timedelta(minutes = 30)
         if len(query) > 0 and query[0].updated < thirty_minutes_ago:
-            print("Player in question has old data. Resetting stats.")
+            LOGGING.push("*'" + username + "'* has old data. Resetting stats.")
             reset_stats(username, user_id, location)
             query = []
 
         if len(query) == 0:
             try:
-                print(username + " (" + str(user_id) + ") from " + location + " does not exist as a model. Attempting to create...")
+                LOGGING.push("*'" + username + "'* from @'" + location + "'@ does not exist in the database. Creating model.")
 
                 session = RiotSession(API_KEY, location)
                 user_data = session.get_stats(user_id)
@@ -181,6 +186,8 @@ def popular_counters(role, limit = 1, counter_limit = 5):
 # TODO: consider exceptions that may occur, use a try/except when getting it.
 #       also clean this up greatly. it can be cleaned up a lot.
 def analyze_player(player_id, location):
+    LOGGING.push("Player analysis for *'" + str(player_id) + "'* is being created.")
+
     flags = {}
 
     session = RiotSession(API_KEY, location)
@@ -189,8 +196,6 @@ def analyze_player(player_id, location):
     match_list = session.get_match_list(player_id)
     match_list = match_list[:min(15, len(match_list))]
     match_ids = [match['matchId'] for match in match_list]
-
-    print("Match list has been requested for " + str(player_id) + ".")
 
     # TODO: abstract out store_match to avoid this interlinkage between app/crawler
     from crawler import store_match
@@ -202,9 +207,9 @@ def analyze_player(player_id, location):
             try:
                 store_match(match_data)
             except KeyError:
-                print("Could not store match " + str(match) + ".")
+                LOGGING.push("Could not store match *'" + str(match) + "'*.")
         else:
-            print(str(match) + " already exists in the database.")
+            LOGGING.push("*'" + str(match) + "'* already exists in the database.")
 
     matches = db_session.query(Champion).join(Match).filter(Match.match_id.in_(match_ids))
     player_data = (db_session
@@ -387,7 +392,7 @@ def reset_stats(username, user_id, location):
 
     rv = CACHE.delete('user_data_' + str(user_id))
 
-    print("Resetting stats for " + username + " (" + str(user_id) + ") from " + location + ".")
+    LOGGING.push("Resetting stats for *'" + username + "'* from @'" + location + "'@.")
 
 @app.route('/api/numbers/')
 def numbers():

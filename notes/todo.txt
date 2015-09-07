@@ -1,27 +1,30 @@
 > Production To Do:
   > install circus and set up crawler
-  > install node, npm and gulp globally
   > firewall
   > start cleaning up gulp file and make a python distribution setup.py
+  > improve usage of gulp to have packages installed via npm
 
 > Development To Do:
-  > set up Alembic
-  > set up gulp jshint, sourcemaps
+  > set up gulp: jshint, sourcemaps
   > set up Python Linter
   > start using unittests
+    > write a unit test and make travis-ci run tests on commit, 404 or 400 invalid
+      > https://flask-webtest.readthedocs.org/en/latest/
 
 > To Do List:
   > make post on League Reddit, League Group UW about new update
 
-  > MOVE ALL REQUESTS FROM MATCH_HISTORY POINT! It will become depricated!
-    > used in crawler
-    > use new endpoint
+  > make sure all get_matches are moved to get_match_list
 
   > catch exceptions for player analysis
 
   > error handling with front side
+    > send error codes, etc.
+      > user doesn't exist
+      > Riot didn't give a valid response
 
-  > deep clean app.py and models.py
+  > deep clean app.py, models.py, riot.py
+    > find better way to fix errors in riot.py
 
   > start switching over to logging from printing
     > implement PrettyLog in all places
@@ -32,56 +35,44 @@
     > fix champion detail pick rate. should be relative not absolute.
       > group by date and zip the counts.
 
+  > improve calculation of counters/assists with large databases
+
   > change links in footer to relative links and resolved links with ng-link {{ component }}
+    > linking without the #?
+
   > hierarchy for championList and About and Version History to avoid redundancy w/ templating
     > angular-blocks
-  > add highlighting for home page link title
-  > linking without the #?
 
   > use cached for the other views
 
-  > make a "quick info" page
-    > top 3 champions to play in each position
-    > counter top played champions with these champions
-    > "you have been playing these well"
+  > improve quick info page
     > champion icons fade into overlay of score on hover
-
-    > grab top champion from each role
-      > "counter x"
-      > display 3 champions to play against them
-
-    > player analysis
-      > "you have been playing these well"
-      > "consider playing more x lane"
+    > featured champions, rising new stars, and random suggested champs
 
   > add names to adjustments/analyze
-  > maybe change adjustment counters/assists to run afterwards?
+    > maybe change adjustment counters/assists to run afterwards?
 
-  > role calculations in getting the champion data for a player? see TODO
+  > role calculations in getting the champion data for a player (app.py)? see TODO
 
   > find a way to make use of items and banned champions
-
-  > improve calculation of counters/assists with large databases
 
   > make a section for "champions this champion is good against"
     > aka who does this champion counter
 
   > auto load more champions as you scroll down
 
-  > write a unit test and make travis-ci run tests on commit, 404 or 400 invalid
-    > https://flask-webtest.readthedocs.org/en/latest/
+  > start using pylinter
 
   > use better calls for sqlalchemy
     > .update()
 
-  > make about page available on the outside
-
   > make production workflow more efficient
     > travis-ci and rsync the build from a build server
       > fabric or node plugins
-      > "JUST DO YOUR BUILD LOCALLY rsync -r ./dist/ MYSERVER:/var/www/"
-        > Or use a gulp rsync
-        > https://www.npmjs.com/package/gulp-rsync
+    > or build locally
+      > rsync -r ./dist/ MYSERVER:/var/www/
+    > or use a gulp rsync
+      > https://www.npmjs.com/package/gulp-rsync
     > or use a staging server. upload to a git repo when knowing it works.
       > "POINT staging.choosemychampion.net TO YOUR SAME SERVER"
         "AND SET THE HOSTNAME OF A SEPARATE SITE AS THAT RSYNC TO THAT SETUP FIRST"
@@ -91,79 +82,38 @@
   > start cleaning up planofaction.txt and directory of files
     > delete files that aren't used anymore
 
-  > start cleaning up crawler and models
-  > find better way to fix errors in riot.py
-
   > comment on all new code
 
   > fix front page player count to accurate
 
   > fix models.py and clean it up and add abstract riot API
     > improve the calculated win rate to actually include personal data
-    > add counters/champions that work
-    > add messages of information
-    > tips to improve play, looks at recent matches with the champion
 
-  > improve get_counters() and get_assists()
-    > reduce server load by putting it as a column (one to many relation?)
-    > go reverse from matches to the champions to make the compilation easier
+  > add personal analysis for a particular champion
+    > tips to improve play, looks at recent matches with the champion
+    > also include the champion analysis in the details part to server side
+      > make discussion paragraphs more complex with a lot more configurations
+
   > improve compilation of the data in the app.py by abstraction
 
-  > implement player_analysis
-
   > implement league in the database
+    > consider some champions may be better in certain leagues
 
   > improve the crawler by having different starting points
 
-  > start using pylint and unit testing
-  > start using gulp
-    > download the cloud files during building with bower or npm
-      > npm -S install angular-aria
-        > Gulp: npm install, copy module files into build folder, build css, build js
-          create the distribution
-        > https://travismaynard.com/writing/getting-started-with-gulp (tips)
-          > concatenate and minify js
-          > gulp.src('node_modules/**/*.js').pipe('all.js').pipe(uglify())
-    > keep gulpfile in git repo and when distributing, use gulp build
+  > FIX PARENTING!
+    > making it relative makes it easily broken due to ng
 
-  > championList shows things only if certain values. calculate these server side instead?
-    > enable a feature where it randomly talks about the champion server side instead.
-
-  > FIX PARENTING! It seems to be a problem when surrounded ng statements. Adding more statments
-    breaks the situation.
-
-  > make discussion paragraphs more complex with a lot more configurations
-
-  > first screen should be a "quick view" or "quick pick" screen
-    > portrait summary with highest winning champions and can click on the actual roles
-      when necessary.
-
-  > generate phrases server side to make it more complex and easier to manage
-
-  > put in the legal jibber jabber, faq, and contact information
-
-  > change adjustment and expected win rate to favor played champions, a lot more. A LOT MORE.
   > add more factors into champion win rates
-    > factors to consider: wins under 20 minutes? damage? meta? cs numbers? economy of items?
-
-  > remake website
-    > detailed champion statistics needs more PERSONAL and IMPROVEMENT statistics of the player
+    > change adjustment and expected win rate to favor played champions, a lot more. A LOT MORE.
+    > factors to consider:
+      > wins under 20 minutes? damage? meta? cs numbers? economy of items?
 
   > set up database backups
+
   > memcached? (https://docs.webfaction.com/software/memcached.html)
 
-  > make the settings page nicer
-    > implement /stats/reset (implemented w/out creating new data)
-  > make the reset button not delete things but just edit the availability of data
-
-  > featured champions, rising new stars, and random suggested champs
-
-  > personal champion skill level
-  > data visualization and interactive data over time
-
   > implement settings: other season data and normal games, color theme?
-
-  > add a version history for public
 
   > set up suggestions/bugs form
 

@@ -140,9 +140,7 @@
             <div class="six columns">
               <h4 class="info-text">Personal Analysis</h4>
 
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tincidunt accumsan rutrum. Mauris tellus lacus, pretium eu sollicitudin in, lacinia et dolor. Cras quis massa ex. Aliquam ultrices maximus ornare. Donec euismod nisl eu augue egestas lacinia. Morbi est massa, dapibus sit amet luctus a, ultricies sed arcu. Proin ut sollicitudin lacus, facilisis venenatis sapien. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed elementum accumsan justo mollis fermentum. Integer convallis elit elit, non malesuada magna malesuada ut. Curabitur lectus lacus, efficitur in convallis quis, blandit tempus lacus.
-              </p>
+              <p ng-bind-html="$parent.champions.analyzed_player | unsafe"></p>
             </div>
           </div>
         </div>

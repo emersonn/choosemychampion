@@ -3,15 +3,15 @@
 
 # Analyzes each champions score
 
-import requests
-
 from models import ChampionData
 from prettylog import PrettyLog
 
 LOGGING = PrettyLog()
 
-# takes all the champion data and creates a score
+
 def make_adjustments():
+    """ Takes all champion data and creates a score.
+    """
     champions = ChampionData.query.all()
 
     # TODO: look at pro players? look at nerfplz.com and analyze their

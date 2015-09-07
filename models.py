@@ -13,6 +13,20 @@ LOGGING = PrettyLog()
 SESSION = RiotSession(API_KEY)
 
 
+def get_kda(data):
+    """ Gives the KDA of a particular object.
+
+    Args:
+        data: Class with the attributes kills, assists, and deaths.
+    """
+
+    overall = float(data.kills + data.assists)
+    if data.deaths == 0:
+        return overall
+    else:
+        return overall / (data.deaths)
+
+
 class Match(Base):
     """ Used to store basic information about the match.
     """
@@ -49,12 +63,10 @@ class Champion(Base):
     assists = Column(Integer)
     damage = Column(Integer)
 
-    # objective_score is scored as the addition of
-    # baron kills and dragon kills
+    # objective_score is the addition of dragon and baron kills
     objective_score = Column(Integer)
     tower_score = Column(Integer)
 
-    # references the champion to a particular match
     match_id = Column(Integer, ForeignKey("match.id"))
     match = relationship("Match", backref=backref("champion", order_by=id))
 
@@ -62,10 +74,7 @@ class Champion(Base):
         return '<Champion %r>' % (self.champion_id)
 
     def get_kda(self):
-        if self.deaths == 0:
-            return (1.0 * self.kills + self.assists)
-        else:
-            return (1.0 * self.kills + self.assists) / (self.deaths)
+        return get_kda(self)
 
 
 class BannedChampion(Base):

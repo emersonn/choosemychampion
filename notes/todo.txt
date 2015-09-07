@@ -15,6 +15,9 @@
 > To Do List:
   > make post on League Reddit, League Group UW about new update
 
+  > accidentally added settings.py to the commit. make sure it doesn't override
+    current development edits.
+
   > after linting all the code, add docstrings for everything
     > http://sphinxcontrib-napoleon.readthedocs.org/en/latest/example_google.html
 

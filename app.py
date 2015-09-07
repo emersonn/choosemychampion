@@ -550,14 +550,15 @@ def reset_stats(username, user_id, location):
         location: Riot's abbreviation for the region.
     """
 
-    query = (
+    (
         PlayerData.query
         .filter_by(player_id=user_id, location=location)
         .delete()
     )
+
     db_session.commit()
 
-    rv = CACHE.delete('user_data_' + str(user_id))
+    CACHE.delete('user_data_' + str(user_id))
 
     LOGGING.push(
         "Resetting stats for *'" +

@@ -1,0 +1,13 @@
+*.pyc
+*.DS_STORE
+alembic/
+env/
+legacy/
+static/dist
+alembic.ini
+node_modules/
+static/images/favicon.png
+static/images/favicon.pxm
+log_general.txt
+settings.py
+app_settings.py

@@ -16,3 +16,5 @@
     > chart.js, angular-chart
     > skeleton.css, normalize.css
   > Gulp, npm
+
+> Deployment needs editing of: settings.py, app_settings.py, update of package.json

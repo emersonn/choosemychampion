@@ -23,6 +23,8 @@
       > app_settings debug is false.
       > settings has database changed.
       > package.json ????
+    > make sure that everything works now
+    > add those files to .gitignore
 
   > after linting all the code, add docstrings for everything
     > http://sphinxcontrib-napoleon.readthedocs.org/en/latest/example_google.html

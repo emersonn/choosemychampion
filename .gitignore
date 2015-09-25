@@ -11,3 +11,6 @@ static/images/favicon.pxm
 log_general.txt
 settings.py
 app_settings.py
+*.cfg
+*.coverage
+cover/

@@ -15,22 +15,9 @@
 > To Do List:
   > make post on League Reddit, League Group UW about new update
 
-  > need to fix production server! it is on a different track than the master
-    branch. settings.py, package.json, and app_settings.py are all different
-    files.
-    > .gitignore those files and remove them from the repository.
-    > store .py.default files instead and rename them in the deployment
-      > app_settings debug is false.
-      > settings has database changed.
-      > package.json ????
-    > make sure that everything works now
-    > add those files to .gitignore
-
   > after linting all the code, add docstrings for everything
     > http://sphinxcontrib-napoleon.readthedocs.org/en/latest/example_google.html
     > echo "flake8" >> .git/hooks/pre-commit
-
-  > make sure all get_matches are moved to get_match_list
 
   > catch exceptions for player analysis
 

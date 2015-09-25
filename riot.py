@@ -14,6 +14,7 @@ import requests
 #       unless some type of force_sleep is enabled.
 from time import sleep
 
+# TODO: Make base URL
 URLS = {
     'ids': 'https://{location}.api.pvp.net/api/lol/{location}/v1.4/summoner/by-name/{players}',
     'stats': 'https://{location}.api.pvp.net/api/lol/{location}/v1.3/stats/by-summoner/{player}/ranked/',

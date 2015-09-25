@@ -16,5 +16,12 @@
     > chart.js, angular-chart
     > skeleton.css, normalize.css
   > Gulp, npm
+  > nose, coverage installed
+    > /tests/ folder created
+    >   test_file.py created
+  > nosetests
+    > --pdb
+      > q to quit c to continue h for help
+    > cover/index.html
 
 > Deployment needs editing of: settings.py, app_settings.py, update of package.json

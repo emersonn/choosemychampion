@@ -51,6 +51,7 @@ class Champion(Base):
 
     id = Column(Integer, primary_key=True)
 
+    # TODO: Maybe make a Champion reference instead?
     champion_id = Column(Integer)
     player_id = Column(Integer)
 

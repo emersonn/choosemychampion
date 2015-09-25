@@ -28,6 +28,13 @@ def shutdown_session(exception=None):
 
 
 def cached(timeout=10 * 60, key='view/%s'):
+    """ Cache decorator for app functions.
+
+    Args:
+        timeout: Timeout for the cache.
+        key: Storage key for the request.
+    """
+
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
@@ -230,6 +237,13 @@ def popular_counters(role, limit=1, counter_limit=5):
 
 
 def analyze_player(player_id, location):
+    """ Analyzes a player for recent game statistics.
+
+    Args:
+        player_id: The Riot player_id for the player in question.
+        location: The abbreviated location for the particular player.
+    """
+
     LOGGING.push(
         "Player analysis for *'" +
         str(player_id) + "'* is being created."
@@ -434,6 +448,16 @@ def analyze_player(player_id, location):
 
 
 def html_surround(phrase, tag="strong"):
+    """ Surrounds a particular phrase in an HTML non-self-closing tag.
+
+    Args:
+        phrase: Phrase to put into the tags.
+        tag: The HTML tag to surround the text with.
+
+    Returns:
+        String: The surrounded phrase in given HTML tag.
+    """
+
     return "<" + tag + ">" + str(phrase) + "</" + tag + ">"
 
 # TODO: implement personal statistics over time
@@ -443,6 +467,16 @@ def html_surround(phrase, tag="strong"):
 @app.route('/api/stats/<champion>/<role>/')
 @cached()
 def champion_stats(champion, role):
+    """ Gives detailed champion stats for a particular champion.
+
+    Args:
+        champion: Champion ID for the champion in question.
+        role: The role that the champion players.
+
+    Returns:
+        json: JSON formatted response for the champion statistics.
+    """
+
     champ = (
         db_session.query(ChampionData)
         .filter_by(champion_id=champion, role=role)
@@ -502,6 +536,16 @@ def champion_stats(champion, role):
 
 
 def compile_sorted_champions(listing, reverse=True):
+    """ Compiles the sorted champion list into detailed information.
+
+    Args:
+        listing: Sorted champion list.
+        reverse: Whether the list should be sorted in reverse.
+            Defaults to True.
+
+    Returns:
+        dict: Dictionary of champion data.
+    """
     sorted_listing = sorted(
         listing.items(),
         key=operator.itemgetter(1),
@@ -555,6 +599,12 @@ def reset_stats(username, user_id, location):
 
 @app.route('/api/numbers/')
 def numbers():
+    """ Gives a summary of champion statistics.
+
+    Returns:
+        json: JSON formatted champion statistic summary.
+    """
+
     rv = CACHE.get('numbers')
     if rv is None:
         popular_champ = (

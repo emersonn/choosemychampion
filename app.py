@@ -457,8 +457,7 @@ def html_surround(phrase, tag="strong"):
 
     return "<" + tag + ">" + str(phrase) + "</" + tag + ">"
 
-# TODO: implement personal statistics over time
-#       and good team archetype to have.
+# TODO: Implement personal statistics over time, and team archetype.
 
 
 @app.route('/api/stats/<champion>/<role>/')
@@ -592,6 +591,9 @@ def reset_stats(username, user_id, location):
         username + "'* from @'" +
         location + "'@."
     )
+
+# TODO: Improve loading times of this.
+#       Cache the numbers for longer? Preprocess the numbers?
 
 
 @app.route('/api/numbers/')

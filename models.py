@@ -39,8 +39,10 @@ class Match(Base):
     match_time = Column(DateTime)
     match_duration = Column(Integer)
 
+    """
     def __repr__(self):
         return '<Match %r>' % (self.match_id)
+    """
 
 
 class Champion(Base):
@@ -71,8 +73,10 @@ class Champion(Base):
     match_id = Column(Integer, ForeignKey("match.id"))
     match = relationship("Match", backref=backref("champion", order_by=id))
 
+    """
     def __repr__(self):
         return '<Champion %r>' % (self.champion_id)
+    """
 
     def get_kda(self):
         return get_kda(self)
@@ -92,9 +96,10 @@ class BannedChampion(Base):
         "Match", backref=backref("banned_champion", order_by=id)
     )
 
+    """
     def __repr__(self):
         return '<Banned Champion %r>' % (self.champion_id)
-
+    """
 
 class BuiltItems(Base):
     """ Stores basic information about built items for a particular player.
@@ -110,8 +115,10 @@ class BuiltItems(Base):
         "Champion", backref=backref("built_items", order_by=id)
     )
 
+    """
     def __repr__(self):
         return '<Item %r>' % (self.item_id)
+    """
 
 
 class PlayerData(Base):

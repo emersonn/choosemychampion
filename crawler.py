@@ -1,24 +1,22 @@
 import datetime
 import random
 
-# TODO: fix this. there are warnings about python 2.7 and also
-# SSL. maybe need to implement SSL because using HTTPS in the
-# requests?
+# TODO: Fix this.
 import logging
 logging.captureWarnings(True)
 
-# TODO: make this into a module so these are imported less relatively
+# TODO: Make League into a package.
 from database import db_session
 from models import Match, Champion, BannedChampion, BuiltItems
 from settings import API_KEY
 from riot import RiotSession
 from prettylog import PrettyLog
 
-# crawler settings
+# Crawler settings.
 BREADTH = 15
 DEPTH = 15
 
-# trackers
+# Trackers
 PLAYER_LIST = 0
 MATCH_COUNT = 0
 

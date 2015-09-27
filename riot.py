@@ -11,6 +11,7 @@
 import requests
 
 BASE_URL = "https://{location}.api.pvp.net/"
+
 # https://{location}.api.pvp.net/api/lol/{location}/
 BASE_API_URL = BASE_URL + "api/lol/{location}/"
 # https://{location}.api.pvp.net/api/lol/static-data/{location}/

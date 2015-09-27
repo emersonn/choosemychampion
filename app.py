@@ -3,7 +3,7 @@ from functools import wraps
 import operator
 import urllib
 
-# TODO: fix this.
+# TODO: Fix this.
 import logging
 logging.captureWarnings(True)
 
@@ -48,14 +48,10 @@ def cached(timeout=10 * 60, key='view/%s'):
         return decorated_function
     return decorator
 
-# TODO: try to find a way to combine these urls.
-
 
 @app.route('/')
 def index():
     return send_file('static/index.html')
-
-# TODO: cache this.
 
 
 @app.route('/api/champions/<username>/<location>/')
@@ -72,16 +68,15 @@ def profile(username, location):
             "*'" + username + "'* from @'" + location +
             "'@ is requesting their user ID."
         )
+        # TODO: Save the ID lookup in the database.
         session = RiotSession(API_KEY, location)
         response = session.get_ids([urllib.pathname2url(username)])
 
-        # TODO: should use the username as the key instead.
+        # TODO: Should use the username as the key to be consistent.
         user_id = response[response.keys()[0]]['id']
 
-    # TODO: fix this. this catches both 429 and 400 errors. try to catch
-    #       the status code instead. or handle it through the module. KeyError?
-    #       catch the error too. raise new exception! need more info about
-    #       what riot responded.
+    # TODO: Fix this to catch both 429 and 400 errors.
+    #       Use a new exception. Handle through Riot. Handle w/ status cocde.
     except ValueError:
         LOGGING.push(
             "Tried to get *'" + username +
@@ -90,6 +85,8 @@ def profile(username, location):
         abort(400)
 
     return stats(username, user_id, location)
+
+# Implement using @cached(). May need request URL?
 
 
 def stats(username, user_id, location):
@@ -444,7 +441,7 @@ def analyze_player(player_id, location):
 
     return response
 
-# TODO: temporary fix, unsafe
+# TODO: Temporary fix. Kind of unsafe?
 
 
 def html_surround(phrase, tag="strong"):
@@ -532,7 +529,7 @@ def champion_stats(champion, role):
 
     return jsonify(stats)
 
-# TODO: maybe do this at the model level?
+# TODO: Maybe do this at the model level?
 
 
 def compile_sorted_champions(listing, reverse=True):
@@ -569,7 +566,7 @@ def compile_sorted_champions(listing, reverse=True):
     return listing
 
 
-# TODO: call all new adjustments
+# TODO: Call all new adjustments they may need.
 
 def reset_stats(username, user_id, location):
     """ Resets user statistics in the database.
@@ -598,6 +595,7 @@ def reset_stats(username, user_id, location):
 
 
 @app.route('/api/numbers/')
+@cached()
 def numbers():
     """ Gives a summary of champion statistics.
 
@@ -605,98 +603,93 @@ def numbers():
         json: JSON formatted champion statistic summary.
     """
 
-    rv = CACHE.get('numbers')
-    if rv is None:
-        popular_champ = (
-            db_session.query(ChampionData)
-            .order_by(ChampionData.num_seen.desc())
-            .first()
-        )
+    popular_champ = (
+        db_session.query(ChampionData)
+        .order_by(ChampionData.num_seen.desc())
+        .first()
+    )
 
-        popular_champs = (
-            db_session.query(ChampionData)
-            .order_by(ChampionData.num_seen.desc())
-            .limit(15)
-            .all()
-        )
+    popular_champs = (
+        db_session.query(ChampionData)
+        .order_by(ChampionData.num_seen.desc())
+        .limit(15)
+        .all()
+    )
 
-        random_champ = (
-            db_session.query(ChampionData)
-            .order_by(func.rand())
-            .first()
-        )
+    random_champ = (
+        db_session.query(ChampionData)
+        .order_by(func.rand())
+        .first()
+    )
 
-        winning_champ = (
-            db_session.query(ChampionData)
-            .filter(ChampionData.num_seen > 10)
-            .order_by(ChampionData.score.desc())
-            .first()
-        )
+    winning_champ = (
+        db_session.query(ChampionData)
+        .filter(ChampionData.num_seen > 10)
+        .order_by(ChampionData.score.desc())
+        .first()
+    )
 
-        winning_champ_roles = (
-            db_session.query(
-                Champion.role.label("role"),
-                func.count(Champion.id).label("seen")
-            )
-            .filter(Champion.champion_id == winning_champ.champion_id)
-            .group_by(Champion.role).all()
+    winning_champ_roles = (
+        db_session.query(
+            Champion.role.label("role"),
+            func.count(Champion.id).label("seen")
         )
+        .filter(Champion.champion_id == winning_champ.champion_id)
+        .group_by(Champion.role).all()
+    )
 
-        # Stats, Date Stats, Case Study of Popular or Highest Win Rate
-        stats = {
-            'stats': {
-                'match_count': Match.query.count(),
-                'popular_champ': popular_champ.get_name(),
-                'popular_champ_kda': round(popular_champ.get_kda(), 2),
-                'random_champ': random_champ.get_name(),
-                'random_champ_role': random_champ.role.capitalize(),
-                'random_champ_seen': random_champ.num_seen,
-                'average_kills': round(
-                    db_session.query(
-                        func.avg(ChampionData.kills)
-                    )
-                    .first()[0], 2
-                ),
-                'average_towers': round(
-                    db_session.query(
-                        func.avg(ChampionData.tower_score)
-                    ).first()[0], 2
+    # Stats, Date Stats, Case Study of Popular or Highest Win Rate
+    stats = {
+        'stats': {
+            'match_count': Match.query.count(),
+            'popular_champ': popular_champ.get_name(),
+            'popular_champ_kda': round(popular_champ.get_kda(), 2),
+            'random_champ': random_champ.get_name(),
+            'random_champ_role': random_champ.role.capitalize(),
+            'random_champ_seen': random_champ.num_seen,
+            'average_kills': round(
+                db_session.query(
+                    func.avg(ChampionData.kills)
                 )
-            },
+                .first()[0], 2
+            ),
+            'average_towers': round(
+                db_session.query(
+                    func.avg(ChampionData.tower_score)
+                ).first()[0], 2
+            )
+        },
 
-            'champion_picks': {
+        'champion_picks': {
+            'labels': [
+                champ.get_name() + " (" +
+                champ.role.capitalize() + ")" for champ in popular_champs
+            ],
+            'data': [champ.num_seen for champ in popular_champs],
+            'images': [champ.get_full_image() for champ in popular_champs]
+        },
+
+        # Time graph of pick rate over a week, group by date picked
+        'winning_champ': {
+            'name': winning_champ.get_name(),
+            'role': winning_champ.role.capitalize(),
+            'image': winning_champ.get_full_image(),
+            'seen': winning_champ.num_seen,
+            'won': winning_champ.won * 100,
+            'assists': compile_sorted_champions(
+                champ.get_compiled_weights("assists")
+            ),
+            'kda': winning_champ.get_kda(),
+
+            'role_distribution': {
                 'labels': [
-                    champ.get_name() + " (" +
-                    champ.role.capitalize() + ")" for champ in popular_champs
+                    data.role.capitalize() for data in winning_champ_roles
                 ],
-                'data': [champ.num_seen for champ in popular_champs],
-                'images': [champ.get_full_image() for champ in popular_champs]
-            },
-
-            # Time graph of pick rate over a week, group by date picked
-            'winning_champ': {
-                'name': winning_champ.get_name(),
-                'role': winning_champ.role.capitalize(),
-                'image': winning_champ.get_full_image(),
-                'seen': winning_champ.num_seen,
-                'won': winning_champ.won * 100,
-                'assists': compile_sorted_champions(
-                    champ.get_compiled_weights("assists")
-                ),
-                'kda': winning_champ.get_kda(),
-
-                'role_distribution': {
-                    'labels': [
-                        data.role.capitalize() for data in winning_champ_roles
-                    ],
-                    'data': [data.seen for data in winning_champ_roles]
-                }
+                'data': [data.seen for data in winning_champ_roles]
             }
         }
-        CACHE.set('numbers', stats, timeout=10 * 60)
-        return jsonify(stats)
-
-    return jsonify(rv)
+    }
+    return jsonify(stats)
 
 
 def build_stats(data, username, location):

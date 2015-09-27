@@ -39,12 +39,13 @@ class RiotSession(requests.Session):
         self.params.update({'api_key': api})
         self.location = location
 
-    def _get_request(self, connection, formats):
+    def _get_request(self, connection, formats={}, parameters={}):
         """ Builds a get request with the given API request
 
         Args:
             connection: Desired URL key in the URLS list.
             formats: Keyword arguments to format the string with.
+            parameters: Extra parameters for the .get() request.
 
         Returns:
             json: JSON loaded response from the server.
@@ -54,13 +55,24 @@ class RiotSession(requests.Session):
                 location.
         """
 
-        return self.get(URLS[connection].format(**formats)).json()
+        if 'location' not in formats:
+            formats['location'] = self.location
+
+        return self.get(
+            URLS[connection].format(**formats),
+            params=parameters
+        ).json()
 
     def get_featured(self):
+        """ Performs a request to get the featured games from Riot.
+
+        Returns:
+            list: List of featured games. If there are no games in the list,
+                an empty list is returned.
+        """
+
         try:
-            return self.get(URLS['featured'].format(
-                location=self.location
-            )).json()['gameList']
+            return self._get_request('featured')['gameList']
         except KeyError:
             return []
 
@@ -69,47 +81,94 @@ class RiotSession(requests.Session):
         warnings.warn("Riot will be depricating this URL.")
 
         try:
-            return self.get(
-                URLS['matches'].format(
-                    location=self.location, player=str(player)
-                ),
-                params={'rankedQueues': match_type, 'endIndex': matches}
-            ).json()['matches']
+            parameters = {'rankedQueues': match_type, 'endIndex': matches}
+            return self._get_request(
+                'matches',
+                {'player': str(player)},
+                parameters
+            )['matches']
         except KeyError:
             return []
 
     def get_match(self, match):
-        return self.get(
-            URLS['match'].format(location=self.location, match=str(match))
-        ).json()
+        """ Performs a request to get match data from Riot.
+
+        Returns:
+            json: JSON loaded data in dictionary format.
+        """
+
+        return self._get_request(
+            'match',
+            {'match': str(match)}
+        )
 
     # TODO: UnicodeEncodeError: 'ascii' codec can't encode character u'\xfc'
     #       in position 218: ordinal not in range(128)
     def get_ids(self, players):
-        return self.get(
-            URLS['ids'].format(
-                location=self.location,
-                players=','.join(players)
-            )
-        ).json()
+        """ Performs a request to get the ID lists from a list of usernames.
+
+        Args:
+            players (list): List of players to perform the lookup on.
+
+        Returns:
+            json: JSON loaded data in dictionary format.
+        """
+
+        return self._get_request(
+            'ids',
+            {'players': ','.join(players)}
+        )
 
     def get_stats(self, player):
-        return self.get(
-            URLS['stats'].format(location=self.location, player=str(player))
-        ).json()
+        """ Performs a request to get the stats of a particular player.
+
+        Args:
+            player: Player ID.
+
+        Returns:
+            json: JSON loaded data of the player champion statistics
+                in dictionary format.
+        """
+
+        return self._get_request(
+            'stats',
+            {'player': str(player)}
+        )
 
     def get_match_list(self, player, match_type='RANKED_SOLO_5x5'):
-        return self.get(
-            URLS['match_list'].format(
-                location=self.location, player=str(player)
-            ),
-            params={'rankedQueues': match_type}
-        ).json()['matches']
+        """ Performs a request to get the match list of a player.
+
+        Args:
+            player: ID of the player.
+            match_type: Riot specified argument of the match types to look up.
+                Defaults to Ranked Solo matches.
+
+        Returns:
+            list: List of match data.
+        """
+
+        parameters = {'rankedQueues': match_type}
+        return self._get_request(
+            'match_list',
+            {'player': str(player)},
+            parameters
+        )['matches']
 
     def get_champion(self, champion_id, champ_data="all"):
-        return self.get(
-            URLS['champion'].format(
-                location=self.location, champion=str(champion_id)
-            ),
-            params={'champData': champ_data}
-        ).json()
+        """ Performs a request to get static champion data.
+
+        Args:
+            champion_id: Champion ID.
+            champ_data: Riot specific argument.
+                Defaults to ALL champion data returned.
+
+        Returns:
+            json: JSON formatted data in dictionary format.
+        """
+
+        parameters = {'champData': champ_data}
+        return self._get_request(
+            'champion',
+            {'champion': str(champion_id)},
+            parameters
+        )

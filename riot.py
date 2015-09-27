@@ -148,11 +148,14 @@ class RiotSession(requests.Session):
         """
 
         parameters = {'rankedQueues': match_type}
-        return self._get_request(
-            'match_list',
-            {'player': str(player)},
-            parameters
-        )['matches']
+        try:
+            return self._get_request(
+                'match_list',
+                {'player': str(player)},
+                parameters
+            )['matches']
+        except KeyError:
+            return []
 
     def get_champion(self, champion_id, champ_data="all"):
         """ Performs a request to get static champion data.

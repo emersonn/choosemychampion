@@ -16,7 +16,7 @@
     > chart.js, angular-chart
     > skeleton.css, normalize.css
   > Gulp, npm
-  > nose, coverage installed
+  > nose, coverage, mock installed
     > /tests/ folder created
     >   test_file.py created
   > nosetests

@@ -6,3 +6,4 @@
   > made about and version history pages
   > added a quick notes section
     > added personal analysis
+  > lots of improvement on the backend

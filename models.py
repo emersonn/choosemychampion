@@ -6,7 +6,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 
 from database import Base, db_session
 from prettylog import PrettyLog
-from riot import RiotSession
+from leaguepy import RiotSession
 from settings import API_KEY
 
 LOGGING = PrettyLog()

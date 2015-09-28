@@ -9,7 +9,7 @@ logging.captureWarnings(True)
 from database import db_session
 from models import Match, Champion, BannedChampion, BuiltItems
 from settings import API_KEY
-from riot import RiotSession
+from leaguepy import RiotSession
 from prettylog import PrettyLog
 
 # Crawler settings.

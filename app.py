@@ -13,7 +13,7 @@ from sqlalchemy import func, Integer
 from models import PlayerData, ChampionData, Champion, Match
 from database import db_session
 from prettylog import PrettyLog
-from riot import RiotSession
+from leaguepy import RiotSession
 from settings import API_KEY, CACHE
 
 app = Flask(__name__)

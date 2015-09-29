@@ -9,16 +9,23 @@
     > sudo service nginx restart, sudo service league restart
 
 > Technologies in Use
-  > Flask, MySQL
-    > sqlalchemy, colorama, statistics
-    > scipy, numpy, requests, uwsgi, nginx, virutalenv, Alembic, pip
-  > Angular, jQuery
-    > chart.js, angular-chart
-    > skeleton.css, normalize.css
-  > Gulp, npm
-  > nose, coverage, mock installed
-    > /tests/ folder created
-    >   test_file.py created
+  > Backend Technologies
+    > Python Packages in Use
+      > Flask, sqlalchemy, colorama, statistics
+      > scipy, numpy, requests
+    > MySQL, Alembic, pip, nginx, uwsgi, virtualenv
+  > Frontend Technologies
+    > Angular, jQuery
+    > JavaSciprt Libraries
+      > chart.js, angular-chart
+    > CSS Libraries
+      > skeleton.css, normalize.css
+  > Compilation Technologies
+    > Gulp, npm
+  > Testing Technologies
+    > nose, coverage, mock
+
+> Testing Workflow
   > nosetests
     > --pdb
       > q to quit c to continue h for help

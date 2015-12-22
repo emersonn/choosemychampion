@@ -76,14 +76,6 @@ class TestChampionData(object):
 
         assert champ.get_name() == "cats"
 
-        champ = ChampionData(
-            champion_id=1
-        )
-
-        # ASSUMPTION: Champion ID with 1 is Annie. Also it can make a
-        #             request to the Riot servers.
-        assert champ.get_name() == "Annie"
-
     def test_get_kda(self):
         champ = ChampionData(
             kills=1,

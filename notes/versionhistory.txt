@@ -8,3 +8,6 @@
   > added a quick notes section
     > added personal analysis
   > lots of improvement on the backend
+
+> 2.2
+  > added continuous integration, less things should break now

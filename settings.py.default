@@ -11,7 +11,7 @@ URLS = {'ids': 'https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/',
         'match': 'https://na.api.pvp.net/api/lol/na/v2.2/match/'}
 
 """ Database Settings """
-DATABASE = 'mydatabase'
+DATABASE = 'sqlite:///:memory:'
 
 """ Cache Settings """
 from werkzeug.contrib.cache import SimpleCache

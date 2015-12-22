@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
-from sqlalchemy import ForeignKey, Float, func
+from sqlalchemy import BigInteger, ForeignKey, Float, func
 from sqlalchemy.orm import relationship, backref
 
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -35,7 +35,10 @@ class Match(Base):
 
     id = Column(Integer, primary_key=True)
 
-    match_id = Column(Integer)
+    # TODO: Fix this for EUW and other people. This is a long. Store
+    #   as a BigInteger?
+    match_id = Column(BigInteger)
+
     match_time = Column(DateTime)
     match_duration = Column(Integer)
 

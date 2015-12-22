@@ -3,18 +3,31 @@ from functools import wraps
 import operator
 import urllib
 
-# TODO: Fix this.
+# TODO(Fix this. Related to SSL.)
 import logging
 logging.captureWarnings(True)
 
-from flask import Flask, abort, jsonify, request, send_file
+from flask import abort
+from flask import Flask
+from flask import jsonify
+from flask import request
+from flask import send_file
+
 from sqlalchemy import func, Integer
 
-from models import PlayerData, ChampionData, Champion, Match
+from models import Champion
+from models import ChampionData
+from models import Match
+from models import PlayerData
+
 from database import db_session
-from prettylog import PrettyLog
+
 from leaguepy import RiotSession
-from settings import API_KEY, CACHE
+
+from prettylog import PrettyLog
+
+from settings import API_KEY
+from settings import CACHE
 
 app = Flask(__name__)
 app.config.from_object('app_settings')

@@ -11,19 +11,3 @@ db_session = scoped_session(
 
 Base = declarative_base()
 Base.query = db_session.query_property()
-
-# DEPRICATED: Alembic is used now.
-
-
-def init_db():
-    """ Initializes the database.
-    """
-
-    import models
-    Base.metadata.create_all(bind=engine)
-
-# TODO: implement this. may need to use to clean player data.
-
-
-def clean_db():
-    pass

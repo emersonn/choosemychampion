@@ -6,3 +6,5 @@ requests
 nose
 coverage
 mock
+
+-e git://github.com/emersonn/leaguepy.git#egg=leaguepy

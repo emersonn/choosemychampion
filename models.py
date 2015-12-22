@@ -35,8 +35,6 @@ class Match(Base):
 
     id = Column(Integer, primary_key=True)
 
-    # TODO: Fix this for EUW and other people. This is a long. Store
-    #   as a BigInteger?
     match_id = Column(BigInteger)
 
     match_time = Column(DateTime)

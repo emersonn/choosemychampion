@@ -2,9 +2,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from models import Champion, ChampionData
+from models import Champion
+from models import ChampionData
 
-# TODO: Abstract out the setup and teardown.
+# TODO(Abstract out the setup and teardown.)
 
 
 class TestChampion(object):
@@ -68,8 +69,8 @@ class TestChampionData(object):
         self.db_session.remove()
 
     def test_get_name(self):
-        # TODO: Test if the name does exist, it just returns it
-        #       and nothing else happens.
+        # TODO(Test if the name does exist, it just returns it
+        #       and nothing else happens)
         champ = ChampionData(
             champion_name="cats"
         )

@@ -41,7 +41,7 @@ def shutdown_session(exception=None):
 
 
 def cached(timeout=10 * 60, key='view/%s'):
-    """ Cache decorator for app functions.
+    """Cache decorator for app functions.
 
     Args:
         timeout: Timeout for the cache.
@@ -69,7 +69,7 @@ def index():
 
 @app.route('/api/champions/<username>/<location>/')
 def profile(username, location):
-    """ Gathers champion statistics for a particular user.
+    """Gathers champion statistics for a particular user.
 
     Args:
         username: The urlencoded username of the summoner.
@@ -103,7 +103,7 @@ def profile(username, location):
 
 
 def stats(username, user_id, location):
-    """ Gathers champion statistics given a particular user.
+    """Gathers champion statistics given a particular user.
 
     Args:
         username: The actual username of the user.
@@ -247,7 +247,7 @@ def popular_counters(role, limit=1, counter_limit=5):
 
 
 def analyze_player(player_id, location):
-    """ Analyzes a player for recent game statistics.
+    """Analyzes a player for recent game statistics.
 
     Args:
         player_id: The Riot player_id for the player in question.
@@ -458,7 +458,7 @@ def analyze_player(player_id, location):
 
 
 def html_surround(phrase, tag="strong"):
-    """ Surrounds a particular phrase in an HTML non-self-closing tag.
+    """Surrounds a particular phrase in an HTML non-self-closing tag.
 
     Args:
         phrase: Phrase to put into the tags.
@@ -476,7 +476,7 @@ def html_surround(phrase, tag="strong"):
 @app.route('/api/stats/<champion>/<role>/')
 @cached()
 def champion_stats(champion, role):
-    """ Gives detailed champion stats for a particular champion.
+    """Gives detailed champion stats for a particular champion.
 
     Args:
         champion: Champion ID for the champion in question.
@@ -545,7 +545,7 @@ def champion_stats(champion, role):
 
 
 def compile_sorted_champions(listing, reverse=True):
-    """ Compiles the sorted champion list into detailed information.
+    """Compiles the sorted champion list into detailed information.
 
     Args:
         listing: Sorted champion list.
@@ -581,7 +581,7 @@ def compile_sorted_champions(listing, reverse=True):
 # TODO: Call all new adjustments they may need.
 
 def reset_stats(username, user_id, location):
-    """ Resets user statistics in the database.
+    """Resets user statistics in the database.
 
     Args:
         username: Username of the particular user.
@@ -612,7 +612,7 @@ def reset_stats(username, user_id, location):
 @app.route('/api/numbers/')
 @cached()
 def numbers():
-    """ Gives a summary of champion statistics.
+    """Gives a summary of champion statistics.
 
     Returns:
         json: JSON formatted champion statistic summary.
@@ -708,7 +708,7 @@ def numbers():
 
 
 def build_stats(data, username, location):
-    """ Builds stats based on a given player's performance.
+    """Builds stats based on a given player's performance.
 
     Args:
         data: Riot JSON response to the 'stats' query.

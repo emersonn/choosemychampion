@@ -2,8 +2,6 @@ flask
 sqlalchemy
 colorama
 statistics
-scipy
-numpy
 requests
 nose
 coverage

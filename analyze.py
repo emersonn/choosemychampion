@@ -6,23 +6,27 @@
 
 from sqlalchemy import func, Integer
 
-from models import Match, Champion, ChampionData
 from database import db_session
+
+from models import Champion
+from models import ChampionData
+from models import Match
+
 from prettylog import PrettyLog
 
 LOGGING = PrettyLog()
 
-# TODO: optimize this query for large databases. window the query.
-#       http://stackoverflow.com/questions/7389759/memory-efficient-built-in-sqlalchemy-iterator-generator
-#       filter the query to the most recent matches (30 days)
-#       limit the query to a good amount ~10 mill?
-#       prune the database every so often
+"""
+TODO(Optimize this query for large databases. Window the query.
+    http://stackoverflow.com/questions/7389759/memory-efficient-built-in-sqlalchemy-iterator-generator
+    Filter the query to the most recent matches (30 days?)
+    Limit the query to a good amount (10 million?)
+    Prune the database every so often.)
+"""
 
 
 def analyze():
-    """ Analyzes the champion database and condenses the statistics for easy
-    retrieval.
-    """
+    """Analyzes the champion database and condenses the statistics"""
 
     match_num = get_match_count()
 

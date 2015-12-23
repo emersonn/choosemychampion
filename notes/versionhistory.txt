@@ -11,3 +11,4 @@
 
 > 2.2
   > added continuous integration, less things should break now
+  > sped up getting scores a bit

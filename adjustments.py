@@ -30,8 +30,19 @@ def make_adjustments():
         #       degree is the most likely to win in the meta.
         #   Can start storing specified MMR for games and create a single
         #       source shortest path to a desired MMR.
+        #   Adjust all champions scores to model a normal distribution.
+        #       Adjustment scores are used for this.
+
+
+def approximate_normal():
+    """Approximate the normal distribution with champion scores."""
+    pass
 
 if __name__ == "__main__":
     LOGGING.push("Starting adjustments.")
     make_adjustments()
     LOGGING.push("Adjustments have been completed.")
+
+    LOGGING.push("Now starting to approximate normal.")
+    approximate_normal()
+    LOGGING.push("Finished approximating normal.")

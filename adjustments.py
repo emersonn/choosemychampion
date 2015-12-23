@@ -14,14 +14,22 @@ def make_adjustments():
 
     champions = ChampionData.query.all()
 
-    # TODO(look at pro players? look at nerfplz.com and analyze their
-    # algorithm for assigning tier lists. look at popularity on twitter?)
+    # TODO(Look at external sources for better analysis.)
+    #   Look at pro players? Look at nerfplz.com and analyze their
+    #       algorithm for assigning tier lists. Look at popularity on twitter?
 
     for champion in champions:
         # True forces the methods to force updates
         champion.get_score(True)
         champion.get_counters(True)
         champion.get_assists(True)
+
+        # TODO(Use adjustments attribute to assign miscellaneous overall stats)
+        #   ChampionDatas as verticies. Directed edges against champions to
+        #       depict wins against that champion. Champion w/ highest out
+        #       degree is the most likely to win in the meta.
+        #   Can start storing specified MMR for games and create a single
+        #       source shortest path to a desired MMR.
 
 if __name__ == "__main__":
     LOGGING.push("Starting adjustments.")

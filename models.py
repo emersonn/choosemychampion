@@ -358,7 +358,7 @@ class ChampionData(Base):
         """Gets the score of the particular champion.
 
         Args:
-            force_update: Whether the score should be forced to update.
+            force_update: Whether the current score should be force updated.
 
         Returns:
             float: Score of the champion. Attempted to normalize around 100.
@@ -380,11 +380,10 @@ class ChampionData(Base):
 
             calculated_score = 0
 
+            from scipy import stats
             import statistics
 
-            from scipy import stats
-
-            # percentile of num seen
+            # Percentile of num seen
             champions_seen = [
                 data.num_seen for data in ChampionData.query.all()
             ]
@@ -394,10 +393,10 @@ class ChampionData(Base):
             )
             percentile = stats.norm.sf(zscore)
 
-            # adjusts score with respect to won and num seen percentile
+            # Adjusts score with respect to won and num seen percentile
             calculated_score += self.won * 45 * (1 - percentile)
 
-            # percentile of kda
+            # Percentile of kda
             champions_kda = [
                 data.get_kda() for data in ChampionData.query.all()
             ]
@@ -410,7 +409,7 @@ class ChampionData(Base):
             kda_percentile = stats.norm.sf(kda_zscore)
             calculated_score += 30 * (1 - kda_percentile) * (1 - percentile)
 
-            # percentile of objective score
+            # Percentile of objective score
             champions_objectives = [
                 data.objective_score +
                 data.tower_score for data in ChampionData.query.all()

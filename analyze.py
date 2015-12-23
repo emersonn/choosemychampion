@@ -26,7 +26,7 @@ TODO(Optimize this query for large databases. Window the query.
 
 
 def analyze():
-    """Analyzes the champion database and condenses the statistics"""
+    """Analyzes the champion database and condenses the statistics."""
 
     match_num = get_match_count()
 

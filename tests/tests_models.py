@@ -96,10 +96,11 @@ class TestChampionData(object):
             objective_score=1,
             pick_rate=1,
             adjustment=1,
-            champion_name="Annie"
+            champion_name="Annie",
+            score=49
         )
 
         self.db_session.add(champ)
         self.db_session.commit()
 
-        champ.get_score(True)
+        assert champ.get_score(False) == 49

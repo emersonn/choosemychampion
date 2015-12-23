@@ -18,7 +18,7 @@ SESSION = RiotSession(API_KEY)
 
 
 def get_kda(data):
-    """ Gives the KDA of a particular object.
+    """Gives the KDA of a particular object.
 
     Args:
         data: Class with the attributes kills, assists, and deaths.
@@ -32,8 +32,7 @@ def get_kda(data):
 
 
 class Match(Base):
-    """ Used to store basic information about the match.
-    """
+    """Used to store basic information about the match."""
 
     __tablename__ = 'match'
 
@@ -51,14 +50,13 @@ class Match(Base):
 
 
 class Champion(Base):
-    """ Stores information about the player who played this champion in a game.
-    """
+    """Stores information about the player's champion in a particular game."""
 
     __tablename__ = 'champion'
 
     id = Column(Integer, primary_key=True)
 
-    # TODO: Maybe make a Champion reference instead?
+    # TODO(Maybe make a Champion reference instead?)
     champion_id = Column(Integer)
     player_id = Column(Integer)
 
@@ -88,8 +86,7 @@ class Champion(Base):
 
 
 class BannedChampion(Base):
-    """ Basic information about a banned champion in a particular match.
-    """
+    """Basic information about a banned champion in a particular match."""
 
     __tablename__ = 'banned_champion'
 
@@ -106,9 +103,9 @@ class BannedChampion(Base):
         return '<Banned Champion %r>' % (self.champion_id)
     """
 
+
 class BuiltItems(Base):
-    """ Stores basic information about built items for a particular player.
-    """
+    """Stores basic information about built items for a particular player."""
 
     __tablename__ = 'built_items'
 
@@ -127,8 +124,7 @@ class BuiltItems(Base):
 
 
 class PlayerData(Base):
-    """ Stores summary data for a particular champion a player played.
-    """
+    """Stores summary data for a particular champion a player played."""
 
     __tablename__ = 'player_data'
 
@@ -154,7 +150,7 @@ class PlayerData(Base):
     adjustment = Column(Float)
 
     def get_name(self):
-        """ Gets the name of the champion in question.
+        """Gets the name of the champion in question.
 
         Returns:
             String: The champion name. (capitalized)
@@ -191,15 +187,14 @@ class PlayerData(Base):
     def get_kda(self):
         return get_kda(self)
 
-    # TODO: fix this. this needs to be more in depth.
-    #       temporary solution to the adjustment of a player.
-    #       played champions are more favored.
-    #       needs to be balanced.
-    #       also figure out champions that do not fit
-    #       into the role, not many picks.
+    # TODO(Fix this. Needs to be more in depth. Temporary solution to adjust.
+    #       Played champions are more favored.
+    #       Needs to be balanced.
+    #       Also figure out champions that do not fit into the role,
+    #       not many picks.)
 
     def get_adjustment(self, force_update=False):
-        """ Calculates the adjustment for a particular player in the database.
+        """Calculates the adjustment for a particular player in the database.
 
         Args:
             force_update: Decides whether to force update the current
@@ -222,6 +217,7 @@ class PlayerData(Base):
             adjustment = 0.0
 
             import statistics
+
             from scipy import stats
 
             player_champions = (
@@ -233,10 +229,10 @@ class PlayerData(Base):
                 .all()
             )
 
-            # TODO: temporary fix to the zero division error,
+            # TODO(Temporary fix to the zero division error,
             #       fix to MySQL returning integers.
             #       MySQL gives integers for this and getScore()
-            #       negative numbers?
+            #       negative numbers?)
 
             champions_seen = [
                 data.sessions_played for data in player_champions
@@ -251,7 +247,7 @@ class PlayerData(Base):
                 LOGGING.push("Got error: #'" + e + "'# in compiling seen.")
                 percentile = 1
 
-            # TODO: temporary fix to zero division error
+            # TODO(Temporary fix to zero division error.)
             try:
                 adjustment += (
                     (self.won * 1.0 / (self.sessions_played)) * 15 *
@@ -260,7 +256,7 @@ class PlayerData(Base):
             except ZeroDivisionError:
                 percentile = 0
 
-            # TODO: temporary fix to zero division error
+            # TODO(Temporary fix to zero division error.)
             champions_kda = [data.get_kda() for data in player_champions]
             try:
                 kda_zscore = (
@@ -274,7 +270,7 @@ class PlayerData(Base):
 
             adjustment += 15 * (1 - kda_percentile) * (1 - percentile)
 
-            # TODO: temporary fix to zero division error
+            # TODO(Temporary fix to zero division error)
             try:
                 adjustment += (
                     .49 * self.sessions_played /
@@ -290,17 +286,17 @@ class PlayerData(Base):
 
         return self.adjustment
 
-    # TODO: implement this. make this into a paragraph and graphs
+    # TODO(Implement this. make this into a paragraph and graphs
     #       that discuss how the player is at this
     #       champion compared to other people.
     #       show distributions and highlight where they are.
-    #       such as tower scores or kda and such.
+    #       such as tower scores or kda and such.)
     def player_analysis(self):
         pass
 
 
 class ChampionData(Base):
-    """ Stores analyzed champion data.
+    """Stores analyzed champion data.
 
     NOTE: All data is stored as averaged data.
     """
@@ -336,11 +332,11 @@ class ChampionData(Base):
     def get_kda(self):
         return get_kda(self)
 
-    # TODO: combine this with PlayerData, but also use the database
+    # TODO(Combine this with PlayerData, but also use the database
     #       there are already records of a particular champion
-    #       so there's not need to try to search for the name again.
+    #       so there's not need to try to search for the name again.)
     def get_name(self):
-        """ Finds the name in the database, otherwise requests it.
+        """Finds the name in the database, otherwise requests it.
 
         Returns:
             String: Champion name.
@@ -359,7 +355,7 @@ class ChampionData(Base):
         return self.champion_name
 
     def get_score(self, force_update):
-        """ Gets the score of the particular champion.
+        """Gets the score of the particular champion.
 
         Args:
             force_update: Whether the score should be forced to update.
@@ -385,6 +381,7 @@ class ChampionData(Base):
             calculated_score = 0
 
             import statistics
+
             from scipy import stats
 
             # percentile of num seen
@@ -434,8 +431,8 @@ class ChampionData(Base):
 
             calculated_score *= 1.15
 
-            # TODO: depricate this for a more statistical approach.
-            # bottom or middle roles are more likely to win so a higher score
+            # TODO(Depricate this for a more statistical approach.
+            # bottom or middle roles are more likely to win so a higher score)
             if self.role == "BOTTOM" or self.role == "MIDDLE":
                 calculated_score *= 1.04
 
@@ -469,10 +466,10 @@ class ChampionData(Base):
             .format(uri=self.get_image().split('.')[0].lower())
         )
 
-    # TODO: role, archetype of champion
+    # TODO(Role, archetype of champion)
 
     def get_calculated_win(self, player_id, location):
-        """ Calculates the percepted win for a player/champion combination.
+        """Calculates the percepted win for a player/champion combination.
 
         Returns:
             float: Calculated win rate.
@@ -510,9 +507,9 @@ class ChampionData(Base):
 
         return self.won
 
-    # TODO: implement updating of old counters
+    # TODO(Implement updating of old counters
     #       (or self.champion_counters[0].updated)
-    #       also find a way to combine counters and assists
+    #       also find a way to combine counters and assists)
 
     def get_counters(self, force_update=False):
         counters = self.counters
@@ -559,12 +556,12 @@ class ChampionData(Base):
 
         return counters
 
-    # TODO: kind of weird abstraction...
+    # TODO(Kind of weird abstraction...)
     def get_compiled_weights(self, process):
         compiled = {}
 
         for champion in getattr(self, "get_" + process)():
-            # TODO: Abstract this out more
+            # TODO(Abstract this out more)
             if process == "counters":
                 current_counter = Counter.query.filter_by(
                     original=self, **{process[:-1]: champion}

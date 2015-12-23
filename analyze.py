@@ -36,6 +36,7 @@ def analyze():
         Aggragate right away with a .query() with func.sum, func.count
         Filter then aggragate (order by date, limit by a large number)
     """
+
     champions = (db_session.query(
         Champion.champion_id.label("champion_id"),
         Champion.role.label("role"),
@@ -66,6 +67,10 @@ def analyze():
             .first()
         )
 
+        # TODO(Can simplify this by combining both branches by creating an
+        #   empty champion otherwise and filling all of this info for 'found.')
+
+        # TODO(Can be is not found.)
         if found is None:
             LOGGING.push(
                 "Did not find *'" + str(champion.champion_id) +

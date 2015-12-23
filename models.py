@@ -392,15 +392,11 @@ class ChampionData(Base):
                     champion.objective_score + champion.tower_score
                 )
 
-            champion_list = ChampionData.query.all()
-
             from scipy import stats
             import statistics
 
             # Percentile of num seen
-            champions_seen = [
-                data.num_seen for data in champion_list
-            ]
+            champions_seen = champion_stats['champions_seen']
             zscore = (
                 (self.num_seen - statistics.mean(champions_seen)) /
                 statistics.stdev(champions_seen)
@@ -411,9 +407,7 @@ class ChampionData(Base):
             calculated_score += self.won * 45 * (1 - percentile)
 
             # Percentile of kda
-            champions_kda = [
-                data.get_kda() for data in champion_list
-            ]
+            champions_kda = champion_stats['champions_kda']
             kda_zscore = (
                 (
                     self.get_kda() - statistics.mean(champions_kda) /
@@ -424,10 +418,7 @@ class ChampionData(Base):
             calculated_score += 30 * (1 - kda_percentile) * (1 - percentile)
 
             # Percentile of objective score
-            champions_objectives = [
-                data.objective_score +
-                data.tower_score for data in champion_list
-            ]
+            champions_objectives = champion_stats['champions_objectives']
             objectives_zscore = (
                 (
                     (self.objective_score + self.tower_score) -

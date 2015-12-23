@@ -10,7 +10,7 @@ import logging
 from colorama import Fore
 
 
-class PrettyLog:
+class PrettyLog(object):
     colors = {
         '#': Fore.RED,
         '$': Fore.GREEN,
@@ -20,6 +20,13 @@ class PrettyLog:
     }
 
     def __init__(self, filename="log_general.txt"):
+        """Initializes a PrettyLog.
+
+        Args:
+            filename (String): Default is log_general.txt.
+                This is the file to log to.
+        """
+
         self.file_logger = logging.getLogger("file_log")
         self.stream_logger = logging.getLogger("stream_log")
 
@@ -48,12 +55,30 @@ class PrettyLog:
         self.stream_logger.addHandler(self.channel)
 
     def push(self, message, level="debug"):
+        """Pushes a new message to PrettyLog.
+
+        Args:
+            message (String): Message to log.
+            level (String): Default is 'debug.' This is syntax for the logging
+                to label it correctly.
+        """
+
         getattr(self.file_logger, level)(self.clean(message))
         getattr(self.stream_logger, level)(self.format(message))
 
     def format(self, message):
-        # TODO: implement a better method. this is a temporary, quick solution
-        #       possibly stacks to check for valid input.
+        """Formats the given message with colors.
+
+        Args:
+            message (String): Message to format.
+
+        Returns:
+            String: Formatted message with replaced colors.
+        """
+
+        # TODO(Implement a better method. Temporary quick solution.)
+        #   Possibly stacks to check for valid input.
+
         for color in self.colors.keys():
             current_color = False
             split = list(message)
@@ -72,6 +97,15 @@ class PrettyLog:
         return message
 
     def clean(self, message):
+        """Cleans message of all possible color formattings.
+
+        Args:
+            message (String): Message to clean.
+
+        Returns:
+            String: Cleaned message.
+        """
+
         for color in self.colors.keys():
             message = message.replace(color, "")
 

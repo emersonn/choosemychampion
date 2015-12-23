@@ -10,20 +10,20 @@ LOGGING = PrettyLog()
 
 
 def make_adjustments():
-    """ Takes all champion data and creates a score.
-    """
+    """Takes all champion data and creates a score."""
+
     champions = ChampionData.query.all()
 
-    # TODO: look at pro players? look at nerfplz.com and analyze their
-    # algorithim for assigning tier lists. look at popularity on twitter?
+    # TODO(look at pro players? look at nerfplz.com and analyze their
+    # algorithm for assigning tier lists. look at popularity on twitter?)
 
     for champion in champions:
-        # true is important as it forces an update of the champion data
-        # file with respect to the score
+        # True forces the methods to force updates
         champion.get_score(True)
         champion.get_counters(True)
         champion.get_assists(True)
 
 if __name__ == "__main__":
+    LOGGING.push("Starting adjustments.")
     make_adjustments()
     LOGGING.push("Adjustments have been completed.")

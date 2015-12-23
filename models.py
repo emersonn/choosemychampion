@@ -4,9 +4,13 @@ from sqlalchemy.orm import relationship, backref
 
 from sqlalchemy.ext.associationproxy import association_proxy
 
-from database import Base, db_session
+from database import Base
+from database import db_session
+
 from prettylog import PrettyLog
+
 from leaguepy import RiotSession
+
 from settings import API_KEY
 
 LOGGING = PrettyLog()

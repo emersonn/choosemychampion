@@ -69,8 +69,6 @@ class TestChampionData(object):
         self.db_session.remove()
 
     def test_get_name(self):
-        # TODO(Test if the name does exist, it just returns it
-        #       and nothing else happens)
         champ = ChampionData(
             champion_name="cats"
         )
@@ -91,6 +89,7 @@ class TestChampionData(object):
             kills=1,
             deaths=0,
             assists=0,
+            role="TOP",
             num_seen=0,
             won=1,
             tower_score=1,
@@ -100,4 +99,7 @@ class TestChampionData(object):
             champion_name="Annie"
         )
 
-        champ.get_score(False)
+        self.db_session.add(champ)
+        self.db_session.commit()
+
+        champ.get_score(True)

@@ -85,3 +85,19 @@ class TestChampionData(object):
         )
 
         assert champ.get_kda() == 1
+
+    def test_get_score(self):
+        champ = ChampionData(
+            kills=1,
+            deaths=0,
+            assists=0,
+            num_seen=0,
+            won=1,
+            tower_score=1,
+            objective_score=1,
+            pick_rate=1,
+            adjustment=1,
+            champion_name="Annie"
+        )
+
+        champ.get_score(False)

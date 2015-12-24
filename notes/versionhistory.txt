@@ -1,14 +1,3 @@
-> 2.1
-  > improved performance of counters/assists and detailed champion stats
-    > it should not take forever to load all of the detailed data now
-  > fixed major bug with data collection
-    > much more stable numbers for win rates, etc
-  > fixed major bug with EUW players
-  > made about and version history pages
-  > added a quick notes section
-    > added personal analysis
-  > lots of improvement on the backend
-
 > 2.2
   > added continuous integration, less things should break now
   > sped up getting scores a bit

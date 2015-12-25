@@ -1,6 +1,6 @@
 import app
 
-# TODO: Need to set the database to something new.
+# TODO(Implement flask-sqlalchemy.)
 
 
 class TestApp(object):
@@ -15,9 +15,9 @@ class TestApp(object):
         rv = self.app.get('/')
         assert rv is not None
 
-    # TODO: Test whether the profile returns the stats get.
-    # TODO: Test for all regions and known usernames/ids.
-    # TODO: Abstract out the retrieval of the ID. Or mock it.
+    # TODO(Test whether the profile returns the stats get.)
+    # TODO(Test for all regions and known usernames/ids.)
+    # TODO(Abstract out the retrieval of the ID. Or mock it.)
     def test_profile(self):
         pass
 

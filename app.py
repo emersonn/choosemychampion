@@ -81,14 +81,14 @@ def profile(username, location):
             "*'" + username + "'* from @'" + location +
             "'@ is requesting their user ID."
         )
-        # TODO: Save the ID lookup in the database.
+        # TODO(Save the ID lookup in the database.)
         session = RiotSession(API_KEY, location)
         response = session.get_ids([urllib.pathname2url(username)])
 
-        # TODO: Should use the username as the key to be consistent.
+        # TODO(Should use the username as the key to be consistent.)
         user_id = response[response.keys()[0]]['id']
 
-    # TODO: Fix this to catch both 429 and 400 errors.
+    # TODO(Fix this to catch both 429 and 400 errors.)
     #       Use a new exception. Handle through Riot. Handle w/ status cocde.
     except ValueError:
         LOGGING.push(
@@ -119,7 +119,7 @@ def stats(username, user_id, location):
             .all()
         )
 
-        # TODO: abstract this timer out into a constant
+        # TODO(Abstract this timer out into a constant.)
         thirty_minutes_ago = (
             datetime.datetime.now() - datetime.timedelta(minutes=30)
         )
@@ -145,11 +145,11 @@ def stats(username, user_id, location):
                     .all()
                 )
 
-            # TODO: make this a more descriptive error
+            # TODO(Make this a more descriptive error.)
             except KeyError:
                 abort(429)
 
-        # TODO: restructure this so it doesn't make multiple query requests...
+        # TODO(Restructure this so it doesn't make multiple query requests.)
         analyzed_player = analyze_player(user_id, location)
 
         full_stats = {'scores': []}
@@ -157,7 +157,7 @@ def stats(username, user_id, location):
 
         query = ChampionData.query.all()
 
-        # TODO: this is vastly inefficient.
+        # TODO(This is vastly inefficient.)
 
         # attempts to go through all the champion data and generate the
         # array of score information for each champion. this also appends
@@ -166,7 +166,7 @@ def stats(username, user_id, location):
             # attempts to go through each of the players champions when playing
             # this champion and gets their adjustment for the score
 
-            # TODO: implement role? is role not included in this calculation?
+            # TODO(Implement role? is role not included in this calculation?)
             user_query = (
                 PlayerData.query
                 .filter_by(
@@ -221,7 +221,7 @@ def stats(username, user_id, location):
     else:
         return jsonify(rv)
 
-# TODO: implement limiting for multiple champions of the same role
+# TODO(Implement limiting for multiple champions of the same role.)
 
 
 def popular_counters(role, limit=1, counter_limit=5):
@@ -242,8 +242,8 @@ def popular_counters(role, limit=1, counter_limit=5):
         )[:5]
     }
 
-# TODO: consider exceptions that may occur, use a try/except when getting it.
-#       also clean this up greatly. it can be cleaned up a lot.
+# TODO(Consider exceptions that may occur, use a try/except when getting it.
+#       also clean this up greatly. it can be cleaned up a lot.)
 
 
 def analyze_player(player_id, location):
@@ -263,12 +263,12 @@ def analyze_player(player_id, location):
 
     session = RiotSession(API_KEY, location)
 
-    # TODO: maybe reduce requests by storing the updated time?
+    # TODO(Maybe reduce requests by storing the updated time?)
     match_list = session.get_match_list(player_id)
     match_list = match_list[:min(15, len(match_list))]
     match_ids = [match['matchId'] for match in match_list]
 
-    # TODO: abstract out store_match to avoid this
+    # TODO(Abstract out store_match to avoid this.)
     from crawler import store_match
 
     for match in match_ids:
@@ -337,7 +337,7 @@ def analyze_player(player_id, location):
     )
 
     if flags['best_champ'] is not None:
-        # TODO: kind of arbitrary number of kda. only ensures they're positive
+        # TODO(Kind of arbitrary number of kda. only ensures they're positive.)
         flags['best_champ_well'] = flags['best_champ_kda'] > 1
     else:
         flags['best_champ_well'] = (
@@ -454,7 +454,7 @@ def analyze_player(player_id, location):
 
     return response
 
-# TODO: Temporary fix. Kind of unsafe?
+# TODO(Temporary fix. Kind of unsafe?)
 
 
 def html_surround(phrase, tag="strong"):
@@ -470,7 +470,7 @@ def html_surround(phrase, tag="strong"):
 
     return "<" + tag + ">" + str(phrase) + "</" + tag + ">"
 
-# TODO: Implement personal statistics over time, and team archetype.
+# TODO(Implement personal statistics over time, and team archetype.)
 
 
 @app.route('/api/stats/<champion>/<role>/')
@@ -522,8 +522,8 @@ def champion_stats(champion, role):
             champ.get_compiled_weights("assists")
         ),
 
-        # TODO: Need to divide this by the number of matches collected
-        #       that particular day
+        # TODO(Need to divide this by the number of matches collected.)
+        #       This is for that particular day.
         'days_seen': {
             'labels': [data.match_time.strftime(
                 "%b %d (%A)"
@@ -541,7 +541,7 @@ def champion_stats(champion, role):
 
     return jsonify(stats)
 
-# TODO: Maybe do this at the model level?
+# TODO(Maybe do this at the model level?)
 
 
 def compile_sorted_champions(listing, reverse=True):
@@ -578,7 +578,7 @@ def compile_sorted_champions(listing, reverse=True):
     return listing
 
 
-# TODO: Call all new adjustments they may need.
+# TODO(Call all new adjustments they may need.)
 
 def reset_stats(username, user_id, location):
     """Resets user statistics in the database.
@@ -605,7 +605,7 @@ def reset_stats(username, user_id, location):
         location + "'@."
     )
 
-# TODO: Improve loading times of this.
+# TODO(Improve loading times of this.)
 #       Cache the numbers for longer? Preprocess the numbers?
 
 

@@ -1,3 +1,7 @@
+""" Flask Settings """
+DEBUG = True
+SECRET_KEY = '420'
+
 """ API Settings """
 API_KEY = "API_KEY_HERE"
 

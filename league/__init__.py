@@ -10,10 +10,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = settings.DATABASE
 
 # TODO(Modify this to put into an app_settings.py)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-# app.config['DEBUG'] = True
-# app.config['SECRET_KEY'] = '420'
+app.config['DEBUG'] = settings.DEBUG
 
-app.config.from_object('league.app_settings')
+# app.config['SECRET_KEY'] = '420'
+# app.config.from_object('league.app_settings')
 
 db = SQLAlchemy(app)
 

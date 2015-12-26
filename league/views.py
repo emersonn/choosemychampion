@@ -26,6 +26,9 @@ from leaguepy import RiotSession
 
 from prettylog import PrettyLog
 
+# TODO(Abstract out store_match to avoid this.)
+from analysis.crawler import store_match
+
 from settings import API_KEY
 from settings import CACHE
 
@@ -264,9 +267,6 @@ def analyze_player(player_id, location):
     match_list = session.get_match_list(player_id)
     match_list = match_list[:min(15, len(match_list))]
     match_ids = [match['matchId'] for match in match_list]
-
-    # TODO(Abstract out store_match to avoid this.)
-    from crawler import store_match
 
     for match in match_ids:
         check_match = (

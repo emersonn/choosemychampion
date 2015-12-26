@@ -6,5 +6,6 @@ requests
 nose
 coverage
 mock
+flask-sqlalchemy
 
 -e git://github.com/emersonn/leaguepy.git#egg=leaguepy

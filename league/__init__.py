@@ -13,7 +13,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 # app.config['DEBUG'] = True
 # app.config['SECRET_KEY'] = '420'
 
-app.config.from_object('app_settings')
+app.config.from_object('league.app_settings')
 
 db = SQLAlchemy(app)
 

@@ -6,9 +6,8 @@ from league import settings
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = settings.DATABASE
-
 # TODO(Modify this to put into an app_settings.py)
+app.config['SQLALCHEMY_DATABASE_URI'] = settings.DATABASE
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['DEBUG'] = settings.DEBUG
 app.config['SECRET_KEY'] = settings.SECRET_KEY

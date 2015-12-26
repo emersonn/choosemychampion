@@ -16,3 +16,5 @@ app_settings.py
 cover/
 dist/
 *.DS_Store
+favicon.png
+favicon.pxm

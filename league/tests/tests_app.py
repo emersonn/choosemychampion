@@ -1,12 +1,12 @@
-import app
+from league import app
 
 # TODO(Implement flask-sqlalchemy.)
 
 
 class TestApp(object):
     def setup(self):
-        app.app.config['TESTING'] = True
-        self.app = app.app.test_client()
+        app.config['TESTING'] = True
+        self.app = app.test_client()
 
     def teardown(self):
         pass

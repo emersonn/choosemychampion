@@ -2,8 +2,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from models import Champion
-from models import ChampionData
+from league.models import Champion
+from league.models import ChampionData
 
 # TODO(Abstract out the setup and teardown.)
 
@@ -18,7 +18,7 @@ class TestChampion(object):
             sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
         )
 
-        from models import Base
+        from league.models import Base
         Base.metadata.create_all(bind=self.engine)
 
     def teardown(self):
@@ -62,7 +62,7 @@ class TestChampionData(object):
             sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
         )
 
-        from models import Base
+        from league.models import Base
         Base.metadata.create_all(bind=self.engine)
 
     def teardown(self):

@@ -8,12 +8,14 @@ import logging
 logging.captureWarnings(True)
 
 from flask import abort
-from flask import Flask
 from flask import jsonify
 from flask import request
 from flask import send_file
 
 from sqlalchemy import func, Integer
+
+from league import app
+from league import db
 
 from models import Champion
 from models import ChampionData
@@ -28,9 +30,6 @@ from prettylog import PrettyLog
 
 from settings import API_KEY
 from settings import CACHE
-
-app = Flask(__name__)
-app.config.from_object('app_settings')
 
 LOGGING = PrettyLog()
 
@@ -733,6 +732,3 @@ def build_stats(data, username, location):
             )
             db_session.add(new_player)
     db_session.commit()
-
-if __name__ == '__main__':
-    app.run()

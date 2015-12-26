@@ -1,15 +1,12 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
-from sqlalchemy import BigInteger, ForeignKey, Float, func
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy import func
 
 from sqlalchemy.ext.associationproxy import association_proxy
-
-from database import Base
-from database import db_session
 
 from prettylog import PrettyLog
 
 from leaguepy import RiotSession
+
+from league import db
 
 from settings import API_KEY
 
@@ -31,17 +28,17 @@ def get_kda(data):
         return overall / (data.deaths)
 
 
-class Match(Base):
+class Match(db.Model):
     """Used to store basic information about the match."""
 
     __tablename__ = 'match'
 
-    id = Column(Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
 
-    match_id = Column(BigInteger)
+    match_id = db.Column(db.BigInteger)
 
-    match_time = Column(DateTime)
-    match_duration = Column(Integer)
+    match_time = db.Column(db.DateTime)
+    match_duration = db.Column(db.Integer)
 
     """
     def __repr__(self):
@@ -49,32 +46,35 @@ class Match(Base):
     """
 
 
-class Champion(Base):
+class Champion(db.Model):
     """Stores information about the player's champion in a particular game."""
 
     __tablename__ = 'champion'
 
-    id = Column(Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
 
     # TODO(Maybe make a Champion reference instead?)
-    champion_id = Column(Integer)
-    player_id = Column(Integer)
+    champion_id = db.Column(db.Integer)
+    player_id = db.Column(db.Integer)
 
-    team_id = Column(Integer)
-    won = Column(Boolean)
+    team_id = db.Column(db.Integer)
+    won = db.Column(db.Boolean)
 
-    role = Column(String(30), nullable=False)
-    kills = Column(Integer)
-    deaths = Column(Integer)
-    assists = Column(Integer)
-    damage = Column(Integer)
+    role = db.Column(db.String(30), nullable=False)
+    kills = db.Column(db.Integer)
+    deaths = db.Column(db.Integer)
+    assists = db.Column(db.Integer)
+    damage = db.Column(db.Integer)
 
-    # objective_score is the addition of dragon and baron kills
-    objective_score = Column(Integer)
-    tower_score = Column(Integer)
+    # NOTE: Objective_score is the addition of dragon and baron kills
+    objective_score = db.Column(db.Integer)
+    tower_score = db.Column(db.Integer)
 
-    match_id = Column(Integer, ForeignKey("match.id"))
-    match = relationship("Match", backref=backref("champion", order_by=id))
+    match_id = db.Column(db.Integer, db.ForeignKey("match.id"))
+    match = db.relationship(
+        "Match",
+        backref=db.backref("champion", order_by=id)
+    )
 
     """
     def __repr__(self):
@@ -85,17 +85,18 @@ class Champion(Base):
         return get_kda(self)
 
 
-class BannedChampion(Base):
+class BannedChampion(db.Model):
     """Basic information about a banned champion in a particular match."""
 
     __tablename__ = 'banned_champion'
 
-    id = Column(Integer, primary_key=True)
-    champion_id = Column(Integer)
+    id = db.Column(db.Integer, primary_key=True)
+    champion_id = db.Column(db.Integer)
 
-    match_id = Column(Integer, ForeignKey("match.id"))
-    match = relationship(
-        "Match", backref=backref("banned_champion", order_by=id)
+    match_id = db.Column(db.Integer, db.ForeignKey("match.id"))
+    match = db.relationship(
+        "Match",
+        backref=db.backref("banned_champion", order_by=id)
     )
 
     """
@@ -104,17 +105,17 @@ class BannedChampion(Base):
     """
 
 
-class BuiltItems(Base):
+class BuiltItems(db.Model):
     """Stores basic information about built items for a particular player."""
 
     __tablename__ = 'built_items'
 
-    id = Column(Integer, primary_key=True)
-    item_id = Column(Integer)
+    id = db.Column(db.Integer, primary_key=True)
+    item_id = db.Column(db.Integer)
 
-    champion_id = Column(Integer, ForeignKey("champion.id"))
-    champion = relationship(
-        "Champion", backref=backref("built_items", order_by=id)
+    champion_id = db.Column(db.Integer, db.ForeignKey("champion.id"))
+    champion = db.relationship(
+        "Champion", backref=db.backref("built_items", order_by=id)
     )
 
     """
@@ -123,37 +124,37 @@ class BuiltItems(Base):
     """
 
 
-class PlayerData(Base):
+class PlayerData(db.Model):
     """Stores summary data for a particular champion a player played."""
 
     __tablename__ = 'player_data'
 
-    id = Column(Integer, primary_key=True)
-    player_id = Column(Integer)
-    player_name = Column(String(40))
-    location = Column(String(12))
+    id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.Integer)
+    player_name = db.Column(db.String(40))
+    location = db.Column(db.String(12))
 
-    champion_id = Column(Integer)
-    champion_name = Column(String(30))
+    champion_id = db.Column(db.Integer)
+    champion_name = db.Column(db.String(30))
 
-    role = Column(String(30))
+    role = db.Column(db.String(30))
 
-    updated = Column(DateTime)
-    sessions_played = Column(Integer)
+    updated = db.Column(db.DateTime)
+    sessions_played = db.Column(db.Integer)
 
-    kills = Column(Integer)
-    deaths = Column(Integer)
-    assists = Column(Integer)
+    kills = db.Column(db.Integer)
+    deaths = db.Column(db.Integer)
+    assists = db.Column(db.Integer)
 
-    won = Column(Integer)
+    won = db.Column(db.Integer)
 
-    adjustment = Column(Float)
+    adjustment = db.Column(db.Float)
 
     def get_name(self):
         """Gets the name of the champion in question.
 
         Returns:
-            String: The champion name. (capitalized)
+            db.String: The champion name. (capitalized)
         """
 
         if self.champion_name is None:
@@ -172,7 +173,7 @@ class PlayerData(Base):
                     self.champion_name = (
                         SESSION.get_champion(self.champion_id)['name']
                     )
-                    db_session.commit()
+                    db.session.commit()
 
                 # DEPRICATED: if the player data had been
                 #             stored with the summary data
@@ -181,7 +182,7 @@ class PlayerData(Base):
                     return "summary"
             else:
                 self.champion_name = query.champion_name
-                db_session.commit()
+                db.session.commit()
         return self.champion_name
 
     def get_kda(self):
@@ -230,8 +231,8 @@ class PlayerData(Base):
             )
 
             # TODO(Temporary fix to the zero division error,
-            #       fix to MySQL returning integers.
-            #       MySQL gives integers for this and getScore()
+            #       fix to MySQL returning db.Integers.
+            #       MySQL gives db.Integers for this and getScore()
             #       negative numbers?)
 
             champions_seen = [
@@ -282,7 +283,7 @@ class PlayerData(Base):
                 LOGGING.push("Got error: #'" + e + "'# in compiling sessions.")
 
             self.adjustment = adjustment
-            db_session.commit()
+            db.session.commit()
 
         return self.adjustment
 
@@ -295,7 +296,7 @@ class PlayerData(Base):
         pass
 
 
-class ChampionData(Base):
+class ChampionData(db.Model):
     """Stores analyzed champion data.
 
     NOTE: All data is stored as averaged data.
@@ -303,28 +304,28 @@ class ChampionData(Base):
 
     __tablename__ = 'champion_data'
 
-    id = Column(Integer, primary_key=True)
-    champion_id = Column(Integer)
-    champion_name = Column(String(40))
-    role = Column(String(30), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    champion_id = db.Column(db.Integer)
+    champion_name = db.Column(db.String(40))
+    role = db.Column(db.String(30), nullable=False)
 
-    won = Column(Float)
-    num_seen = Column(Integer)
+    won = db.Column(db.Float)
+    num_seen = db.Column(db.Integer)
 
-    kills = Column(Float)
-    deaths = Column(Float)
-    assists = Column(Float)
+    kills = db.Column(db.Float)
+    deaths = db.Column(db.Float)
+    assists = db.Column(db.Float)
 
-    damage = Column(Float)
-    objective_score = Column(Float)
-    tower_score = Column(Float)
+    damage = db.Column(db.Float)
+    objective_score = db.Column(db.Float)
+    tower_score = db.Column(db.Float)
 
-    pick_rate = Column(Float)
+    pick_rate = db.Column(db.Float)
 
-    adjustment = Column(Float)
-    score = Column(Float)
+    adjustment = db.Column(db.Float)
+    score = db.Column(db.Float)
 
-    image = Column(String(100))
+    image = db.Column(db.String(100))
 
     counters = association_proxy('champion_counters', 'counter')
     assisters = association_proxy('champion_assists', 'assist')
@@ -339,7 +340,7 @@ class ChampionData(Base):
         """Finds the name in the database, otherwise requests it.
 
         Returns:
-            String: Champion name.
+            db.String: Champion name.
         """
 
         if self.champion_name is None:
@@ -350,7 +351,7 @@ class ChampionData(Base):
             self.champion_name = (
                 SESSION.get_champion(self.champion_id)['name']
             )
-            db_session.commit()
+            db.session.commit()
 
         return self.champion_name
 
@@ -361,7 +362,7 @@ class ChampionData(Base):
             force_update: Whether the current score should be force updated.
 
         Returns:
-            float: Score of the champion. Attempted to normalize around 100.
+            db.Float: Score of the champion. Attempted to normalize around 100.
         """
 
         if self.score is None or force_update:
@@ -443,7 +444,7 @@ class ChampionData(Base):
             calculated_score += self.adjustment
 
             self.score = calculated_score
-            db_session.commit()
+            db.session.commit()
 
         return self.score
 
@@ -453,7 +454,7 @@ class ChampionData(Base):
                 champion_id=self.champion_id,
                 champ_data="image"
             )['image']['full']
-            db_session.commit()
+            db.session.commit()
 
         return self.image
 
@@ -476,7 +477,7 @@ class ChampionData(Base):
         """Calculates the percepted win for a player/champion combination.
 
         Returns:
-            float: Calculated win rate.
+            db.Float: Calculated win rate.
         """
 
         """
@@ -504,7 +505,7 @@ class ChampionData(Base):
         )
 
         player = (
-            db_session.query(PlayerData)
+            db.session.query(PlayerData)
             .filter_by(player_id=player_id, location=location)
         )
         """
@@ -525,10 +526,10 @@ class ChampionData(Base):
             )
 
             Counter.query.filter(Counter.original == self).delete()
-            db_session.commit()
+            db.session.commit()
 
             champions = (
-                db_session.query(
+                db.session.query(
                     Champion,
                     func.count(Champion.champion_id).label("num_seen")
                 )
@@ -555,8 +556,8 @@ class ChampionData(Base):
                     counter=champion_data,
                     weight=champion.num_seen
                 )
-                db_session.add(new_counter)
-            db_session.commit()
+                db.session.add(new_counter)
+            db.session.commit()
 
         return counters
 
@@ -588,10 +589,10 @@ class ChampionData(Base):
             )
 
             Assist.query.filter(Assist.original == self).delete()
-            db_session.commit()
+            db.session.commit()
 
             champions = (
-                db_session.query(
+                db.session.query(
                     Champion,
                     func.count(Champion.champion_id).label("num_seen")
                 )
@@ -615,57 +616,57 @@ class ChampionData(Base):
                         assist=champion_data,
                         weight=champion.num_seen
                     )
-                    db_session.add(new_assist)
-            db_session.commit()
+                    db.session.add(new_assist)
+            db.session.commit()
 
         return assists
 
 
-class Counter(Base):
+class Counter(db.Model):
     __tablename__ = 'counter_champions'
 
-    original_id = Column(
-        Integer, ForeignKey('champion_data.id'), primary_key=True
+    original_id = db.Column(
+        db.Integer, db.ForeignKey('champion_data.id'), primary_key=True
     )
-    counter_id = Column(
-        Integer, ForeignKey('champion_data.id'), primary_key=True
+    counter_id = db.Column(
+        db.Integer, db.ForeignKey('champion_data.id'), primary_key=True
     )
 
-    weight = Column(Integer)
-    updated = Column(DateTime, default=func.now())
+    weight = db.Column(db.Integer)
+    updated = db.Column(db.DateTime, default=func.now())
 
-    original = relationship(
+    original = db.relationship(
         ChampionData,
-        backref=backref("champion_counters"),
+        backref=db.backref("champion_counters"),
         foreign_keys=[original_id]
     )
-    counter = relationship(
+    counter = db.relationship(
         ChampionData,
-        backref=backref("countered"),
+        backref=db.backref("countered"),
         foreign_keys=[counter_id]
     )
 
 
-class Assist(Base):
+class Assist(db.Model):
     __tablename__ = 'assist_champions'
 
-    original_id = Column(
-        Integer, ForeignKey('champion_data.id'), primary_key=True
+    original_id = db.Column(
+        db.Integer, db.ForeignKey('champion_data.id'), primary_key=True
     )
-    assist_id = Column(
-        Integer, ForeignKey('champion_data.id'), primary_key=True
+    assist_id = db.Column(
+        db.Integer, db.ForeignKey('champion_data.id'), primary_key=True
     )
 
-    weight = Column(Integer)
-    updated = Column(DateTime, default=func.now())
+    weight = db.Column(db.Integer)
+    updated = db.Column(db.DateTime, default=func.now())
 
-    original = relationship(
+    original = db.relationship(
         ChampionData,
-        backref=backref("champion_assists"),
+        backref=db.backref("champion_assists"),
         foreign_keys=[original_id]
     )
-    assist = relationship(
+    assist = db.relationship(
         ChampionData,
-        backref=backref("assisted"),
+        backref=db.backref("assisted"),
         foreign_keys=[assist_id]
     )

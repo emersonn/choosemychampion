@@ -12,7 +12,7 @@
   > Backend Technologies
     > Python Packages in Use
       > Flask, sqlalchemy, colorama, statistics
-      > scipy, numpy, requests
+      > scipy, numpy, requests, flask-sqlalchemy
     > MySQL, Alembic, pip, nginx, uwsgi, virtualenv
   > Frontend Technologies
     > Angular, jQuery

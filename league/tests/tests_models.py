@@ -1,36 +1,31 @@
-# from nose.tools import set_trace
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
+from league import app
+from league import db
 
 from league.models import Champion
 from league.models import ChampionData
 
-# TODO(Abstract out the setup and teardown.)
-
 
 class TestChampion(object):
+    # TODO(Abstract out the setup and teardown.)
     def setup(self):
-        self.engine = create_engine(
-            "sqlite:///:memory:",
-        )
+        app.config['TESTING'] = True
+        app.config['WTF_CSRF_ENABLED'] = False
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        self.app = app.test_client()
 
-        self.db_session = scoped_session(
-            sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
-        )
-
-        from league.models import Base
-        Base.metadata.create_all(bind=self.engine)
+        db.create_all()
+        self.db = db
 
     def teardown(self):
-        self.db_session.remove()
+        self.db.session.remove()
 
     def test_create(self):
         champ = Champion(
             role="TOP",
         )
 
-        self.db_session.add(champ)
-        self.db_session.flush()
+        self.db.session.add(champ)
+        self.db.session.flush()
 
         assert champ.id == 1
 
@@ -54,19 +49,16 @@ class TestChampion(object):
 
 class TestChampionData(object):
     def setup(self):
-        self.engine = create_engine(
-            "sqlite:///:memory:",
-        )
+        app.config['TESTING'] = True
+        app.config['WTF_CSRF_ENABLED'] = False
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        self.app = app.test_client()
 
-        self.db_session = scoped_session(
-            sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
-        )
-
-        from league.models import Base
-        Base.metadata.create_all(bind=self.engine)
+        db.create_all()
+        self.db = db
 
     def teardown(self):
-        self.db_session.remove()
+        self.db.session.remove()
 
     def test_get_name(self):
         champ = ChampionData(
@@ -100,7 +92,7 @@ class TestChampionData(object):
             score=49
         )
 
-        self.db_session.add(champ)
-        self.db_session.commit()
+        self.db.session.add(champ)
+        self.db.session.commit()
 
         assert champ.get_score(False) == 49

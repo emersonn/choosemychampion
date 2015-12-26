@@ -6,11 +6,15 @@ import logging
 logging.captureWarnings(True)
 
 # TODO: Make League into a package.
-from database import db_session
-from models import Match, Champion, BannedChampion, BuiltItems
-from settings import API_KEY
+from league import db
+
+from league.models import Match, Champion, BannedChampion, BuiltItems
+
+from league.settings import API_KEY
+
 from leaguepy import RiotSession
-from prettylog import PrettyLog
+
+from league.prettylog import PrettyLog
 
 # Crawler settings.
 BREADTH = 15
@@ -70,7 +74,7 @@ def crawl_player(player, depth, breadth):
             # TODO: inefficient. checks every match, maybe check by player
             #       match history for all of them?
             check_match = (
-                db_session.query(Match)
+                db.session.query(Match)
                 .filter(Match.match_id == match['matchId'])
                 .count()
             )
@@ -142,7 +146,7 @@ def store_match(given_match):
         ),
         match_duration=given_match['matchDuration']
     )
-    db_session.add(match)
+    db.session.add(match)
 
     # the bans is created as a set of champion ids
     bans = set()
@@ -187,7 +191,7 @@ def store_match(given_match):
             match=match
         )
 
-        db_session.add(champion)
+        db.session.add(champion)
 
         # iterates through the items built by this particular player
         # and saves it into the database
@@ -197,7 +201,7 @@ def store_match(given_match):
                 champion_id=champion.champion_id,
                 champion=champion
             )
-            db_session.add(item)
+            db.session.add(item)
 
         # TODO: make this more efficient. although it is easy it is continually
         # attempting to add to the set a banned champion for every
@@ -214,8 +218,8 @@ def store_match(given_match):
             match_id=match.match_id,
             match=match
         )
-        db_session.add(banned_champion)
-    db_session.commit()
+        db.session.add(banned_champion)
+    db.session.commit()
 
 
 def crawl_database():

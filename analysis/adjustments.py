@@ -3,8 +3,9 @@
 
 # Analyzes each champions score
 
-from models import ChampionData
-from prettylog import PrettyLog
+from league.models import ChampionData
+
+from league.prettylog import PrettyLog
 
 LOGGING = PrettyLog()
 

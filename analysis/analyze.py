@@ -6,13 +6,13 @@
 
 from sqlalchemy import func, Integer
 
-from database import db_session
+from league import db
 
-from models import Champion
-from models import ChampionData
-from models import Match
+from league.models import Champion
+from league.models import ChampionData
+from league.models import Match
 
-from prettylog import PrettyLog
+from league.prettylog import PrettyLog
 
 LOGGING = PrettyLog()
 
@@ -37,7 +37,7 @@ def analyze():
         Filter then aggragate (order by date, limit by a large number)
     """
 
-    champions = (db_session.query(
+    champions = (db.session.query(
         Champion.champion_id.label("champion_id"),
         Champion.role.label("role"),
         func.avg(Champion.kills).label("kills"),
@@ -59,7 +59,7 @@ def analyze():
         )
 
         found = (
-            db_session.query(ChampionData)
+            db.session.query(ChampionData)
             .filter(
                 ChampionData.champion_id == champion.champion_id,
                 ChampionData.role == champion.role
@@ -91,7 +91,7 @@ def analyze():
                 num_seen = champion.seen,
                 adjustment = 0
             )
-            db_session.add(new_champion)
+            db.session.add(new_champion)
 
         else:
             LOGGING.push(
@@ -108,14 +108,14 @@ def analyze():
             found.pick_rate = (champion.seen / float(match_num))
             found.num_seen = champion.seen
 
-            db_session.add(found)
-        db_session.commit()
-    db_session.commit()
+            db.session.add(found)
+        db.session.commit()
+    db.session.commit()
 
 
 def get_match_count():
     LOGGING.push("Getting match count.")
-    match_num = db_session.query(Match).count()
+    match_num = db.session.query(Match).count()
     LOGGING.push("*'" + str(match_num) + "'* matches found in the database.")
 
     return match_num

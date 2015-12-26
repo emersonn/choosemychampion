@@ -22,8 +22,6 @@ from models import ChampionData
 from models import Match
 from models import PlayerData
 
-from database import db_session
-
 from leaguepy import RiotSession
 
 from prettylog import PrettyLog
@@ -36,7 +34,7 @@ LOGGING = PrettyLog()
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
-    db_session.remove()
+    db.session.remove()
 
 
 def cached(timeout=10 * 60, key='view/%s'):
@@ -113,7 +111,7 @@ def stats(username, user_id, location):
     rv = CACHE.get('user_data_' + str(user_id))
     if rv is None:
         query = (
-            db_session.query(PlayerData)
+            db.session.query(PlayerData)
             .filter_by(player_id=user_id, location=location)
             .all()
         )
@@ -225,7 +223,7 @@ def stats(username, user_id, location):
 
 def popular_counters(role, limit=1, counter_limit=5):
     champion = (
-        db_session.query(ChampionData)
+        db.session.query(ChampionData)
         .filter_by(role=role)
         .order_by(ChampionData.num_seen.desc())
         .limit(limit)
@@ -272,7 +270,7 @@ def analyze_player(player_id, location):
 
     for match in match_ids:
         check_match = (
-            db_session.query(Match)
+            db.session.query(Match)
             .filter(Match.match_id == match)
             .count()
         )
@@ -289,13 +287,13 @@ def analyze_player(player_id, location):
             )
 
     matches = (
-        db_session.query(Champion)
+        db.session.query(Champion)
         .join(Match)
         .filter(Match.match_id.in_(match_ids))
     )
 
     player_data = (
-        db_session.query(PlayerData.champion_id)
+        db.session.query(PlayerData.champion_id)
         .filter_by(player_id=player_id, location=location)
         .order_by(PlayerData.won.desc())
         .limit(5)
@@ -330,7 +328,7 @@ def analyze_player(player_id, location):
     flags['won'] = flags['wins'] > flags['losses']
 
     best_champ = (
-        db_session.query(ChampionData)
+        db.session.query(ChampionData)
         .filter_by(champion_id=flags['best_champ'])
         .first()
     )
@@ -340,7 +338,7 @@ def analyze_player(player_id, location):
         flags['best_champ_well'] = flags['best_champ_kda'] > 1
     else:
         flags['best_champ_well'] = (
-            db_session.query(PlayerData)
+            db.session.query(PlayerData)
             .filter_by(champion_id=flags['best_champ'])
             .first()
             .get_kda() > 1
@@ -486,14 +484,14 @@ def champion_stats(champion, role):
     """
 
     champ = (
-        db_session.query(ChampionData)
+        db.session.query(ChampionData)
         .filter_by(champion_id=champion, role=role)
         .first()
     )
 
     days_ago = datetime.datetime.now() - datetime.timedelta(days=7)
     champ_list = (
-        db_session.query(
+        db.session.query(
             Champion.champion_id.label("champion_id"),
             func.count(Champion.id).label("num_seen"),
             func.avg(Champion.won, type_=Integer).label("won"),
@@ -594,7 +592,7 @@ def reset_stats(username, user_id, location):
         .delete()
     )
 
-    db_session.commit()
+    db.session.commit()
 
     CACHE.delete('user_data_' + str(user_id))
 
@@ -618,33 +616,33 @@ def numbers():
     """
 
     popular_champ = (
-        db_session.query(ChampionData)
+        db.session.query(ChampionData)
         .order_by(ChampionData.num_seen.desc())
         .first()
     )
 
     popular_champs = (
-        db_session.query(ChampionData)
+        db.session.query(ChampionData)
         .order_by(ChampionData.num_seen.desc())
         .limit(15)
         .all()
     )
 
     random_champ = (
-        db_session.query(ChampionData)
+        db.session.query(ChampionData)
         .order_by(func.rand())
         .first()
     )
 
     winning_champ = (
-        db_session.query(ChampionData)
+        db.session.query(ChampionData)
         .filter(ChampionData.num_seen > 10)
         .order_by(ChampionData.score.desc())
         .first()
     )
 
     winning_champ_roles = (
-        db_session.query(
+        db.session.query(
             Champion.role.label("role"),
             func.count(Champion.id).label("seen")
         )
@@ -662,13 +660,13 @@ def numbers():
             'random_champ_role': random_champ.role.capitalize(),
             'random_champ_seen': random_champ.num_seen,
             'average_kills': round(
-                db_session.query(
+                db.session.query(
                     func.avg(ChampionData.kills)
                 )
                 .first()[0], 2
             ),
             'average_towers': round(
-                db_session.query(
+                db.session.query(
                     func.avg(ChampionData.tower_score)
                 ).first()[0], 2
             )
@@ -730,5 +728,5 @@ def build_stats(data, username, location):
                 assists=total_stats['totalAssists'],
                 won=total_stats['totalSessionsWon']
             )
-            db_session.add(new_player)
-    db_session.commit()
+            db.session.add(new_player)
+    db.session.commit()

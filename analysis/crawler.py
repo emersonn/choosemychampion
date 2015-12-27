@@ -1,11 +1,7 @@
 import datetime
 import random
 
-# TODO: Fix this.
-import logging
-logging.captureWarnings(True)
-
-# TODO: Make League into a package.
+# TODO(Make League into a package.)
 from league import db
 
 from league.models import Match, Champion, BannedChampion, BuiltItems

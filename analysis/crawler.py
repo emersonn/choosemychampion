@@ -1,10 +1,12 @@
 import datetime
 import random
 
-# TODO(Make League into a package.)
 from league import db
 
-from league.models import Match, Champion, BannedChampion, BuiltItems
+from league.models import BannedChampion
+from league.models import BuiltItems
+from league.models import Champion
+from league.models import Match
 
 from league.settings import API_KEY
 
@@ -25,7 +27,7 @@ LOGGING = PrettyLog()
 
 
 def get_featured():
-    """ Grabs all featured games available.
+    """Grabs all featured games available.
 
     Returns:
         list: Summoners that participated in each of the featured games
@@ -45,7 +47,7 @@ def get_featured():
 
 
 def crawl_player(player, depth, breadth):
-    """ Crawls a particular player.
+    """Crawls a particular player.
 
     Args:
         player: Particular player's id.
@@ -67,8 +69,8 @@ def crawl_player(player, depth, breadth):
         players = set()
 
         for match in matches[:min(15, len(matches))]:
-            # TODO: inefficient. checks every match, maybe check by player
-            #       match history for all of them?
+            # TODO(Inefficient. Checks every match)
+            #       Check by player match history for all of them?
             check_match = (
                 db.session.query(Match)
                 .filter(Match.match_id == match['matchId'])
@@ -107,7 +109,7 @@ def crawl_player(player, depth, breadth):
         PLAYER_LIST += BREADTH - 1
         MATCH_COUNT += len(matches)
 
-        # TODO: implement player list count. player list is now: example.
+        # TODO(Implement player list count. Player list is now: example.)
         LOGGING.push(
             "Finished crawling player *'" +
             str(player) +
@@ -126,7 +128,7 @@ def crawl_player(player, depth, breadth):
 
 
 def store_match(given_match):
-    """ Stores the match in the database.
+    """Stores the match in the database.
 
     Args:
         given_match: Particular match data from Riot's Match API.
@@ -151,7 +153,8 @@ def store_match(given_match):
     for participant in given_match['participants']:
         participant_identity = participant['participantId']
 
-        # TODO: make this more clear. it is a search through identities
+        # TODO(Make this more clear.)
+        #       It is a search through identities
         #       to find the team and the actual player in the match data.
 
         # iterates through the participant identities and tries to find the
@@ -199,10 +202,10 @@ def store_match(given_match):
             )
             db.session.add(item)
 
-        # TODO: make this more efficient. although it is easy it is continually
-        # attempting to add to the set a banned champion for every
-        # single person. iterates through the bans and adds it to the set.
-        # also this gives an error sometimes?
+        # TODO(Make this more efficient.)
+        #   Attempting to add to the set a banned champion for every
+        #   single person. iterates through the bans and adds it to the set.
+        #   Also this gives an error sometimes?
         for ban in team['bans']:
             bans.add(ban['championId'])
 
@@ -219,8 +222,7 @@ def store_match(given_match):
 
 
 def crawl_database():
-    """ Crawls the Riot API using featured games as a starting point.
-    """
+    """Crawls the Riot API using featured games as a starting point."""
 
     LOGGING.push("Attempting to request featured games.")
     participants = get_featured()

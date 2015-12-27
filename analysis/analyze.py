@@ -1,8 +1,9 @@
-# Data analysis script
-# Emerson Matson
+"""
+Data analysis script
+Emerson Matson
 
-# Used for moving the database into a more accessible size for analysis and
-# data presentation
+Moves the large data set into a more compact, workable dataset for analysis.
+"""
 
 from sqlalchemy import func, Integer
 
@@ -17,11 +18,14 @@ from league.prettylog import PrettyLog
 LOGGING = PrettyLog()
 
 """
-TODO(Optimize this query for large databases. Window the query.
-    http://stackoverflow.com/questions/7389759/memory-efficient-built-in-sqlalchemy-iterator-generator
+TODO(Optimize this query for large databases.)
+    Window the query.
+        http://stackoverflow.com/
+            questions/7389759/
+            memory-efficient-built-in-sqlalchemy-iterator-generator
     Filter the query to the most recent matches (30 days?)
     Limit the query to a good amount (10 million?)
-    Prune the database every so often.)
+    Prune the database every so often.
 """
 
 

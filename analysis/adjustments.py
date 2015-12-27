@@ -1,7 +1,9 @@
-# Champion Score Analysis
-# Emerson Matson
+"""
+Champion Score Analysis
+Emerson Matson
 
-# Analyzes each champions score
+Analyzes individual champion (and role's) score.
+"""
 
 from league.models import ChampionData
 

@@ -1,3 +1,10 @@
+"""
+Riot API Crawler
+Emerson Matson
+
+Crawls the Riot API and stores data about the matches for future analysis.
+"""
+
 import datetime
 import random
 

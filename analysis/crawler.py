@@ -19,7 +19,7 @@ from league.settings import API_KEY
 
 from leaguepy import RiotSession
 
-from league.prettylog import PrettyLog
+from prettylog import PrettyLog
 
 # Crawler settings
 BREADTH = 15

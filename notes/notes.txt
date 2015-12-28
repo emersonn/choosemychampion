@@ -31,5 +31,7 @@
       > q to quit c to continue h for help
     > cover/index.html
 
-> Install league.py (pip install -editable setup.py) on the virtualenv
+> Install leaguepy (pip install -editable setup.py) on the virtualenv
+> Install prettylog on the virtualenv
 > Deployment needs editing of: settings.py, app_settings.py, update of package.json
+> Deployment needs compiling of: gulp

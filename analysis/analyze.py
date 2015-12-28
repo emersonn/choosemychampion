@@ -13,7 +13,7 @@ from league.models import Champion
 from league.models import ChampionData
 from league.models import Match
 
-from league.prettylog import PrettyLog
+from prettylog import PrettyLog
 
 LOGGING = PrettyLog()
 

@@ -7,7 +7,7 @@ Analyzes individual champion (and role's) score.
 
 from league.models import ChampionData
 
-from league.prettylog import PrettyLog
+from prettylog import PrettyLog
 
 LOGGING = PrettyLog()
 

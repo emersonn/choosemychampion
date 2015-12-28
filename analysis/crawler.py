@@ -21,7 +21,7 @@ from leaguepy import RiotSession
 
 from league.prettylog import PrettyLog
 
-# Crawler settings.
+# Crawler settings
 BREADTH = 15
 DEPTH = 15
 
@@ -101,7 +101,7 @@ def crawl_player(player, depth, breadth):
                 LOGGING.push("#Could not store match. Continuing.#")
                 continue
 
-            # adds the players in the match to the crawl list
+            # NOTE: Adds the players in the match to the crawl list
             players.update(
                 [
                     person['player']['summonerId'] for person
@@ -235,7 +235,7 @@ def crawl_database():
     participants = get_featured()
     LOGGING.push("Got @" + str(len(participants)) + "@ participants.")
 
-    # only 40 summoners can be requested at a time
+    # NOTE: Only 40 summoners can be requested at a time
     participants = random.sample(participants, min(40, len(participants)))
 
     ids = SESSION.get_ids(participants)
@@ -246,7 +246,7 @@ def crawl_database():
         str(BREADTH) + "@ and depth of ^" + str(DEPTH) + "^."
     )
 
-    # creates the original call stack to crawl players
+    # NOTE: Creates the original call stack to crawl players
     for player in search_players:
         crawl_player(player, DEPTH, BREADTH)
 

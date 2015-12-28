@@ -9,3 +9,4 @@ mock
 flask-sqlalchemy
 
 -e git://github.com/emersonn/leaguepy.git#egg=leaguepy
+-e git://github.com/emersonn/prettylog.git#egg=prettylog

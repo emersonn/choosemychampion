@@ -128,6 +128,8 @@ def stats(username, user_id, location):
             reset_stats(username, user_id, location)
             query = []
 
+        has_ranked = True
+
         if len(query) == 0:
             try:
                 LOGGING.push(
@@ -136,7 +138,18 @@ def stats(username, user_id, location):
                 )
 
                 session = RiotSession(API_KEY, location)
-                user_data = session.get_stats(user_id)
+
+                try:
+                    user_data = session.get_stats(user_id)
+                except ValueError:
+                    LOGGING.push(
+                        "Looks like *" + username + "* doesn't" +
+                        " have any ranked matches."
+                    )
+
+                    user_data = {'champions': []}
+                    has_ranked = False
+
                 build_stats(user_data, username, location)
 
                 query = (
@@ -150,7 +163,10 @@ def stats(username, user_id, location):
                 abort(429)
 
         # TODO(Restructure this so it doesn't make multiple query requests.)
-        analyzed_player = analyze_player(user_id, location)
+        analyzed_player = (
+            analyze_player(user_id, location) if has_ranked
+            else "No analysis available."
+        )
 
         full_stats = {'scores': []}
         index = 1

@@ -448,9 +448,8 @@ def analyze_player(player_id, location):
 
     return response
 
+
 # TODO(Temporary fix. Kind of unsafe?)
-
-
 def html_surround(phrase, tag="strong"):
     """Surrounds a particular phrase in an HTML non-self-closing tag.
 
@@ -464,9 +463,8 @@ def html_surround(phrase, tag="strong"):
 
     return "<" + tag + ">" + str(phrase) + "</" + tag + ">"
 
+
 # TODO(Implement personal statistics over time, and team archetype.)
-
-
 @app.route('/api/stats/<champion>/<role>/')
 @cached()
 def champion_stats(champion, role):
@@ -573,7 +571,6 @@ def compile_sorted_champions(listing, reverse=True):
 
 
 # TODO(Call all new adjustments they may need.)
-
 def reset_stats(username, user_id, location):
     """Resets user statistics in the database.
 
@@ -599,10 +596,9 @@ def reset_stats(username, user_id, location):
         location + "'@."
     )
 
+
 # TODO(Improve loading times of this.)
 #       Cache the numbers for longer? Preprocess the numbers?
-
-
 @app.route('/api/numbers/')
 @cached()
 def numbers():

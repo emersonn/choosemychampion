@@ -28,6 +28,9 @@ from analysis.crawler import store_match
 from settings import API_KEY
 from settings import CACHE
 
+# TODO(Make this into a setting.)
+CACHE_LIMIT = 30
+
 LOGGING = PrettyLog()
 
 
@@ -106,6 +109,7 @@ def stats(username, location):
         location (string): Riot abbreviated region.
     """
 
+    # Grabs necessary information for analysis.
     user_id = get_user_id(username, location)
 
     query = (
@@ -114,18 +118,21 @@ def stats(username, location):
         .all()
     )
 
-    # TODO(Abstract this timer out into a constant.)
-    thirty_minutes_ago = (
-        datetime.datetime.now() - datetime.timedelta(minutes=30)
+    has_ranked = True
+
+    # Calculates the time in which we should reset the data.
+    cache_difference = (
+        datetime.datetime.now() - datetime.timedelta(minutes=CACHE_LIMIT)
     )
 
-    if len(query) > 0 and query[0].updated < thirty_minutes_ago:
+    # If we have data, and it's old, we reset the user's data.
+    if len(query) > 0 and query[0].updated < cache_difference:
         LOGGING.push("*'" + username + "'* has old data. Resetting stats.")
+
         reset_stats(username, user_id, location)
         query = []
 
-    has_ranked = True
-
+    # If we don't have data we get new data.
     if len(query) == 0:
         try:
             LOGGING.push(
@@ -137,6 +144,8 @@ def stats(username, location):
 
             try:
                 user_data = session.get_stats(user_id)
+
+            # We get a ValueError if no ranked matches are found.
             except ValueError:
                 LOGGING.push(
                     "Looks like *" + username + "* doesn't" +
@@ -159,13 +168,15 @@ def stats(username, location):
             abort(429)
 
     # TODO(Restructure this so it doesn't make multiple query requests.)
+
+    # If we don't have data we don't call analyze_player.
     analyzed_player = (
         analyze_player(user_id, location) if has_ranked
         else "No analysis available."
     )
 
+    # Sets up data for analysis.
     full_stats = {'scores': []}
-
     query = ChampionData.query.all()
 
     # TODO(This is vastly inefficient.)
@@ -173,7 +184,7 @@ def stats(username, location):
     #       score information for each champion.
     #   Appends user data and user adjustments to the data.
     for champion in query:
-        # TODO(Implement role? Is role not included in this calculation?)
+        # TODO(Implement role? Role is not included in stats.)
         user_query = (
             PlayerData.query
             .filter_by(
@@ -215,8 +226,7 @@ def stats(username, location):
 
     full_stats['analyzed_player'] = analyzed_player
 
-    # returns the json of the stats as an array of scores
-    CACHE.set('user_data_' + str(user_id), full_stats, timeout=1 * 60)
+    # Returns a json of all the stats needed for display
     return jsonify(full_stats)
 
 

@@ -102,12 +102,17 @@ def crawl_player(player, depth, breadth):
                 continue
 
             # NOTE: Adds the players in the match to the crawl list
-            players.update(
-                [
-                    person['player']['summonerId'] for person
-                    in match_data['participantIdentities']
-                ]
-            )
+            try:
+                players.update(
+                    [
+                        person['player']['summonerId'] for person
+                        in match_data['participantIdentities']
+                    ]
+                )
+
+            # This happens if there are no participants in this game.
+            except KeyError:
+                continue
 
         # ensures that the current player does not get crawled again
         players.discard(player)

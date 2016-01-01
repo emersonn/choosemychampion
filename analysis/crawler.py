@@ -98,7 +98,7 @@ def crawl_player(player, depth, breadth):
                 elif check_match == 0:
                     store_match(match_data)
             except KeyError:
-                LOGGING.push("#Could not store match. Continuing.#")
+                LOGGING.push("#Could not store match.# Continuing.")
                 continue
 
             # NOTE: Adds the players in the match to the crawl list
@@ -114,7 +114,7 @@ def crawl_player(player, depth, breadth):
 
         global MATCH_COUNT
         PLAYER_LIST += BREADTH - 1
-        MATCH_COUNT += len(matches)
+        MATCH_COUNT += min(15, len(matches))
 
         # TODO(Implement player list count. Player list is now: example.)
         LOGGING.push(

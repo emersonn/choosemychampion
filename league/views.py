@@ -98,6 +98,7 @@ def get_user_id(username, location):
 
 # TODO(Implement using @cached(). May need request URL?)
 @app.route('/api/champions/<username>/<location>/')
+@cached()
 def stats(username, location):
     """Gathers champion statistics given a particular user.
 
@@ -109,119 +110,115 @@ def stats(username, location):
 
     user_id = get_user_id(username, location)
 
-    rv = CACHE.get('user_data_' + str(user_id))
-    if rv is None:
-        query = (
-            db.session.query(PlayerData)
-            .filter_by(player_id=user_id, location=location)
-            .all()
-        )
+    query = (
+        db.session.query(PlayerData)
+        .filter_by(player_id=user_id, location=location)
+        .all()
+    )
 
-        # TODO(Abstract this timer out into a constant.)
-        thirty_minutes_ago = (
-            datetime.datetime.now() - datetime.timedelta(minutes=30)
-        )
-        if len(query) > 0 and query[0].updated < thirty_minutes_ago:
-            LOGGING.push("*'" + username + "'* has old data. Resetting stats.")
-            reset_stats(username, user_id, location)
-            query = []
+    # TODO(Abstract this timer out into a constant.)
+    thirty_minutes_ago = (
+        datetime.datetime.now() - datetime.timedelta(minutes=30)
+    )
+    if len(query) > 0 and query[0].updated < thirty_minutes_ago:
+        LOGGING.push("*'" + username + "'* has old data. Resetting stats.")
+        reset_stats(username, user_id, location)
+        query = []
 
-        has_ranked = True
+    has_ranked = True
 
-        if len(query) == 0:
-            try:
-                LOGGING.push(
-                    "*'" + username + "'* from @'" + location +
-                    "'@ does not exist in the database. Creating model."
-                )
-
-                session = RiotSession(API_KEY, location)
-
-                try:
-                    user_data = session.get_stats(user_id)
-                except ValueError:
-                    LOGGING.push(
-                        "Looks like *" + username + "* doesn't" +
-                        " have any ranked matches."
-                    )
-
-                    user_data = {'champions': []}
-                    has_ranked = False
-
-                build_stats(user_data, username, location)
-
-                query = (
-                    PlayerData.query
-                    .filter_by(player_id=user_id, location=location)
-                    .all()
-                )
-
-            # TODO(Make this a more descriptive error.)
-            except KeyError:
-                abort(429)
-
-        # TODO(Restructure this so it doesn't make multiple query requests.)
-        analyzed_player = (
-            analyze_player(user_id, location) if has_ranked
-            else "No analysis available."
-        )
-
-        full_stats = {'scores': []}
-
-        query = ChampionData.query.all()
-
-        # TODO(This is vastly inefficient.)
-        #   Goes through all champion data and generates an array of
-        #       score information for each champion.
-        #   Appends user data and user adjustments to the data.
-        for champion in query:
-            # TODO(Implement role? Is role not included in this calculation?)
-            user_query = (
-                PlayerData.query
-                .filter_by(
-                    player_id=user_id,
-                    location=location,
-                    champion_id=champion.champion_id
-                )
-                .first()
+    if len(query) == 0:
+        try:
+            LOGGING.push(
+                "*'" + username + "'* from @'" + location +
+                "'@ does not exist in the database. Creating model."
             )
 
-            adjustment = user_query.get_adjustment() if user_query else 0
+            session = RiotSession(API_KEY, location)
 
-            full_stats['scores'].append({
-                'championName': champion.get_name(),
-                'championId': champion.champion_id,
-                'score': champion.get_score(False) + adjustment,
-                'role': champion.role,
-                'image': champion.get_full_image(),
-                'playerAdjust': adjustment,
-                'url': champion.get_url(),
-                'kills': champion.kills,
-                'deaths': champion.deaths,
-                'assists': champion.assists,
-                'kda': champion.get_kda(),
-                'winRate': champion.won * 100,
-                'pickRate': champion.pick_rate * 100,
-                'calculated': (
-                    champion.get_calculated_win(user_id, location) * 100
-                ),
-                'player': username
-            })
+            try:
+                user_data = session.get_stats(user_id)
+            except ValueError:
+                LOGGING.push(
+                    "Looks like *" + username + "* doesn't" +
+                    " have any ranked matches."
+                )
 
-        full_stats['popular_counters'] = [
-            popular_counters("TOP"),
-            popular_counters("MIDDLE"),
-            popular_counters("BOTTOM"),
-            popular_counters("JUNGLE")
-        ]
+                user_data = {'champions': []}
+                has_ranked = False
 
-        full_stats['analyzed_player'] = analyzed_player
+            build_stats(user_data, username, location)
 
-        # returns the json of the stats as an array of scores
-        CACHE.set('user_data_' + str(user_id), full_stats, timeout=1 * 60)
-        return jsonify(full_stats)
-    else:
-        return jsonify(rv)
+            query = (
+                PlayerData.query
+                .filter_by(player_id=user_id, location=location)
+                .all()
+            )
+
+        # TODO(Make this a more descriptive error.)
+        except KeyError:
+            abort(429)
+
+    # TODO(Restructure this so it doesn't make multiple query requests.)
+    analyzed_player = (
+        analyze_player(user_id, location) if has_ranked
+        else "No analysis available."
+    )
+
+    full_stats = {'scores': []}
+
+    query = ChampionData.query.all()
+
+    # TODO(This is vastly inefficient.)
+    #   Goes through all champion data and generates an array of
+    #       score information for each champion.
+    #   Appends user data and user adjustments to the data.
+    for champion in query:
+        # TODO(Implement role? Is role not included in this calculation?)
+        user_query = (
+            PlayerData.query
+            .filter_by(
+                player_id=user_id,
+                location=location,
+                champion_id=champion.champion_id
+            )
+            .first()
+        )
+
+        adjustment = user_query.get_adjustment() if user_query else 0
+
+        full_stats['scores'].append({
+            'championName': champion.get_name(),
+            'championId': champion.champion_id,
+            'score': champion.get_score(False) + adjustment,
+            'role': champion.role,
+            'image': champion.get_full_image(),
+            'playerAdjust': adjustment,
+            'url': champion.get_url(),
+            'kills': champion.kills,
+            'deaths': champion.deaths,
+            'assists': champion.assists,
+            'kda': champion.get_kda(),
+            'winRate': champion.won * 100,
+            'pickRate': champion.pick_rate * 100,
+            'calculated': (
+                champion.get_calculated_win(user_id, location) * 100
+            ),
+            'player': username
+        })
+
+    full_stats['popular_counters'] = [
+        popular_counters("TOP"),
+        popular_counters("MIDDLE"),
+        popular_counters("BOTTOM"),
+        popular_counters("JUNGLE")
+    ]
+
+    full_stats['analyzed_player'] = analyzed_player
+
+    # returns the json of the stats as an array of scores
+    CACHE.set('user_data_' + str(user_id), full_stats, timeout=1 * 60)
+    return jsonify(full_stats)
 
 
 # TODO(Implement limiting for multiple champions of the same role.)

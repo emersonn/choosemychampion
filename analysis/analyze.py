@@ -29,7 +29,7 @@ TODO(Optimize this query for large databases.)
 """
 
 
-def analyze():
+def analyze_champions():
     """Analyzes the champion database and condenses the statistics."""
 
     match_num = get_match_count()
@@ -124,7 +124,14 @@ def get_match_count():
 
     return match_num
 
+
+def analyze_bans():
+    """Analyze banning patterns, looking at what popular bans, and when."""
+
+    pass
+
+
 if __name__ == '__main__':
     LOGGING.push("Analyzing database.")
-    analyze()
+    analyze_champions()
     LOGGING.push("Database has been analyzed.")

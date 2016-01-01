@@ -1,8 +1,10 @@
+import mock
+
 from league import app
+# from league import views
+
 
 # TODO(Implement flask-sqlalchemy.)
-
-
 class TestApp(object):
     def setup(self):
         app.config['TESTING'] = True
@@ -23,3 +25,15 @@ class TestApp(object):
 
         # rv = self.app.get('/api/champions/tartio/na/')
         # assert rv == app.stats('tartio', "27284", "na")
+
+    @mock.patch('league.views.RiotSession')
+    def test_get_user_id(self, mock_session):
+        mock_session.get_ids.return_value = {
+            'tartio': {
+                'id': 420
+            }
+        }
+
+        # rv = views.get_user_id("tartio", "na")
+        # print(rv)
+        # assert rv == 420

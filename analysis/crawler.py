@@ -114,7 +114,7 @@ def crawl_player(player, depth, breadth):
             except KeyError:
                 continue
 
-        # ensures that the current player does not get crawled again
+        # Ensures that the current player does not get crawled again
         players.discard(player)
 
         global MATCH_COUNT
@@ -158,20 +158,18 @@ def store_match(given_match):
     )
     db.session.add(match)
 
-    # the bans is created as a set of champion ids
+    # Bans are created as a set of champion IDs
     bans = set()
 
-    # goes through each participant in the match participant list
+    # Goes through each participant in the match participant list
     for participant in given_match['participants']:
         participant_identity = participant['participantId']
 
         # TODO(Make this more clear.)
         #       It is a search through identities
-        #       to find the team and the actual player in the match data.
+        #           to find the team and the actual player in the match data.
 
-        # iterates through the participant identities and tries to find the
-        # exact participant in the match, but also attempts
-        # to find the exact team.
+        # Finds the participant and team in the given match participans
         person = (
             item for item in given_match['participantIdentities']
             if item['participantId'] == participant_identity
@@ -204,7 +202,7 @@ def store_match(given_match):
 
         db.session.add(champion)
 
-        # iterates through the items built by this particular player
+        # Iterates through the items built by this particular player
         # and saves it into the database
         for item_num in range(7):
             item = BuiltItems(

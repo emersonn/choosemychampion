@@ -465,6 +465,7 @@ def html_surround(phrase, tag="strong"):
     Args:
         phrase: Phrase to put into the tags.
         tag: The HTML tag to surround the text with.
+            Defaults to "strong."
 
     Returns:
         String: The surrounded phrase in given HTML tag.

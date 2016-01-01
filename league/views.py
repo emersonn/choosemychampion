@@ -49,12 +49,16 @@ def cached(timeout=10 * 60, key='view/%s'):
         def decorated_function(*args, **kwargs):
             cache_key = key % request.path
             rv = CACHE.get(cache_key)
+
             if rv is not None:
                 return rv
+
             rv = f(*args, **kwargs)
             CACHE.set(cache_key, rv, timeout=timeout)
             return rv
+
         return decorated_function
+
     return decorator
 
 
@@ -63,13 +67,12 @@ def index():
     return send_file('static/index.html')
 
 
-@app.route('/api/champions/<username>/<location>/')
-def profile(username, location):
-    """Gathers champion statistics for a particular user.
+def get_user_id(username, location):
+    """Gets the user id for a particular user.
 
     Args:
-        username: The urlencoded username of the summoner.
-        location: Riot abbreviation for regions.
+        username: URL encoded username for the summoner.
+        location: Riot abbreviation for the region.
     """
 
     try:
@@ -77,27 +80,25 @@ def profile(username, location):
             "*'" + username + "'* from @'" + location +
             "'@ is requesting their user ID."
         )
+
         # TODO(Save the ID lookup in the database.)
         session = RiotSession(API_KEY, location)
+
         response = session.get_ids([urllib.pathname2url(username)])
+        return response[urllib.pathname2url(username)]['id']
 
-        # TODO(Should use the username as the key to be consistent.)
-        user_id = response[response.keys()[0]]['id']
-
-    # TODO(Fix this to catch both 429 and 400 errors.)
-    #       Use a new exception. Handle through Riot. Handle w/ status cocde.
+    # TODO(Fix this to catch both 429 and 400 errors w/ Riot Exception.)
     except ValueError:
         LOGGING.push(
             "Tried to get *'" + username +
             "'* id. Response did not have user id."
         )
-        abort(400, {'message': "User ID was not found."})
-
-    return stats(username, user_id, location)
+        abort(404, {'message': "User ID was not found."})
 
 
 # TODO(Implement using @cached(). May need request URL?)
-def stats(username, user_id, location):
+@app.route('/api/champions/<username>/<location>/')
+def stats(username, location):
     """Gathers champion statistics given a particular user.
 
     Args:
@@ -105,6 +106,8 @@ def stats(username, user_id, location):
         user_id (int): The summoner ID of the user.
         location: Riot abbreviated region.
     """
+
+    user_id = get_user_id(username, location)
 
     rv = CACHE.get('user_data_' + str(user_id))
     if rv is None:

@@ -118,6 +118,7 @@ def stats(username, location):
     thirty_minutes_ago = (
         datetime.datetime.now() - datetime.timedelta(minutes=30)
     )
+
     if len(query) > 0 and query[0].updated < thirty_minutes_ago:
         LOGGING.push("*'" + username + "'* has old data. Resetting stats.")
         reset_stats(username, user_id, location)

@@ -96,16 +96,14 @@ def get_user_id(username, location):
         abort(404, {'message': "User ID was not found."})
 
 
-# TODO(Implement using @cached(). May need request URL?)
 @app.route('/api/champions/<username>/<location>/')
 @cached()
 def stats(username, location):
     """Gathers champion statistics given a particular user.
 
     Args:
-        username: The actual username of the user.
-        user_id (int): The summoner ID of the user.
-        location: Riot abbreviated region.
+        username (string): The actual username of the user.
+        location (string): Riot abbreviated region.
     """
 
     user_id = get_user_id(username, location)

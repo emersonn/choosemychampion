@@ -3,10 +3,6 @@ from functools import wraps
 import operator
 import urllib
 
-# TODO(Fix this. Related to SSL.)
-import logging
-logging.captureWarnings(True)
-
 from flask import abort
 from flask import jsonify
 from flask import request
@@ -93,15 +89,14 @@ def profile(username, location):
     except ValueError:
         LOGGING.push(
             "Tried to get *'" + username +
-            "'*'s id. Response did not have user id."
+            "'* id. Response did not have user id."
         )
-        abort(400)
+        abort(400, {'message': "User ID was not found."})
 
     return stats(username, user_id, location)
 
-# Implement using @cached(). May need request URL?
 
-
+# TODO(Implement using @cached(). May need request URL?)
 def stats(username, user_id, location):
     """Gathers champion statistics given a particular user.
 
@@ -169,20 +164,15 @@ def stats(username, user_id, location):
         )
 
         full_stats = {'scores': []}
-        index = 1
 
         query = ChampionData.query.all()
 
         # TODO(This is vastly inefficient.)
-
-        # attempts to go through all the champion data and generate the
-        # array of score information for each champion. this also appends
-        # user data and user adjustments to the data.
+        #   Goes through all champion data and generates an array of
+        #       score information for each champion.
+        #   Appends user data and user adjustments to the data.
         for champion in query:
-            # attempts to go through each of the players champions when playing
-            # this champion and gets their adjustment for the score
-
-            # TODO(Implement role? is role not included in this calculation?)
+            # TODO(Implement role? Is role not included in this calculation?)
             user_query = (
                 PlayerData.query
                 .filter_by(
@@ -193,17 +183,13 @@ def stats(username, user_id, location):
                 .first()
             )
 
-            if user_query is None:
-                adjustment = 0
-            else:
-                adjustment = user_query.get_adjustment()
+            adjustment = user_query.get_adjustment() if user_query else 0
 
             full_stats['scores'].append({
                 'championName': champion.get_name(),
                 'championId': champion.champion_id,
                 'score': champion.get_score(False) + adjustment,
                 'role': champion.role,
-                'id': index,
                 'image': champion.get_full_image(),
                 'playerAdjust': adjustment,
                 'url': champion.get_url(),
@@ -218,9 +204,6 @@ def stats(username, user_id, location):
                 ),
                 'player': username
             })
-
-            # DEPRICATED: remove this. not used in front anymore
-            index += 1
 
         full_stats['popular_counters'] = [
             popular_counters("TOP"),
@@ -237,9 +220,8 @@ def stats(username, user_id, location):
     else:
         return jsonify(rv)
 
+
 # TODO(Implement limiting for multiple champions of the same role.)
-
-
 def popular_counters(role, limit=1, counter_limit=5):
     champion = (
         db.session.query(ChampionData)
@@ -258,10 +240,9 @@ def popular_counters(role, limit=1, counter_limit=5):
         )[:5]
     }
 
-# TODO(Consider exceptions that may occur, use a try/except when getting it.
-#       also clean this up greatly. it can be cleaned up a lot.)
 
-
+# TODO(Consider exceptions that may occur.)
+# TODO(Clean this up.)
 def analyze_player(player_id, location):
     """Analyzes a player for recent game statistics.
 

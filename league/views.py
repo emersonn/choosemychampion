@@ -189,21 +189,7 @@ def stats(username, location):
             )
 
             session = RiotSession(API_KEY, location)
-
-            try:
-                user_data = session.get_stats(user_id)
-
-            # We get a ValueError if no ranked matches are found.
-            except ValueError:
-                LOGGING.push(
-                    "Looks like *" + username + "* doesn't" +
-                    " have any ranked matches."
-                )
-
-                user_data = {'champions': []}
-                has_ranked = False
-
-            build_stats(user_data, username, location)
+            has_ranked = build_stats(username, location, session, user_id)
 
             query = (
                 PlayerData.query
@@ -220,8 +206,10 @@ def stats(username, location):
     # Sets up data for analysis.
     full_stats = {'scores': []}
 
+    # Fills the user specific statistics
     fill_user_stats(full_stats, username, user_id, location)
 
+    # Gives popular counters for general roles for quick display
     full_stats['popular_counters'] = [
         popular_counters("TOP"),
         popular_counters("MIDDLE"),
@@ -259,8 +247,7 @@ def popular_counters(role, limit=1, counter_limit=5):
     }
 
 
-# TODO(Consider exceptions that may occur.)
-# TODO(Clean this up.)
+# TODO(Model this as a finite state machine.)
 def analyze_player(player_id, location):
     """Analyzes a player for recent game statistics.
 
@@ -566,6 +553,7 @@ def compile_sorted_champions(listing, reverse=True):
     Returns:
         dict: Dictionary of champion data.
     """
+
     sorted_listing = sorted(
         listing.items(),
         key=operator.itemgetter(1),
@@ -716,20 +704,33 @@ def numbers():
     return jsonify(stats)
 
 
-def build_stats(data, username, location):
+def build_stats(username, location, session, user_id):
     """Builds stats based on a given player's performance.
 
     Args:
-        data: Riot JSON response to the 'stats' query.
-        username: Username for the particular player.
-        location: Location abbreviation for region.
+        username: Username for the particular player
+        location: Location abbreviation for region
+        session: RiotSesssion object
+        user_id: User ID for the particular player
     """
 
-    for champion in data['champions']:
+    try:
+        user_data = session.get_stats(user_id)
+
+    # We get a ValueError if no ranked matches are found.
+    except ValueError:
+        LOGGING.push(
+            "Looks like *" + username + "* doesn't" +
+            " have any ranked matches."
+        )
+
+        return False
+
+    for champion in user_data['champions']:
         if champion['id'] != 0:
             total_stats = champion['stats']
             new_player = PlayerData(
-                player_id=data['summonerId'],
+                player_id=user_data['summonerId'],
                 player_name=username,
                 location=location,
                 champion_id=champion['id'],
@@ -742,3 +743,5 @@ def build_stats(data, username, location):
             )
             db.session.add(new_player)
     db.session.commit()
+
+    return True

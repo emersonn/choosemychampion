@@ -217,12 +217,6 @@ def stats(username, location):
 
     # TODO(Restructure this so it doesn't make multiple query requests.)
 
-    # If we don't have data we don't call analyze_player.
-    analyzed_player = (
-        analyze_player(user_id, location) if has_ranked
-        else "No analysis available."
-    )
-
     # Sets up data for analysis.
     full_stats = {'scores': []}
 
@@ -235,7 +229,11 @@ def stats(username, location):
         popular_counters("JUNGLE")
     ]
 
-    full_stats['analyzed_player'] = analyzed_player
+    # If we don't have data we don't call analyze_player.
+    full_stats['analyzed_player'] = (
+        analyze_player(user_id, location) if has_ranked
+        else "No analysis available."
+    )
 
     # Returns a json of all the stats needed for display
     return jsonify(full_stats)

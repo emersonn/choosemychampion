@@ -99,6 +99,44 @@ def get_user_id(username, location):
         abort(404, {'message': "User ID was not found."})
 
 
+def fill_stats(full_stats, username, user_id, location):
+    query = ChampionData.query.all()
+
+    #   Appends user data and user adjustments to the data.
+    for champion in query:
+        user_query = (
+            PlayerData.query
+            .filter_by(
+                player_id=user_id,
+                location=location,
+                champion_id=champion.champion_id
+            )
+            .first()
+        )
+
+        adjustment = user_query.get_adjustment() if user_query else 0
+
+        full_stats['scores'].append({
+            'championName': champion.get_name(),
+            'championId': champion.champion_id,
+            'score': champion.get_score(False) + adjustment,
+            'role': champion.role,
+            'image': champion.get_full_image(),
+            'playerAdjust': adjustment,
+            'url': champion.get_url(),
+            'kills': champion.kills,
+            'deaths': champion.deaths,
+            'assists': champion.assists,
+            'kda': champion.get_kda(),
+            'winRate': champion.won * 100,
+            'pickRate': champion.pick_rate * 100,
+            'calculated': (
+                champion.get_calculated_win(user_id, location) * 100
+            ),
+            'player': username
+        })
+
+
 @app.route('/api/champions/<username>/<location>/')
 @cached()
 def stats(username, location):
@@ -177,45 +215,8 @@ def stats(username, location):
 
     # Sets up data for analysis.
     full_stats = {'scores': []}
-    query = ChampionData.query.all()
 
-    # TODO(This is vastly inefficient.)
-    #   Goes through all champion data and generates an array of
-    #       score information for each champion.
-    #   Appends user data and user adjustments to the data.
-    for champion in query:
-        # TODO(Implement role? Role is not included in stats.)
-        user_query = (
-            PlayerData.query
-            .filter_by(
-                player_id=user_id,
-                location=location,
-                champion_id=champion.champion_id
-            )
-            .first()
-        )
-
-        adjustment = user_query.get_adjustment() if user_query else 0
-
-        full_stats['scores'].append({
-            'championName': champion.get_name(),
-            'championId': champion.champion_id,
-            'score': champion.get_score(False) + adjustment,
-            'role': champion.role,
-            'image': champion.get_full_image(),
-            'playerAdjust': adjustment,
-            'url': champion.get_url(),
-            'kills': champion.kills,
-            'deaths': champion.deaths,
-            'assists': champion.assists,
-            'kda': champion.get_kda(),
-            'winRate': champion.won * 100,
-            'pickRate': champion.pick_rate * 100,
-            'calculated': (
-                champion.get_calculated_win(user_id, location) * 100
-            ),
-            'player': username
-        })
+    fill_stats(full_stats, username, user_id, location)
 
     full_stats['popular_counters'] = [
         popular_counters("TOP"),

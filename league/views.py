@@ -39,6 +39,22 @@ def shutdown_session(exception=None):
     db.session.remove()
 
 
+def serialize_champion_data(champion):
+    return {
+        'championName': champion.get_name(),
+        'championId': champion.champion_id,
+        'role': champion.role,
+        'image': champion.get_full_image(),
+        'url': champion.get_url(),
+        'kills': champion.kills,
+        'deaths': champion.deaths,
+        'assists': champion.assists,
+        'kda': champion.get_kda(),
+        'winRate': champion.won * 100,
+        'pickRate': champion.pick_rate * 100,
+    }
+
+
 def cached(timeout=10 * 60, key='view/%s'):
     """Cache decorator for app functions.
 
@@ -99,7 +115,7 @@ def get_user_id(username, location):
         abort(404, {'message': "User ID was not found."})
 
 
-def fill_stats(full_stats, username, user_id, location):
+def fill_user_stats(full_stats, username, user_id, location):
     query = ChampionData.query.all()
 
     #   Appends user data and user adjustments to the data.
@@ -116,25 +132,19 @@ def fill_stats(full_stats, username, user_id, location):
 
         adjustment = user_query.get_adjustment() if user_query else 0
 
-        full_stats['scores'].append({
-            'championName': champion.get_name(),
-            'championId': champion.champion_id,
+        champion_dict = serialize_champion_data(champion)
+
+        player_dict = {
             'score': champion.get_score(False) + adjustment,
-            'role': champion.role,
-            'image': champion.get_full_image(),
             'playerAdjust': adjustment,
-            'url': champion.get_url(),
-            'kills': champion.kills,
-            'deaths': champion.deaths,
-            'assists': champion.assists,
-            'kda': champion.get_kda(),
-            'winRate': champion.won * 100,
-            'pickRate': champion.pick_rate * 100,
             'calculated': (
                 champion.get_calculated_win(user_id, location) * 100
             ),
-            'player': username
-        })
+            'player': username,
+        }
+
+        champion_dict.update(player_dict)
+        full_stats['scores'].append(champion_dict)
 
 
 @app.route('/api/champions/<username>/<location>/')
@@ -216,7 +226,7 @@ def stats(username, location):
     # Sets up data for analysis.
     full_stats = {'scores': []}
 
-    fill_stats(full_stats, username, user_id, location)
+    fill_user_stats(full_stats, username, user_id, location)
 
     full_stats['popular_counters'] = [
         popular_counters("TOP"),

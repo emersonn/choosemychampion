@@ -5,6 +5,10 @@ Emerson Matson
 Generates a textual output of analysis for a player.
 """
 
+from prettylog import PrettyLog
+
+from analysis.crawler import store_match
+
 from league import db
 
 from league.models import Champion
@@ -14,8 +18,10 @@ from league.models import PlayerData
 from machination import StringMachination
 from machination import StringState
 
+LOGGING = PrettyLog()
 
-def collect_matches(match_ids):
+
+def collect_matches(match_ids, session):
     for match in match_ids:
         check_match = (
             db.session.query(Match)
@@ -36,7 +42,7 @@ def collect_matches(match_ids):
             )
 
 
-def generate_flags(session, player_id, location):
+def generate_recent_flags(session, player_id, location):
     # Get the 15 most recent matches by the player
     match_list = session.get_match_list(player_id)
     match_list = match_list[:min(15, len(match_list))]
@@ -45,7 +51,7 @@ def generate_flags(session, player_id, location):
     match_ids = [match['matchId'] for match in match_list]
 
     # Attempt to store each match in the database for future retrieval
-    collect_matches(match_ids)
+    collect_matches(match_ids, session)
 
     # Get the matches that were just stored
     matches = (
@@ -63,22 +69,23 @@ def generate_flags(session, player_id, location):
         .all()
     )
 
-    # Get all player matches
-    player_matches = matches.filter(Champion.player_id == player_id).all()
-
+    # Set up basic flags
     flags = {
         'best_champs': [champ[0] for champ in player_data],
+
         'best_champ': player_data[0][0],
+        'best_champ_kda': None,
         'best_champ_played': False,
 
         'wins': 0,
-        'losses': 0
+        'losses': 0,
 
-        'durations': []
+        'durations': [],
         'lose_kdas': []
     }
 
-    for match in player_matches:
+    # Update flags based on the most recent matches
+    for match in matches:
         if match.won:
             flags['wins'] += 1
         else:
@@ -87,45 +94,40 @@ def generate_flags(session, player_id, location):
 
         flags['durations'].append(match.match.match_duration / 60)
 
+        # If the current champion is a 'best champ' store some information
         if match.champion_id in flags['best_champs']:
             flags['played_best_champ'] = True
+
             flags['best_champ'] = match.champion_id
             flags['best_champ_kda'] = match.get_kda()
 
-    flags['won'] = flags['wins'] > flags['losses']
+    # NOTE: Compiled data from collected data
 
-    best_champ = (
-        db.session.query(ChampionData)
-        .filter_by(champion_id=flags['best_champ'])
-        .first()
-    )
-
-    if flags['best_champ'] is not None:
-        # TODO(Kind of arbitrary number of kda. only ensures they're positive.)
-        flags['best_champ_well'] = flags['best_champ_kda'] > 1
-    else:
-        flags['best_champ_well'] = (
-            db.session.query(PlayerData)
-            .filter_by(champion_id=flags['best_champ'])
-            .first()
-            .get_kda() > 1
-        )
-
+    # Get the average duration of games
     flags['average_duration'] = (
         reduce(lambda x, y: x + y, flags['durations']) /
         float(len(flags['durations']))
     )
 
+    # If they have lost games store the average lost kda
     if flags['lose_kdas'] is not None:
         flags['average_lose_kda'] = (
             reduce(lambda x, y: x + y, flags['lose_kdas']) /
             float(len(flags['lose_kdas']))
         )
 
-    flags['long_games'] = flags['average_duration'] > 30
-
     return flags
 
-def generate_machination(session, player_id, location):
-    flags = generate_flags(session, player_id, location)
-    return flags
+
+def generate_recent_machination(session, player_id, location):
+    flags = generate_recent_flags(session, player_id, location)
+
+    # NOTE: Analysis includes:
+    #   Won? Do wins > losses for most recent games
+    #   Do they play their best champ well?
+    #       Is the best_champ_kda flag over 1? Otherwise if that doesn't exist
+    #           we get the kda of the champion from our data instead.
+    #   Do they play long games? (Over 30 to 40 minutes?)
+    #   If they have lost kdas, is that minimized?
+
+    pass

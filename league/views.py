@@ -587,6 +587,12 @@ def reset_stats(username, user_id, location):
         location: Riot's abbreviation for the region.
     """
 
+    LOGGING.push(
+        "Resetting stats for *'" +
+        username + "'* from @'" +
+        location + "'@."
+    )
+
     (
         PlayerData.query
         .filter_by(player_id=user_id, location=location)
@@ -595,32 +601,25 @@ def reset_stats(username, user_id, location):
 
     db.session.commit()
 
-    CACHE.delete('user_data_' + str(user_id))
 
-    LOGGING.push(
-        "Resetting stats for *'" +
-        username + "'* from @'" +
-        location + "'@."
-    )
-
-
-# TODO(Improve loading times of this.)
-#       Cache the numbers for longer? Preprocess the numbers?
+# TODO(Improve loading times for this.)
 @app.route('/api/numbers/')
 @cached()
 def numbers():
-    """Gives a summary of champion statistics.
+    """Gives a neat summary of champion data.
 
     Returns:
-        json: JSON formatted champion statistic summary.
+        json: JSON formatted champion statistic summary
     """
 
+    # The most popular champion
     popular_champ = (
         db.session.query(ChampionData)
         .order_by(ChampionData.num_seen.desc())
         .first()
     )
 
+    # Gets the most popular champions
     popular_champs = (
         db.session.query(ChampionData)
         .order_by(ChampionData.num_seen.desc())
@@ -628,12 +627,14 @@ def numbers():
         .all()
     )
 
+    # Picks a random champion to analyze
     random_champ = (
         db.session.query(ChampionData)
         .order_by(func.rand())
         .first()
     )
 
+    # Gets the champion that wins the most
     winning_champ = (
         db.session.query(ChampionData)
         .filter(ChampionData.num_seen > 10)
@@ -641,6 +642,7 @@ def numbers():
         .first()
     )
 
+    # Gets the role of the champions who wins the most
     winning_champ_roles = (
         db.session.query(
             Champion.role.label("role"),
@@ -701,6 +703,7 @@ def numbers():
             }
         }
     }
+
     return jsonify(stats)
 
 

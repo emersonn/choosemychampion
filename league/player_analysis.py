@@ -90,19 +90,29 @@ def generate_recent_flags(session, player_id, location):
 
     # Set up basic flags
     flags = {
-        'best_champs': [champ[0] for champ in player_data],
-
-        'best_champ': player_data[0][0],
-        'best_champ_kda': None,
-        'best_champ_played': False,
-
         'won': {
             'wins': 0,
             'losses': 0
         },
 
+        'loser': {
+            'best_champ_played': False
+        },
+
+        'long_games': {},
+
+        # NOTE: Intermediate calculations
         'durations': [],
-        'lose_kdas': []
+        'lose_kdas': [],
+
+        'best_champs': [champ[0] for champ in player_data],
+        'best_champ': player_data[0][0],
+        'best_champ_kda': None,
+
+        # NOTE: Placeholders for states
+        'winner': None,
+        'best_yes': None,
+        'best_no': None
     }
 
     # Update flags based on the most recent matches
@@ -117,7 +127,7 @@ def generate_recent_flags(session, player_id, location):
 
         # If the current champion is a 'best champ' store some information
         if match.champion_id in flags['best_champs']:
-            flags['played_best_champ'] = True
+            flags['loser']['best_champ_played'] = True
 
             flags['best_champ'] = match.champion_id
             flags['best_champ_kda'] = match.get_kda()
@@ -125,7 +135,7 @@ def generate_recent_flags(session, player_id, location):
     # NOTE: Compiled data from collected data
 
     # Get the average duration of games
-    flags['average_duration'] = (
+    flags['long_games']['average_duration'] = (
         reduce(lambda x, y: x + y, flags['durations']) /
         float(len(flags['durations']))
     )
@@ -147,6 +157,7 @@ def generate_won_states():
         List: List of StringStates representing the won states.
             Default winner moves to 'long_games.'
             Default loser analyzes best champs and moves accordingly.
+                'best_yes' otherwise 'best_no'
     """
 
     # Won? Do wins > losses?
@@ -160,13 +171,60 @@ def generate_won_states():
 
     def loser(args):
         """Move to a best champ state based on performance"""
-        return ""
+        return "best_yes" if args['best_champ_played'] else "best_no"
 
     won_st = StringState("won", won, "")
     winner_st = StringState("winner", winner, "You are a winner.")
     loser_st = StringState("loser", loser, "You are a loser.")
 
     return [won_st, winner_st, loser_st]
+
+
+def generate_best_states():
+    # Do they play their best champ? Most importantly, do they play it well?
+    def best_yes(args):
+        return "long_games"
+
+    def best_no(args):
+        return "long_games"
+
+    best_yes_st = StringState(
+        "best_yes", best_yes, "You play your best champ."
+    )
+
+    best_no_st = StringState(
+        "best_no", best_no, "You don't play your best champ."
+    )
+
+    return [best_yes_st, best_no_st]
+
+
+def generate_time_states():
+    def long_games(args):
+        return (
+            "long_games_yes" if args['average_duration'] > 40
+            else "long_games_no"
+        )
+
+    def long_games_yes(args):
+        return None
+
+    def long_games_no(args):
+        return None
+
+    long_games_st = StringState(
+        'long_games', long_games, ""
+    )
+
+    yes_st = StringState(
+        'long_games_yes', long_games_yes, "You play long games."
+    )
+
+    no_st = StringState(
+        'long_games_no', long_games_no, "You don't play long games."
+    )
+
+    return [long_games_st, yes_st, no_st]
 
 
 def generate_recent_states():
@@ -180,11 +238,10 @@ def generate_recent_states():
 
     states = []
 
-    won_states = generate_won_states()
-    states.extend(won_states)
+    states.extend(generate_won_states())
+    states.extend(generate_best_states())
 
-    # Do they play their best champ well?
-    #   DEPENDS ON: Winner?
+    return states
 
 
 def generate_recent_machination(session, player_id, location):

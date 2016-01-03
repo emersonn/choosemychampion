@@ -22,6 +22,13 @@ LOGGING = PrettyLog()
 
 
 def collect_matches(match_ids, session):
+    """Takes match ids and stores those matches in the database
+
+    Args:
+        match_ids: List of ints which are match ids to store
+        session: RiotSession object
+    """
+
     for match in match_ids:
         check_match = (
             db.session.query(Match)
@@ -43,6 +50,18 @@ def collect_matches(match_ids, session):
 
 
 def generate_recent_flags(session, player_id, location):
+    """Creates a flags dictionary for the given player
+
+    Args:
+        session: RiotSession object
+        player_id: int representing the Riot's given Player ID
+        location: Riot's location representation
+
+    Returns:
+        dictionary: Dictionary of strings to any type of data
+            See setup for more information.
+    """
+
     # Get the 15 most recent matches by the player
     match_list = session.get_match_list(player_id)
     match_list = match_list[:min(15, len(match_list))]
@@ -121,33 +140,66 @@ def generate_recent_flags(session, player_id, location):
     return flags
 
 
-def generate_recent_states():
-    states = []
+def generate_won_states():
+    """Generates won states.
+
+    Returns:
+        List: List of StringStates representing the won states.
+            Default winner moves to 'long_games.'
+            Default loser analyzes best champs and moves accordingly.
+    """
 
     # Won? Do wins > losses?
     def won(args):
+        """Move to winner if wins > losses, otherwise loser"""
         return "winner" if args['wins'] > args['losses'] else "loser"
 
     def winner(args):
-        return "best"
+        """Skip directly to long games if they have been winning"""
+        return "long_games"
 
     def loser(args):
-        return "best"
+        """Move to a best champ state based on performance"""
+        return ""
 
     won_st = StringState("won", won, "")
     winner_st = StringState("winner", winner, "You are a winner.")
     loser_st = StringState("loser", loser, "You are a loser.")
 
-    states.extend([
-        won_st,
-        winner_st,
-        loser_st
-    ])
+    return [won_st, winner_st, loser_st]
+
+
+def generate_recent_states():
+    """Generates states for recent games.
+
+    Returns:
+        List: List of states where the states represent an analysis of
+            the player's most recent games, and improvement
+            strategies.
+    """
+
+    states = []
+
+    won_states = generate_won_states()
+    states.extend(won_states)
 
     # Do they play their best champ well?
+    #   DEPENDS ON: Winner?
 
 
 def generate_recent_machination(session, player_id, location):
+    """Generates a Machination for the given player based on recent games.
+
+    Args:
+        session: RiotSession object.
+        player_id: Player ID given by Riot.
+        location: Riot abbreviation for location.
+
+    Returns:
+        string: String output of the Machination based on the player.
+            This would be an analysis of the player's most recent games.
+    """
+
     flags = generate_recent_flags(session, player_id, location)
 
     # NOTE: Analysis includes:

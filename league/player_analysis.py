@@ -90,6 +90,7 @@ def generate_recent_flags(session, player_id, location):
 
     # Set up basic flags
     flags = {
+        # NOTE: State arguments
         'won': {
             'wins': 0,
             'losses': 0
@@ -99,7 +100,9 @@ def generate_recent_flags(session, player_id, location):
             'best_champ_played': False
         },
 
-        'long_games': {},
+        'long_games': {
+            'average_duration': None
+        },
 
         # NOTE: Intermediate calculations
         'durations': [],
@@ -111,8 +114,12 @@ def generate_recent_flags(session, player_id, location):
 
         # NOTE: Placeholders for states
         'winner': None,
+
         'best_yes': None,
-        'best_no': None
+        'best_no': None,
+
+        'long_games_yes': None,
+        'long_games_no': None
     }
 
     # Update flags based on the most recent matches

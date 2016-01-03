@@ -77,8 +77,10 @@ def generate_recent_flags(session, player_id, location):
         'best_champ_kda': None,
         'best_champ_played': False,
 
-        'wins': 0,
-        'losses': 0,
+        'won': {
+            'wins': 0,
+            'losses': 0
+        },
 
         'durations': [],
         'lose_kdas': []
@@ -87,9 +89,9 @@ def generate_recent_flags(session, player_id, location):
     # Update flags based on the most recent matches
     for match in matches:
         if match.won:
-            flags['wins'] += 1
+            flags['won']['wins'] += 1
         else:
-            flags['losses'] += 1
+            flags['won']['losses'] += 1
             flags['lose_kdas'].append(match.get_kda())
 
         flags['durations'].append(match.match.match_duration / 60)
@@ -119,6 +121,32 @@ def generate_recent_flags(session, player_id, location):
     return flags
 
 
+def generate_recent_states():
+    states = []
+
+    # Won? Do wins > losses?
+    def won(args):
+        return "winner" if args['wins'] > args['losses'] else "loser"
+
+    def winner(args):
+        return "best"
+
+    def loser(args):
+        return "best"
+
+    won_st = StringState("won", won, "")
+    winner_st = StringState("winner", winner, "You are a winner.")
+    loser_st = StringState("loser", loser, "You are a loser.")
+
+    states.extend([
+        won_st,
+        winner_st,
+        loser_st
+    ])
+
+    # Do they play their best champ well?
+
+
 def generate_recent_machination(session, player_id, location):
     flags = generate_recent_flags(session, player_id, location)
 
@@ -129,5 +157,7 @@ def generate_recent_machination(session, player_id, location):
     #           we get the kda of the champion from our data instead.
     #   Do they play long games? (Over 30 to 40 minutes?)
     #   If they have lost kdas, is that minimized?
+    states = generate_recent_states()
+    mach = StringMachination(states, states[0])
 
-    pass
+    return mach.run(flags, " ")

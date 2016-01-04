@@ -245,6 +245,7 @@ def generate_recent_states():
 
     states = []
 
+    # Add generated states into the list
     states.extend(generate_won_states())
     states.extend(generate_best_states())
 
